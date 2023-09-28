@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+###> doctrine/doctrine-bundle ###
+  database:
+    image: postgres:latest
+    container_name: quiz_db_container
+    environment:
+      POSTGRES_DB: quiz
+      # You should definitely change the password in production
+      POSTGRES_PASSWORD: chris
+      POSTGRES_USER: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
+      # - ./docker/db/data:/var/lib/postgresql/data:rw
+###< doctrine/doctrine-bundle ###
+
+volumes:
+  ###> doctrine/doctrine-bundle ###
+  postgres_data:
+###< doctrine/doctrine-bundle ###
