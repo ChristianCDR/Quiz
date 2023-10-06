@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} Modifier Quiz {% endblock %}
+
+{% block body %}
+    <h1>Modifier Quiz</h1>
+
+    {{ include('quiz/_form.html.twig', {'button_label': 'Modifier'}) }}
+
+    <a href="{{ path('app_quiz_index') }}">Retour à la liste</a>
+
+{% endblock %}
