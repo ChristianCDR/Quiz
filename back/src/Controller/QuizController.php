@@ -57,7 +57,7 @@ class QuizController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_quiz_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Answer $answer, Question $question, EntityManagerInterface $entityManager, AnswerRepository $answerRepository, $id): Response
+    public function edit(Request $request, EntityManagerInterface $entityManager, AnswerRepository $answerRepository, $id): Response
     {
         $ans_id_array = $answerRepository->findByQuestionId($id);
 
@@ -148,7 +148,7 @@ class QuizController extends AbstractController
 
         // Update the question_text property with the new value
         $newQuestionText = $sqt_text;
-        $question->setQuestionText($newQuestionText);
+        $question->setQuestionText($newQuestionText); 
 
         // Persist and flush the changes to the database
         $entityManager->persist($question);
