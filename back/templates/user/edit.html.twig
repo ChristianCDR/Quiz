@@ -3,6 +3,8 @@
 {% block title %}Modifier{% endblock %}
 
 {% block body %}
+    {{ include ('/navbar.html.twig') }}
+    
     <h1 class="text-xl text-center font-bold mt-5">Modifier</h1>
 
     {{ include('user/_form.html.twig', {'button_label': 'Enregistrer'}) }}
