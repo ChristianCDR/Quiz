@@ -6,3 +6,6 @@ body {
     background-color: #fff !important;
 }
 
+.titre {
+    @apply text-2xl text-center font-bold mt-5;
+}
