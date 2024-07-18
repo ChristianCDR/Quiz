@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier{% endblock %}
+
+{% block body %}
+    {{ include ('/navbar.html.twig') }}
+    
+    <h1 class="titre">Modifier</h1>
+
+    {{ include('user/_form.html.twig', {'button_label': 'Enregistrer'}) }}
+
+{% endblock %}
