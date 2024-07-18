@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} Supprimer {% endblock %}
+
+{% block body %}
+    <h1 class="titre"> Supprimer </h1>
+
+    <div class="mx-auto w-1/4">
+        <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ user.id }}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{ user.email }}</td>
+            </tr>
+            <tr>
+                <th>Roles</th>
+                <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
+            </tr>
+        </tbody>
+        
+    </table>
+    </div>
+
+    
+
+{% endblock %}

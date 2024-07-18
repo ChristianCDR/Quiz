@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %}
+    {{ include ('/navbar.html.twig') }}
+    
+    <h1 class="titre">Nouvel Utilisateur</h1>
+
+    {{ include ('registration/_form.html.twig')}}
+
+{% endblock %}
