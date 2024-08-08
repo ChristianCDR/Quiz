@@ -39,26 +39,27 @@ export default function Index() {
     }
   }
 
-  const handleTimerEnd = () => {
-    // handleNextQuestion();
-  }
-
   const [userAnswers, setUserAnswers] = useState<(boolean | null)[]>(Array(quizData.length).fill(null)); // Tableau rempli de Null pour avoir la couleur grise
+  const newAnswers = [...userAnswers]; // Deuxieme tableau qui va progressivement se substituer au premier
 
   const handleAnswer = (item: any) => {
-    const answer = quizData[currentQuestion]?.answer;
-    const newAnswers = [...userAnswers]; // Deuxieme tableau qui va progressivement se substituer au premier
+    const answer = quizData[currentQuestion]?.answer; 
     if (item == answer) {
       setScore(score + 1);
       newAnswers[currentQuestion] = true;
-      setUserAnswers(newAnswers);
     } else {
       newAnswers[currentQuestion] = false;
-      setUserAnswers(newAnswers);
     }
+    setUserAnswers(newAnswers);
     handleNextQuestion();
   }
-  true
+
+  const handleTimerEnd = () => {
+    handleNextQuestion();
+    newAnswers[currentQuestion] = false;
+    setUserAnswers(newAnswers);
+  }
+  
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
