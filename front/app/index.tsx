@@ -6,7 +6,7 @@ import QuizScreen from './QuizScreen';
 import ResultScreen from './ResultScreen';
 
 type RootStackParamList = {
-  Home: undefined;
+  Home: undefined;                                                                                    
   Quiz: undefined;
   Result: { score: number };
 };
@@ -20,17 +20,17 @@ export default function index () {
         <Stack.Screen 
           name="Home" 
           component={HomeScreen} 
-          options={{title: 'Home'}}
+          options={{headerShown: false}}                                                                                                                           
         />
         <Stack.Screen 
           name="Quiz" 
           component={QuizScreen} 
-          options={{title: 'Quiz'}}
+          options={{headerShown: false}}
         />
         <Stack.Screen 
           name="Result" 
           component={ResultScreen} 
-          options={{title: 'Result'}}
+          options={{headerShown: false}}
         />
       </Stack.Navigator> 
     </>
