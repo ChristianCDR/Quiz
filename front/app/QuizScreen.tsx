@@ -33,7 +33,7 @@ export default function QuizScreen() {
     }
   ]
 
-  const progress = (currentQuestion +1) / quizData.length
+  const progress = currentQuestion / quizData.length
 
   const handleNextQuestion = () => {
     const nextQuestion = currentQuestion + 1;
@@ -52,8 +52,9 @@ export default function QuizScreen() {
 
   const handleAnswer = (item: any) => {
     const answer = quizData[currentQuestion]?.answer; 
-    if (item == answer) {
-      setScore(score + 1);
+    if (item === answer) {
+      setScore((prevScore) => prevScore + 1);
+      newAnswers[currentQuestion] = true;
     } else {
       newAnswers[currentQuestion] = false;
     }
