@@ -18,11 +18,11 @@ export default function ResultScreen ({route}: Props) {
             <Text style={styles.pageName}>Result</Text>
             <Text style={styles.comment}>Sarce</Text>
             <View style={styles.details}>
-            <Image
-                source={require('../assets/images/myAvatar.png')}
-                style={styles.circularImgView}
-            />
-            <Text>{score}</Text>
+                <Image
+                    source={require('../assets/images/myAvatar.png')}
+                    style={styles.circularImgView}
+                />
+                <Text>{score}</Text>
             </View>
         </View>
     );
