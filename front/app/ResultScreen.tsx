@@ -22,6 +22,7 @@ export default function ResultScreen ({route}: Props) {
                     source={require('../assets/images/myAvatar.png')}
                     style={styles.circularImgView}
                 />
+                <Text> user </Text>
                 <Text>{score}</Text>
             </View>
         </View>
