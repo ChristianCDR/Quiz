@@ -41,24 +41,26 @@ export default function HomeScreen() {
             />
 
             <View style={styles.user}>
-                <Image
-                    source={require('../assets/images/myAvatar.png')}
-                    style={styles.circularImgView}
-                />
-                <Text style={styles.userName}>John Doe</Text>
+                <TouchableOpacity>
+                    <Image
+                        source={require('../assets/images/myAvatar.png')}
+                        style={styles.circularImgView}
+                    />
+                </TouchableOpacity>
+                <Text style={styles.userName}>Jean Dupont</Text>
             </View>
 
             <View style={styles.card}>
                 <Image  style={styles.cardImage} source ={require('../assets/images/question.jpg')}/>
                 <View style={styles.cardText}>
-                    <Text style={styles.cardText1}> Joue & {"\n"} Gagne</Text>
+                    <Text style={styles.cardText1}> Joue & {"\n"} Gagne !</Text>
                     <Text style={styles.cardText2}>
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                     </Text>
                 </View>
             </View>
 
-            <Text style={[styles.title, styles.categoryTitle]}>Categories</Text>
+            <Text style={[styles.title, styles.categoryTitle]}>Catégories</Text>
 
             <ScrollView 
                 horizontal 
