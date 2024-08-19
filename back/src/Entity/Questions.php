@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Entity;
-
+  
 use App\Repository\QuestionsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -19,15 +19,11 @@ class Questions
     #[ORM\Column(type: Types::TEXT)]
     private ?string $questionText = null;
 
-    #[ORM\ManyToMany(targetEntity: Categories::class, mappedBy: 'questions')]
-    private Collection $categories;
-
     #[ORM\OneToMany(mappedBy: 'questions', targetEntity: Answers::class)]
     private Collection $answers;
 
     public function __construct()
     {
-        $this->categories = new ArrayCollection();
         $this->answers = new ArrayCollection();
     }
 
@@ -44,33 +40,6 @@ class Questions
     public function setQuestionText(string $questionText): static
     {
         $this->questionText = $questionText;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Categories>
-     */
-    public function getCategories(): Collection
-    {
-        return $this->categories;
-    }
-
-    public function addCategory(Categories $category): static
-    {
-        if (!$this->categories->contains($category)) {
-            $this->categories->add($category);
-            $category->addQuestion($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCategory(Categories $category): static
-    {
-        if ($this->categories->removeElement($category)) {
-            $category->removeQuestion($this);
-        }
 
         return $this;
     }
