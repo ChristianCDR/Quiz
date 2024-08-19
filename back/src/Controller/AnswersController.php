@@ -15,6 +15,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class AnswersController extends AbstractController
 {
     #[Route('/', name: 'app_answers_index', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: ''
+    )]
     public function index(AnswersRepository $answersRepository): Response
     {
         return $this->render('answers/index.html.twig', [
