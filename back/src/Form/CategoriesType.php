@@ -14,13 +14,9 @@ class CategoriesType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name')
-            ->add('questions', EntityType::class, [
-                'class' => Questions::class,
-'choice_label' => 'id',
-            ])
+            ->add('categoryName')
         ;
-    }
+    } 
 
     public function configureOptions(OptionsResolver $resolver): void
     {
