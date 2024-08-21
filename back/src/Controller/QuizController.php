@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Questions;
 use App\Entity\Options;
+use App\Repository\QuestionsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,12 +19,76 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 #[Route('/api/quiz')]
 class QuizController extends AbstractController
 {
-    #[Route('/', name: 'app_quiz_index', methods: ['GET'])]
-    public function index(): Response
+    #[Route('/', name: 'api_quiz_index', methods: ['GET'])]
+    #[OA\Get(
+        summary: 'Get all questions',
+        tags: ['Quiz'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'List of all questions',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        type: 'object',
+                        properties: [
+                            new OA\Property(property: 'questionText', type: 'text', example: 'New question text'),
+                            new OA\Property(
+                                property: 'options',
+                                type: 'array',
+                                items: new OA\Items(
+                                    properties: [
+                                        new OA\Property(property: 'text', type: 'string', example: 'Paris'),
+                                        new OA\Property(property: 'isCorrect', type: 'boolean', example: true)
+                                    ]
+                                )
+                            )
+                        ]
+                    )
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'No question found',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'error', type: 'string', example: 'No question found')
+                    ]
+                )
+            )
+        ]
+    )]
+    public function index(QuestionsRepository $QuestionsRepository): JsonResponse
     {
-        return $this->render('quiz/index.html.twig', [
-            'controller_name' => 'QuizController',
-        ]);
+        $questions = $QuestionsRepository->findAll();
+
+        if(!$questions){
+            return new JsonResponse ([
+                'error' => 'No question found'
+            ], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        $data = [];
+        $opt= [];
+
+        foreach ($questions as $question) {
+            $options = $question->getOptions();
+
+            foreach($options as $option) {
+                $opt[]= [
+                    'text' => $option->getOptionText(),
+                    'is_correct' => $option->isIsCorrect()
+                ];
+            } 
+            $data[]= [
+                'questiontext' => $question->getQuestionText(), 
+                'options' => $opt  
+            ];
+            $opt= [];
+        }
+        
+        return new JsonResponse ($data, JsonResponse::HTTP_OK);
     }
 
     #[Route('/new', name: 'app_quiz_new', methods: ['POST'])]
@@ -57,12 +122,17 @@ class QuizController extends AbstractController
                 content: new OA\JsonContent(
                     type: 'object',
                     properties: [
-                        new OA\Property(property: 'id', type: 'integer', example: 1),
                         new OA\Property(property: 'questionText', type: 'text', example: 'New question text'),
-                        new OA\Property(property: 'option1', type: 'text', example: 'New option Text'),
-                        new OA\Property(property: 'option2', type: 'text', example: 'New option Text'),
-                        new OA\Property(property: 'option3', type: 'text', example: 'New option Text'),
-                        new OA\Property(property: 'option4', type: 'text', example: 'New option Text')
+                        new OA\Property(
+                            property: 'options',
+                            type: 'array',
+                            items: new OA\Items(
+                                properties: [
+                                    new OA\Property(property: 'text', type: 'string', example: 'Paris'),
+                                    new OA\Property(property: 'isCorrect', type: 'boolean', example: true)
+                                ]
+                            )
+                        )
                     ]
                 )
             ),
@@ -81,7 +151,7 @@ class QuizController extends AbstractController
     public function new (Request $request, EntityManagerInterface $entityManager): JsonResponse 
     {
         /*{
-            "questionText": "New question text",
+            "questionText": "Quelle est la  capitale de la France?",
             "options": [
               {
                 "text": "Bordeaux",

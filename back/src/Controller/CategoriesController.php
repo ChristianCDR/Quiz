@@ -55,7 +55,7 @@ class CategoriesController extends AbstractController
         if (!$categories) {
             return new JsonResponse ([
                 'error' => 'No categories found'
-            ], Response:: HTTP_NOT_FOUND);
+            ], JsonResponse:: HTTP_NOT_FOUND);
         }
 
         $data = [];
