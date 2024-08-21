@@ -70,7 +70,7 @@ class CategoriesController extends AbstractController
         return new JsonResponse($data, JsonResponse::HTTP_OK);
     }
 
-    
+
     #[Route('/new', name: 'app_categories_new', methods: ['POST'])]
     #[OA\Post(
         summary: 'Create a new category',
@@ -302,7 +302,7 @@ class CategoriesController extends AbstractController
             ], JsonResponse::HTTP_NOT_FOUND);
         }
 
-        $entityManager->persist($category);
+        $entityManager->remove($category);
         $entityManager->flush();
 
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
