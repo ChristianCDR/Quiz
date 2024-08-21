@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Questions;
 use App\Entity\Options;
+use App\Entity\Categories;
 use App\Repository\QuestionsRepository;
+use App\Repository\CategoriesRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -99,9 +101,10 @@ class QuestionsController extends AbstractController
             required: true,
             content: new OA\JsonContent(
                 type: 'object',
-                required: ['questionText'],
+                required: ['questionText', 'options', 'categories'],
                 properties: [
                     new OA\Property(property: 'questionText', type: 'text', example: 'New question text'),
+                    new OA\Property(property: 'categories', type: 'array', example: [1,2]),
                     new OA\Property(
                         property: 'options',
                         type: 'array',
@@ -121,8 +124,9 @@ class QuestionsController extends AbstractController
                 description: 'Question created successfully',
                 content: new OA\JsonContent(
                     type: 'object',
-                    properties: [
+                    properties: [      
                         new OA\Property(property: 'questionText', type: 'text', example: 'New question text'),
+                        new OA\Property(property: 'categories', type: 'array', example: [1,2]),
                         new OA\Property(
                             property: 'options',
                             type: 'array',
@@ -148,10 +152,11 @@ class QuestionsController extends AbstractController
             )
         ]
     )]
-    public function new (Request $request, EntityManagerInterface $entityManager): JsonResponse 
+    public function new (Request $request, CategoriesRepository $categoriesRepository, EntityManagerInterface $entityManager): JsonResponse 
     {
         /*{
             "questionText": "Quelle est la  capitale de la France?",
+            "categories": [1,2],
             "options": [
               {
                 "text": "Bordeaux",
@@ -201,11 +206,22 @@ class QuestionsController extends AbstractController
             }
         }
 
+        if (isset($data['categories']) && is_array($data['categories'])) {
+            $categories = $data['categories'];
+
+            foreach($categories as $categoryData) {
+                $categoryId = intVal($categoryData);
+                $category = $categoriesRepository->find($categoryId);            
+                $question->addCategory($category);
+            }     
+        }
+        
         $entityManager->persist($question);
         $entityManager->flush();
 
         return new JsonResponse([
             'questionText' => $question->getQuestionText(),
+            'category' => $data['categories'],
             'options' => $data['options']
         ], Jsonresponse::HTTP_CREATED);
     }
@@ -318,7 +334,7 @@ class QuestionsController extends AbstractController
         responses: [
             new OA\Response(
                 response: 200,
-                description: 'Category updated successfully',
+                description: 'Question updated successfully',
                 content: new OA\JsonContent(
                     type: 'object',
                     properties: [
@@ -367,14 +383,14 @@ class QuestionsController extends AbstractController
             ], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        foreach ($question->getOptions() as $existingOption) {
-            $question->removeOption($existingOption);
-            $entityManager->remove($existingOption);
-        }
-
         if(isset($data['options']) && is_array($data['options'])) {
             $options = $data['options'];
-            
+
+            foreach ($question->getOptions() as $existingOption) {
+                $question->removeOption($existingOption);
+                $entityManager->remove($existingOption);
+            }
+
             foreach ($options as $optionData) {
                 $option = new Options();
                 $option->setOptionText($optionData['text'] ?? '');
