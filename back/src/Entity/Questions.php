@@ -22,7 +22,7 @@ class Questions
     #[ORM\OneToMany(mappedBy: 'question', targetEntity: Options::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $options;
 
-    #[ORM\ManyToMany(targetEntity: Categories::class, inversedBy: 'questions')]
+    #[ORM\ManyToMany(targetEntity: Categories::class, cascade: ['persist', 'remove'], inversedBy: 'questions')]
     private Collection $Categories;
 
     public function __construct()

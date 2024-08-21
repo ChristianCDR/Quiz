@@ -33,7 +33,7 @@ class Categories
 
     public function getCategoryName(): ?string
     {
-        return $this->categoryName;
+        return $this->categoryName; 
     }
 
     public function setCategoryName(string $categoryName): static
