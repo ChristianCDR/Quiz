@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Entity;
-  
+
 use App\Repository\QuestionsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -19,12 +19,16 @@ class Questions
     #[ORM\Column(type: Types::TEXT)]
     private ?string $questionText = null;
 
-    #[ORM\OneToMany(mappedBy: 'questions', targetEntity: Answers::class)]
-    private Collection $answers;
+    #[ORM\OneToMany(mappedBy: 'question', targetEntity: Options::class, cascade: ['persist'], orphanRemoval: true)]
+    private Collection $options;
+
+    #[ORM\ManyToMany(targetEntity: Categories::class, inversedBy: 'questions')]
+    private Collection $Categories;
 
     public function __construct()
     {
-        $this->answers = new ArrayCollection();
+        $this->options = new ArrayCollection();
+        $this->Categories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -45,31 +49,55 @@ class Questions
     }
 
     /**
-     * @return Collection<int, Answers>
+     * @return Collection<int, Options>
      */
-    public function getAnswers(): Collection
+    public function getOptions(): Collection
     {
-        return $this->answers;
+        return $this->options;
     }
 
-    public function addAnswer(Answers $answer): static
+    public function addOption(Options $option): static
     {
-        if (!$this->answers->contains($answer)) {
-            $this->answers->add($answer);
-            $answer->setQuestions($this);
+        if (!$this->options->contains($option)) {
+            $this->options->add($option);
+            $option->setQuestion($this);
         }
 
         return $this;
     }
 
-    public function removeAnswer(Answers $answer): static
+    public function removeOption(Options $option): static
     {
-        if ($this->answers->removeElement($answer)) {
+        if ($this->options->removeElement($option)) {
             // set the owning side to null (unless already changed)
-            if ($answer->getQuestions() === $this) {
-                $answer->setQuestions(null);
+            if ($option->getQuestion() === $this) {
+                $option->setQuestion(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Categories>
+     */
+    public function getCategories(): Collection
+    {
+        return $this->Categories;
+    }
+
+    public function addCategory(Categories $category): static
+    {
+        if (!$this->Categories->contains($category)) {
+            $this->Categories->add($category);
+        }
+
+        return $this;
+    }
+
+    public function removeCategory(Categories $category): static
+    {
+        $this->Categories->removeElement($category);
 
         return $this;
     }
