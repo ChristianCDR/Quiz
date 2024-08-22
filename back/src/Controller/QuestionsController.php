@@ -36,6 +36,15 @@ class QuestionsController extends AbstractController
                         properties: [
                             new OA\Property(property: 'questionText', type: 'text', example: 'New question text'),
                             new OA\Property(
+                                property: 'categories', 
+                                type: 'array',
+                                items: new OA\Items(
+                                    properties: [
+                                        new OA\Property(property: 'category', type: 'integer', example: 1)
+                                    ]
+                                )
+                            ),
+                            new OA\Property(
                                 property: 'options',
                                 type: 'array',
                                 items: new OA\Items(
@@ -73,9 +82,11 @@ class QuestionsController extends AbstractController
 
         $data = [];
         $opt= [];
+        $cat= [];
 
         foreach ($questions as $question) {
             $options = $question->getOptions();
+            $categories = $question->getCategories();
 
             foreach($options as $option) {
                 $opt[]= [
@@ -83,11 +94,20 @@ class QuestionsController extends AbstractController
                     'is_correct' => $option->isIsCorrect()
                 ];
             } 
+
+            foreach($categories as $category) {
+                $cat[]= [
+                    'category' => $category->getCategoryName()
+                ];
+            }
+
             $data[]= [
                 'questiontext' => $question->getQuestionText(), 
-                'options' => $opt  
+                'categories' => $cat,
+                'options' => $opt,
             ];
             $opt= [];
+            $cat= [];
         }
         
         return new JsonResponse ($data, JsonResponse::HTTP_OK);
@@ -104,7 +124,15 @@ class QuestionsController extends AbstractController
                 required: ['questionText', 'options', 'categories'],
                 properties: [
                     new OA\Property(property: 'questionText', type: 'text', example: 'New question text'),
-                    new OA\Property(property: 'categories', type: 'array', example: [1,2]),
+                    new OA\Property(
+                        property: 'categories', 
+                        type: 'array',
+                        items: new OA\Items(
+                            properties: [
+                                new OA\Property(property: 'category', type: 'integer', example: 1)
+                            ]
+                        )
+                    ),
                     new OA\Property(
                         property: 'options',
                         type: 'array',
@@ -126,7 +154,15 @@ class QuestionsController extends AbstractController
                     type: 'object',
                     properties: [      
                         new OA\Property(property: 'questionText', type: 'text', example: 'New question text'),
-                        new OA\Property(property: 'categories', type: 'array', example: [1,2]),
+                        new OA\Property(
+                            property: 'categories', 
+                            type: 'array',
+                            items: new OA\Items(
+                                properties: [
+                                    new OA\Property(property: 'category', type: 'integer', example: 1)
+                                ]
+                            )
+                        ),
                         new OA\Property(
                             property: 'options',
                             type: 'array',
@@ -156,7 +192,11 @@ class QuestionsController extends AbstractController
     {
         /*{
             "questionText": "Quelle est la  capitale de la France?",
-            "categories": [1,2],
+            "categories": [
+              {
+                "category": 1
+              },
+            ],
             "options": [
               {
                 "text": "Bordeaux",
@@ -208,9 +248,9 @@ class QuestionsController extends AbstractController
 
         if (isset($data['categories']) && is_array($data['categories'])) {
             $categories = $data['categories'];
-
+            
             foreach($categories as $categoryData) {
-                $categoryId = intVal($categoryData);
+                $categoryId = intVal($categoryData['category']);   
                 $category = $categoriesRepository->find($categoryId);            
                 $question->addCategory($category);
             }     
@@ -221,7 +261,7 @@ class QuestionsController extends AbstractController
 
         return new JsonResponse([
             'questionText' => $question->getQuestionText(),
-            'category' => $data['categories'],
+            'categories' => $data['categories'],
             'options' => $data['options']
         ], Jsonresponse::HTTP_CREATED);
     }
@@ -237,7 +277,7 @@ class QuestionsController extends AbstractController
                 required: true,
                 schema: new OA\Schema(type: 'integer'),
                 description: 'The ID of the question to retrieve',
-                example: 6
+                example: 12
             )
         ],
         responses: [
@@ -248,6 +288,15 @@ class QuestionsController extends AbstractController
                     type: 'object',
                     properties: [
                         new OA\Property(property: 'questionText', type: 'text', example: 'New question text'),
+                        new OA\Property(
+                            property: 'categories', 
+                            type: 'array',
+                            items: new OA\Items(
+                                properties: [
+                                    new OA\Property(property: 'category', type: 'integer', example: 1)
+                                ]
+                            )
+                        ),
                         new OA\Property(
                             property: 'options',
                             type: 'array',
@@ -281,8 +330,12 @@ class QuestionsController extends AbstractController
             ], JsonResponse::HTTP_NOT_FOUND);
         }
 
-        $opt = [];
+        
         $options = $question->getOptions();
+        $categories = $question->getCategories();
+
+        $opt = [];
+        $cat = [];
 
         foreach($options as $option) {
             $opt[]= [
@@ -291,8 +344,15 @@ class QuestionsController extends AbstractController
             ];
         }
 
+        foreach($categories as $category) {
+            $cat[]= [
+                'category' => $category->getCategoryName()
+            ];
+        }
+
         return new JsonResponse([
             'questionText' => $question->getQuestionText(),
+            'categories' => $cat,
             'options' => $opt
         ], JsonResponse::HTTP_OK);
     }
@@ -308,7 +368,7 @@ class QuestionsController extends AbstractController
                 required: true,
                 schema: new OA\Schema(type: 'integer'),
                 description: 'The ID of the question to update',
-                example: 4
+                example: 9
             )
         ],
         requestBody: new OA\RequestBody(
@@ -318,6 +378,15 @@ class QuestionsController extends AbstractController
                 required: ['questionText', 'options'],
                 properties: [
                     new OA\Property(property: 'questionText', type: 'text', example: 'New question text'),
+                    new OA\Property(
+                        property: 'categories', 
+                        type: 'array',
+                        items: new OA\Items(
+                            properties: [
+                                new OA\Property(property: 'category', type: 'integer', example: 1)
+                            ]
+                        )
+                    ),
                     new OA\Property(
                         property: 'options',
                         type: 'array',
@@ -339,6 +408,15 @@ class QuestionsController extends AbstractController
                     type: 'object',
                     properties: [
                         new OA\Property(property: 'questionText', type: 'text', example: 'New question text'),
+                        new OA\Property(
+                            property: 'categories', 
+                            type: 'array',
+                            items: new OA\Items(
+                                properties: [
+                                    new OA\Property(property: 'category', type: 'integer', example: 1)
+                                ]
+                            )
+                        ),
                         new OA\Property(
                             property: 'options',
                             type: 'array',
@@ -364,7 +442,7 @@ class QuestionsController extends AbstractController
             )
         ]
     )]
-    public function edit (Request $request, Questions $question, EntityManagerInterface $entityManager): JsonResponse
+    public function edit (Request $request, Questions $question, CategoriesRepository $categoriesRepository, EntityManagerInterface $entityManager): JsonResponse
     {
         if(!$question) {
             return new JsonResponse([
@@ -408,11 +486,27 @@ class QuestionsController extends AbstractController
 
         }
 
+        if(isset($data['categories']) && is_array($data['categories'])) {
+            $categories = $data['categories'];
+
+            foreach ($question->getCategories() as $existingCategory) {
+                $question->removeCategory($existingCategory);
+                $entityManager->remove($existingCategory);
+            }
+   
+            foreach($categories as $categoryData) {
+                $categoryId = intVal($categoryData['category']);   
+                $category = $categoriesRepository->find($categoryId);            
+                $question->addCategory($category);
+            }               
+        }
+
         $entityManager->persist($question);
         $entityManager->flush();
 
         return new JsonResponse ([
             'questionText' => $question->getQuestionText(),
+            'categories' => $data['categories'],
             'options' => $data['options']
         ], JsonResponse::HTTP_OK);
     }
@@ -428,7 +522,7 @@ class QuestionsController extends AbstractController
                 required: true,
                 schema: new OA\Schema(type: 'integer'),
                 description: 'The ID of the question to delete',
-                example: 6
+                example: 9
             )
         ],
         responses: [
