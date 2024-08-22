@@ -2,26 +2,25 @@
 
 namespace App\Form;
 
-use App\Entity\Categories;
-use App\Entity\Questions;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Entity\Options;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CategoriesType extends AbstractType
+class OptionsType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('categoryName')
+            ->add('option_text')
+            ->add('is_correct')
         ;
-    } 
+    }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Categories::class,
+            'data_class' => Options::class,
         ]);
     }
 }
