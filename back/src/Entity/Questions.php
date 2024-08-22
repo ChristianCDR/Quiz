@@ -19,16 +19,16 @@ class Questions
     #[ORM\Column(type: Types::TEXT)]
     private ?string $questionText = null;
 
-    #[ORM\ManyToMany(targetEntity: Categories::class, mappedBy: 'questions')]
-    private Collection $categories;
+    #[ORM\OneToMany(mappedBy: 'question', targetEntity: Options::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $options;
 
-    #[ORM\OneToMany(mappedBy: 'questions', targetEntity: Answers::class)]
-    private Collection $answers;
+    #[ORM\ManyToMany(targetEntity: Categories::class, cascade: ['persist', 'remove'], inversedBy: 'questions')]
+    private Collection $Categories;
 
     public function __construct()
     {
-        $this->categories = new ArrayCollection();
-        $this->answers = new ArrayCollection();
+        $this->options = new ArrayCollection();
+        $this->Categories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -49,18 +49,47 @@ class Questions
     }
 
     /**
+     * @return Collection<int, Options>
+     */
+    public function getOptions(): Collection
+    {
+        return $this->options;
+    }
+
+    public function addOption(Options $option): static
+    {
+        if (!$this->options->contains($option)) {
+            $this->options->add($option);
+            $option->setQuestion($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOption(Options $option): static
+    {
+        if ($this->options->removeElement($option)) {
+            // set the owning side to null (unless already changed)
+            if ($option->getQuestion() === $this) {
+                $option->setQuestion(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * @return Collection<int, Categories>
      */
     public function getCategories(): Collection
     {
-        return $this->categories;
+        return $this->Categories;
     }
 
     public function addCategory(Categories $category): static
     {
-        if (!$this->categories->contains($category)) {
-            $this->categories->add($category);
-            $category->addQuestion($this);
+        if (!$this->Categories->contains($category)) {
+            $this->Categories->add($category);
         }
 
         return $this;
@@ -68,39 +97,7 @@ class Questions
 
     public function removeCategory(Categories $category): static
     {
-        if ($this->categories->removeElement($category)) {
-            $category->removeQuestion($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Answers>
-     */
-    public function getAnswers(): Collection
-    {
-        return $this->answers;
-    }
-
-    public function addAnswer(Answers $answer): static
-    {
-        if (!$this->answers->contains($answer)) {
-            $this->answers->add($answer);
-            $answer->setQuestions($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAnswer(Answers $answer): static
-    {
-        if ($this->answers->removeElement($answer)) {
-            // set the owning side to null (unless already changed)
-            if ($answer->getQuestions() === $this) {
-                $answer->setQuestions(null);
-            }
-        }
+        $this->Categories->removeElement($category);
 
         return $this;
     }
