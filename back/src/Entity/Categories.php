@@ -14,11 +14,11 @@ class Categories
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
+ 
     #[ORM\Column(length: 255)]
     private ?string $categoryName = null;
 
-    #[ORM\ManyToMany(targetEntity: questions::class, inversedBy: 'categories')]
+    #[ORM\ManyToMany(targetEntity: Questions::class, mappedBy: 'Categories')]
     private Collection $questions;
 
     public function __construct()
@@ -33,7 +33,7 @@ class Categories
 
     public function getCategoryName(): ?string
     {
-        return $this->categoryName;
+        return $this->categoryName; 
     }
 
     public function setCategoryName(string $categoryName): static
@@ -44,25 +44,28 @@ class Categories
     }
 
     /**
-     * @return Collection<int, questions>
+     * @return Collection<int, Questions>
      */
     public function getQuestions(): Collection
     {
         return $this->questions;
     }
 
-    public function addQuestion(questions $question): static
+    public function addQuestion(Questions $question): static
     {
         if (!$this->questions->contains($question)) {
             $this->questions->add($question);
+            $question->addCategory($this);
         }
 
         return $this;
     }
 
-    public function removeQuestion(questions $question): static
+    public function removeQuestion(Questions $question): static
     {
-        $this->questions->removeElement($question);
+        if ($this->questions->removeElement($question)) {
+            $question->removeCategory($this);
+        }
 
         return $this;
     }

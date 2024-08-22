@@ -3,79 +3,308 @@
 namespace App\Controller;
 
 use App\Entity\Categories;
-use App\Form\CategoriesType;
 use App\Repository\CategoriesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 #[Route('/api/categories')]
 class CategoriesController extends AbstractController
 {
     #[Route('/', name: 'app_categories_index', methods: ['GET'])]
-    public function index(CategoriesRepository $categoriesRepository): Response
+    #[OA\Get(
+        summary: 'Get all categories',
+        tags: ['Categories'],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'List of all categories',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        type: 'object',
+                        properties: [
+                            // new OA\Property(property: 'id', type: 'integer', example: 1),
+                            new OA\Property(property: 'categoryName', type: 'string', example: 'Incendie'),
+                        ]
+                    )
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'No categories found',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'error', type: 'string', example: 'No categories found')
+                    ]
+                )
+            )
+        ]
+    )]
+    public function index(CategoriesRepository $categoriesRepository): JsonResponse
     {
-        return $this->render('categories/index.html.twig', [
-            'categories' => $categoriesRepository->findAll(),
-        ]);
-    }
+        $categories = $categoriesRepository->findAll();
 
-    #[Route('/new', name: 'app_categories_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $category = new Categories();
-        $form = $this->createForm(CategoriesType::class, $category);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($category);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_categories_index', [], Response::HTTP_SEE_OTHER);
+        if (!$categories) {
+            return new JsonResponse ([
+                'error' => 'No categories found'
+            ], JsonResponse:: HTTP_NOT_FOUND);
         }
 
-        return $this->render('categories/new.html.twig', [
-            'category' => $category,
-            'form' => $form,
-        ]);
+        $data = [];
+
+        foreach ($categories as $category) {
+            $data[]= [
+                // 'id' => $category->getId(),
+                'categoryName' => $category->getCategoryName()
+            ];
+        }
+
+        return new JsonResponse($data, JsonResponse::HTTP_OK);
     }
+
+
+    #[Route('/new', name: 'app_categories_new', methods: ['POST'])]
+    #[OA\Post(
+        summary: 'Create a new category',
+        tags: ['Categories'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                required: ['categoryName'],
+                properties: [
+                    new OA\Property(property: 'categoryName', type: 'string', example: 'New Category'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'Category created successfully',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'id', type: 'integer', example: 1),
+                        new OA\Property(property: 'categoryName', type: 'string', example: 'New Category'),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Invalid input',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'error', type: 'string', example: 'Invalid category name')
+                    ]
+                )
+            )
+        ]
+    )]
+    public function new(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $category = new Categories();
+        $category->setCategoryName($data['categoryName'] ?? '');
+
+        if (empty($category->getCategoryName())) {
+            return new JsonResponse([
+                'error' => 'Invalid category name'
+            ], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $entityManager->persist($category);
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'id' => $category->getId(),
+            'categoryName' => $category->getCategoryName(),
+        ], JsonResponse::HTTP_CREATED);
+    }
+
 
     #[Route('/{id}', name: 'app_categories_show', methods: ['GET'])]
-    public function show(Categories $category): Response
+    #[OA\Get(
+        summary: 'Get a category by ID',
+        tags: ['Categories'],
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer'),
+                description: 'The ID of the category to retrieve',
+                example: 1
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Category retrieved successfully',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'id', type: 'integer', example: 1),
+                        new OA\Property(property: 'categoryName', type: 'string', example: 'Incendie'),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Category not found',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'error', type: 'string', example: 'Category not found')
+                    ]
+                )
+            )
+        ]
+    )]
+    public function show(Categories $category): JsonResponse
     {
-        return $this->render('categories/show.html.twig', [
-            'category' => $category,
-        ]);
+        if (!$category) {
+            return new JsonResponse([
+                'error' => 'Category not found',
+            ], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse([
+            'id' => $category->getId(),
+            'categoryName' => $category->getCategoryName(),
+        ], JsonResponse::HTTP_OK);
     }
 
-    #[Route('/{id}/edit', name: 'app_categories_edit', methods: ['GET', 'POST'])]
+
+    #[Route('/{id}/edit', name: 'app_categories_edit', methods: ['PUT'])]
+    #[OA\Put(
+        summary: 'Update a category by ID',
+        tags: ['Categories'],
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer'),
+                description: 'The ID of the category to update',
+                example: 1
+            )
+        ],
+        requestBody: new OA\RequestBody(
+            description: 'Category data to update',
+            content: new OA\JsonContent(
+                type: 'object',
+                required: ['categoryName'],
+                properties: [
+                    new OA\Property(property: 'categoryName', type: 'string', example: 'Updated Category Name')
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Category updated successfully',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'id', type: 'integer', example: 1),
+                        new OA\Property(property: 'categoryName', type: 'string', example: 'Updated Category Name'),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Category not found',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'error', type: 'string', example: 'Category not found')
+                    ]
+                )
+            )
+        ]
+    )]
     public function edit(Request $request, Categories $category, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(CategoriesType::class, $category);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_categories_index', [], Response::HTTP_SEE_OTHER);
+        if (!$category) {
+            return new JsonResponse([
+                'error' => 'Category not found',
+            ], JsonResponse::HTTP_NOT_FOUND);
         }
 
-        return $this->render('categories/edit.html.twig', [
-            'category' => $category,
-            'form' => $form,
-        ]);
+        $data= json_decode($request->getContent(), true);
+
+        if (isset($data['categoryName'])) {
+            $category->setCategoryName($data['categoryName']);
+        }
+        else {
+            return new JsonResponse ([
+                'error' => 'Invalid category name'
+            ], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $entityManager->persist($category);
+        $entityManager->flush();
+
+        return new JsonResponse ([
+            'id' => $category->getId(),
+            'categoryName' => $category->getCategoryName()
+        ], JsonResponse::HTTP_OK);
+
     }
 
-    #[Route('/{id}', name: 'app_categories_delete', methods: ['POST'])]
+
+    #[Route('/{id}', name: 'app_categories_delete', methods: ['DELETE'])]
+    #[OA\Delete(
+        summary: 'Delete a category by ID',
+        tags: ['Categories'],
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer'),
+                description: 'The ID of the category to delete',
+                example: 1
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 204,
+                description: 'Category deleted successfully'
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Category not found',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'error', type: 'string', example: 'Category not found')
+                    ]
+                )
+            )
+        ]
+    )]
     public function delete(Request $request, Categories $category, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$category->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($category);
-            $entityManager->flush();
+        if (!$category) {
+            return new JsonResponse([
+                'error' => 'Category not found',
+            ], JsonResponse::HTTP_NOT_FOUND);
         }
 
-        return $this->redirectToRoute('app_categories_index', [], Response::HTTP_SEE_OTHER);
+        $entityManager->remove($category);
+        $entityManager->flush();
+
+        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
 }

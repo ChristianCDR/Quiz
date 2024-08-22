@@ -4,6 +4,11 @@ nelmio_api_doc:
             title: Quiz 96 API Documentation
             description: An awesome app!
             version: 1.0.0
+        tags:
+            - name: 'Categories'
+              description: 'Endpoints related to categories'
+            - name: 'Questions'
+              description: 'Endpoints related to questions'
     areas: # to filter documented areas
         path_patterns:
             - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
