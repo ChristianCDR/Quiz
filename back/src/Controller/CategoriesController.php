@@ -62,8 +62,9 @@ class CategoriesController extends AbstractController
 
         foreach ($categories as $category) {
             $data[]= [
-                // 'id' => $category->getId(),
-                'categoryName' => $category->getCategoryName()
+                'id' => $category->getId(),
+                'categoryName' => $category->getCategoryName(),
+                'categoryImage' => $category->getCategoryImage()
             ];
         }
 
