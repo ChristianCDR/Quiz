@@ -491,7 +491,6 @@ class QuestionsController extends AbstractController
 
             foreach ($question->getCategories() as $existingCategory) {
                 $question->removeCategory($existingCategory);
-                $entityManager->remove($existingCategory);
             }
    
             foreach($categories as $categoryData) {
