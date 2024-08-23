@@ -83,7 +83,7 @@ class Questions
      */
     public function getCategories(): Collection
     {
-        return $this->Categories;
+        return $this->Categories; 
     }
 
     public function addCategory(Categories $category): static
