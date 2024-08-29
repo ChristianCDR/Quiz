@@ -8,7 +8,7 @@ type RootStackParamList = {
 type ResultScreenRouteProp = RouteProp<RootStackParamList, 'Result'>;
 
 type Props = {
-    route: ResultScreenRouteProp;
+    route: ResultScreenRouteProp
 };
 
 export default function ResultScreen ({route}: Props) {
