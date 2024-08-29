@@ -1,38 +1,32 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Svg, Path } from 'react-native-svg';
 import { useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { RouteProp, useNavigation } from "@react-navigation/native";
 import CountdownTimer from "@/components/CountdownTimer";
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Question } from "../constants/types";
 
 type RootStackParamList = {
-  Quiz: undefined;
+  Quiz: {quizData: Question[]}
   Result: {score: number};
 };
+
 type QuizScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Quiz'>;
 
-export default function QuizScreen() {
+type QuizScreenRouteProp = RouteProp<RootStackParamList, 'Quiz'>
 
+type Props = {
+  route: QuizScreenRouteProp
+}
+
+export default function QuizScreen({route} : Props) {
+  const {quizData} = route.params
+  // console.log(JSON.stringify(quizData, null, "\t"))
   const [currentQuestion, setcurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [reset, setReset] = useState(false);
   const [lastQuestion, setLastQuestion] = useState(false);
   const navigation = useNavigation<QuizScreenNavigationProp>();
-
-  const quizData= [
-    { question: 'Que veut dire SAP?',
-      options: ['truc1', 'Secours à personne', 'truc2', 'truc3'],
-      answer: 'Secours à personne'
-    },
-    { question: 'Que veut dire FPT?',
-      options: ['Fourgon pompe tonne','truc1', 'truc2', 'truc3'],
-      answer: 'Fourgon pompe tonne'
-    },
-    { question: 'Que veut dire FI?',
-      options: ['truc1', 'Formation Incendie', 'truc2', 'truc3'],
-      answer: 'Formation Incendie'
-    }
-  ]
 
   const progress = currentQuestion +1 / quizData.length
 
@@ -53,8 +47,7 @@ export default function QuizScreen() {
   const newAnswers = [...userAnswers]; // Deuxieme tableau qui va progressivement se substituer au premier
 
   const handleAnswer = (item: any) => {
-    const answer = quizData[currentQuestion]?.answer; 
-    if (item === answer) {
+    if (item.is_correct) {
       setScore((prevScore) => prevScore + 1);
       newAnswers[currentQuestion] = true;
     } else {
@@ -87,13 +80,13 @@ export default function QuizScreen() {
       
       <View style={styles.quiz}>
         <View style={styles.questionContainer}>
-          <Text style={styles.questionText}> {quizData[currentQuestion]?.question} </Text>
+          <Text style={styles.questionText}> {quizData[currentQuestion]?.questiontext} </Text>
         </View>
           
         <View style={styles.optionContainer}>
-          {quizData[currentQuestion]?.options.map((item) => {
-            return <TouchableOpacity onPress={()=>{handleAnswer(item)}}>
-              <Text style={styles.optionText}> {item} </Text>
+          {quizData[currentQuestion]?.options.map((item, index) => {
+            return <TouchableOpacity key={index} onPress={()=>{handleAnswer(item)}}>
+              <Text style={styles.optionText}> {item.text} </Text>
             </TouchableOpacity> 
           })}
         </View>
