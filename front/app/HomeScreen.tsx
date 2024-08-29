@@ -1,109 +1,161 @@
-import React from 'react';
-import { StyleSheet, View, Text, Button, StatusBar, Image, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, StatusBar, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Svg, Path } from 'react-native-svg';
+import axios from 'axios';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 type RootStackParamList = {
     Home: undefined;
     Quiz: undefined;
     Result: undefined;
-  };
+    QuizzesByCategory: {categoryId: number};
+
+};
+
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
-export default function HomeScreen() {
-    const navigation = useNavigation<HomeScreenNavigationProp>();
-    const categories = [
-        { id: 1, name: 'Science' },
-        { id: 2, name: 'Mathématiques' },
-        { id: 3, name: 'Histoire' },
-        { id: 4, name: 'Géographie' },
-        { id: 5, name: 'Informatique' }
-      ];
+type ErrorType = string | null;
 
-      const recentQuiz = [
+interface Category {
+    id: number,
+    categoryName: string,
+    categoryImage: string
+}
+
+export default function HomeScreen() {
+    const [data, setData] = useState<Category[]>([]);
+    const [error, setError] = useState<ErrorType>();
+    const [loading, setLoading] = useState<boolean>(true);
+
+    let images: { [key: string]: any } = {
+        'fire.png': require('../assets/images/fire.png'),
+        'fender-bender.png': require('../assets/images/fender-bender.png'),
+        'chainsaw.png': require('../assets/images/chainsaw.png'),
+        'rescue.png': require('../assets/images/rescue.png')
+    }
+
+    const navigation = useNavigation<HomeScreenNavigationProp>();
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+           try {
+                const apiUrl= 'http://192.168.1.161:8000/api/categories/'
+                const response = await axios.get(apiUrl);
+                setData(response.data)
+           }
+           catch (error: unknown) {
+                const errMessage = (error as Error).message
+                setError(errMessage)
+           }
+           finally {
+            setLoading(false)
+           }   
+        }
+        fetchCategories();
+    },[])
+
+    if (loading) {
+        return (
+          <View style={styles.container}>
+            <ActivityIndicator size="large" color="#0000ff" />
+          </View>
+        );
+    }
+    
+    const recentQuiz = [
         { id: 1, name: 'Quiz 1' },
         { id: 2, name: 'Quiz 2' },
         { id: 3, name: 'Quiz 3' },
         { id: 4, name: 'Quiz 4' },
         { id: 5, name: 'Quiz 5' }
-      ];
+    ];
 
     const handlePress = () => {
         alert('top!')
     }
+
+    const handleNavigation = (id: number) => {
+        navigation.navigate('QuizzesByCategory', {categoryId: id})
+    }
+ 
     return (
-        <SafeAreaView style={styles.container}>
+        <View  style={styles.container}>
             <StatusBar
-                backgroundColor="#2A2B31"
-                barStyle="light-content"
+                    backgroundColor="#2A2B31"
+                    barStyle="light-content"
             />
-
-            <View style={styles.user}>
-                <TouchableOpacity>
-                    <Image
-                        source={require('../assets/images/myAvatar.png')}
-                        style={styles.circularImgView}
-                    />
-                </TouchableOpacity>
-                <Text style={styles.userName}>Jean Dupont</Text>
-            </View>
-
-            <View style={styles.card}>
-                <Image  style={styles.cardImage} source ={require('../assets/images/question.jpg')}/>
-                <View style={styles.cardText}>
-                    <Text style={styles.cardText1}> Joue & {"\n"} Gagne !</Text>
-                    <Text style={styles.cardText2}>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                    </Text>
+            <ScrollView style={styles.verticalScroll}>
+                <View style={styles.user}>
+                    <TouchableOpacity>
+                        <Image
+                            source={require('../assets/images/myAvatar.png')}
+                            style={styles.circularImgView}
+                        />
+                    </TouchableOpacity>
+                    <Text style={styles.userName}>Christian CDR</Text>
                 </View>
-            </View>
 
-            <Text style={[styles.title, styles.categoryTitle]}>Catégories</Text>
+                <View style={styles.card}>
+                    <Image  style={styles.cardImage} source ={require('../assets/images/question.jpg')}/>
+                    <View style={styles.cardText}>
+                        <Text style={styles.cardText1}> Joue & {"\n"} Gagne !</Text>
+                        <Text style={styles.cardText2}>
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                        </Text>
+                    </View>
+                </View>
 
-            <ScrollView 
-                horizontal 
-                showsHorizontalScrollIndicator={false} 
-                contentContainerStyle={styles.categoryScrollContainer}
-            >
-                {categories.map(category => (
-                <TouchableOpacity key={category.id} style={styles.category}>
-                    <Text style={styles.categoryText}>{category.name}</Text>
-                </TouchableOpacity>
-                ))}
+                <Text style={[styles.title, styles.categoryTitle]}>Catégories</Text>
+                
+                <ScrollView 
+                    horizontal 
+                    showsHorizontalScrollIndicator={false} 
+                    contentContainerStyle={styles.categoryScrollContainer}
+                >
+                    {data.length > 0 ? (
+                        data.map((category) => ( 
+                            <TouchableOpacity key={category.id} style={styles.category} onPress={()=> handleNavigation(category.id)}>
+                                <Image style={styles.categoryImage} source ={images[category.categoryImage]}/>
+                                <Text style={styles.categoryText}>{category.categoryName}</Text>
+                            </TouchableOpacity>
+                            ))
+                        ) : <Text style={styles.errorText}>{error}</Text>
+                    }
+                </ScrollView>
+                <Text style={[styles.title, styles.recentTitle]}>Récents</Text>
+
+                <View style={styles.recentScrollContainer}>
+                    {recentQuiz.map(recentQuiz => (
+                    <TouchableOpacity key={recentQuiz.id} style={styles.recentQuiz}>
+                        <Text style={styles.recentText}>{recentQuiz.name}</Text>
+                    </TouchableOpacity>
+                    ))}
+                </View>
+                
             </ScrollView>
-
-            <Text style={[styles.title, styles.recentTitle]}>Récents</Text>
-
-            <ScrollView style={styles.recentScrollContainer}>
-                {recentQuiz.map(recentQuiz => (
-                <TouchableOpacity key={recentQuiz.id} style={styles.recentQuiz}>
-                    <Text style={styles.categoryText}>{recentQuiz.name}</Text>
-                </TouchableOpacity>
-                ))}
-            </ScrollView>
-
             <View style={styles.footer}>
-                <TouchableOpacity style={styles.homeButton} onPress={()=>{handlePress()}}>
-                    <Svg width="34" height="34" viewBox="0 0 24 24">
-                        <Path fill="#2A2B31" d="M5 20V9.5l7-5.288L19 9.5V20h-5.192v-6.384h-3.616V20z"/>
-                    </Svg> 
-                    <Text style={styles.homeButtonText}>Home</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=>{handlePress()}}>
-                    <Svg width="28" height="28" viewBox="0 0 32 32">
-                        <Path fill="#2A2B31" d="M14 23h8v2h-8zm-4 0h2v2h-2zm4-5h8v2h-8zm-4 0h2v2h-2zm4-5h8v2h-8zm-4 0h2v2h-2z"/>
-                        <Path fill="#2A2B31" d="M25 5h-3V4a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v1H7a2 2 0 0 0-2 2v21a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2M12 4h8v4h-8Zm13 24H7V7h3v3h12V7h3Z"/>
-                    </Svg>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=>{handlePress()}}>
-                    <Svg width="32" height="32" viewBox="0 0 24 24">
-                        <Path fill="#2A2B31" stroke="#2A2B31" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0M3 6v13m9-13v13m9-13v13"/>
-                    </Svg>
-                </TouchableOpacity>    
+                    <TouchableOpacity onPress={()=>{handlePress()}}>
+                        <Svg width="34" height="34" viewBox="0 0 24 24">
+                            <Path fill="#2A2B31" d="M5 20V9.5l7-5.288L19 9.5V20h-5.192v-6.384h-3.616V20z"/>
+                        </Svg> 
+                        <Text>Home</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={()=>{handlePress()}}>
+                        <Svg width="28" height="28" viewBox="0 0 32 32">
+                            <Path fill="#2A2B31" d="M14 23h8v2h-8zm-4 0h2v2h-2zm4-5h8v2h-8zm-4 0h2v2h-2zm4-5h8v2h-8zm-4 0h2v2h-2z"/>
+                            <Path fill="#2A2B31" d="M25 5h-3V4a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v1H7a2 2 0 0 0-2 2v21a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2M12 4h8v4h-8Zm13 24H7V7h3v3h12V7h3Z"/>
+                        </Svg>
+                        <Text>Scores</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={()=>{handlePress()}}>
+                        <Svg width="32" height="32" viewBox="0 0 24 24">
+                            <Path fill="#2A2B31" stroke="#2A2B31" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0M3 6v13m9-13v13m9-13v13"/>
+                        </Svg>
+                        <Text>Cours</Text>
+                    </TouchableOpacity>    
             </View>
-        </SafeAreaView>
+        </View>
     );
 }
 
@@ -113,11 +165,15 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center"
     },
+    verticalScroll: {
+        width: '100%',
+    },
+    errorText: {
+        fontSize: 18,
+        color: 'red',
+    },
     user: {
         flexDirection: 'row',
-        position: 'absolute',
-        top:0,
-        left:0,
         width: '100%',
         height: 200,
         borderBottomLeftRadius: 10,
@@ -126,7 +182,7 @@ const styles = StyleSheet.create({
     },
     userName: {
         color: 'white',
-        fontWeight: 'bold',
+        fontWeight: 'bold', 
         paddingTop: 45
     },
     circularImgView: {
@@ -143,14 +199,15 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         position: 'absolute',
         top: 100,
+        alignSelf: 'center',
         backgroundColor: '#000',
         flexDirection: 'row',
         justifyContent: 'space-around',
-        alignItems: 'center',
+        alignItems: 'center'
     },
     cardImage: {
         width: '40%',
-        height: '70%'
+        height: '90%'
     },
     cardText: {
         justifyContent: 'center',
@@ -159,14 +216,20 @@ const styles = StyleSheet.create({
     cardText1: {
         color: 'white',
         fontSize: 26,
+        justifyContent: 'center',
         fontWeight: 'bold',
     },
     cardText2: {
         color: 'white'
     },
+    categoryImage: {
+        width: 60,
+        height: 60,
+        margin: 'auto'
+    },
     footer: {
-        height: 50,
         width: '100%',
+        paddingTop: 5,
         backgroundColor: 'white',
         position: 'absolute',
         bottom: 0,
@@ -174,33 +237,27 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         alignItems: 'center'
     },
-    homeButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    homeButtonText: {
-        paddingTop: 4
-    },
     categoryScrollContainer: {
-      paddingHorizontal: 10,
-      height: 100,
-      marginTop: 10,
+        paddingHorizontal: 10,
+        height: 120,
+        marginTop: 10,
     },
     recentScrollContainer: {
-        flex:1,
         paddingHorizontal: 10,
         width: '100%',
         paddingBottom: 100
     },
     category: {
-      backgroundColor: '#000',
-      borderRadius: 20,
-      paddingVertical: 10,
-      paddingHorizontal: 20,
-      marginRight: 10, 
+        backgroundColor: '#fff',
+        height: '100%',
+        width: 140,
+        borderRadius: 20,
+        paddingVertical: 10,
+        marginRight: 10,
+        justifyContent: 'space-around',
     },
     recentQuiz: {
-        backgroundColor: '#000',
+        backgroundColor: '#fff',
         borderRadius: 20,
         paddingVertical: 10,
         paddingHorizontal: 20,
@@ -208,23 +265,31 @@ const styles = StyleSheet.create({
         marginBottom: 15
     },
     categoryTitle: {
-        marginTop: 300,
+        marginHorizontal: 'auto',
+        marginTop: 120,
         marginBottom: 10
     },
     recentTitle: {
-        marginTop: -200,
-        marginBottom: 10
+        marginHorizontal: 'auto',
+        marginTop: 20,
+        marginBottom: 20
     },
     title: {
-      color: '#000',
-      fontSize: 18,
-      fontWeight: 'bold',
-      width: '90%',
-      textAlign: 'left'
+        color: '#000',
+        fontSize: 18,
+        fontWeight: 'bold',
+        width: '90%',
+        textAlign: 'left'
     },
     categoryText: {
-      color: '#fff',
-      fontSize: 18,
-      fontWeight: 'bold',
+        color: '#000',
+        fontSize: 18,
+        fontWeight: 'bold',
+        textAlign: 'center'
+    },
+    recentText: {
+        color: '#000',
+        fontSize: 18,
+        fontWeight: 'bold'
     }
 });

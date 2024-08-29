@@ -4,11 +4,14 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from './HomeScreen';
 import QuizScreen from './QuizScreen';
 import ResultScreen from './ResultScreen';
+import QuizzesByCategoryScreen from './QuizzesByCategoryScreen';
+import { Question } from "../constants/types";
 
 type RootStackParamList = {
   Home: undefined;                                                                                    
-  Quiz: undefined;
+  Quiz: {quizData: Question[]}
   Result: { score: number };
+  QuizzesByCategory: { categoryId: number }
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -31,6 +34,10 @@ export default function index () {
           name="Result" 
           component={ResultScreen} 
           options={{headerShown: false}}
+        />
+        <Stack.Screen 
+          name="QuizzesByCategory"
+          component={QuizzesByCategoryScreen}
         />
       </Stack.Navigator> 
     </>

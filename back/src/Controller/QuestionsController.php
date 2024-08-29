@@ -554,4 +554,96 @@ class QuestionsController extends AbstractController
 
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
+
+
+    #[OA\Get(
+        summary: 'Get a questions by categoryId',
+        tags: ['Questions'],
+        parameters: [
+            new OA\Parameter(
+                name: 'categoryId',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer'),
+                example: 7
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Questions retrieved successfully',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'questionText', type: 'text', example: 'New question text'),
+                        new OA\Property(
+                            property: 'categories', 
+                            type: 'array',
+                            items: new OA\Items(
+                                properties: [
+                                    new OA\Property(property: 'category', type: 'integer', example: 1)
+                                ]
+                            )
+                        ),
+                        new OA\Property(
+                            property: 'options',
+                            type: 'array',
+                            items: new OA\Items(
+                                properties: [
+                                    new OA\Property(property: 'text', type: 'string', example: 'Paris'),
+                                    new OA\Property(property: 'isCorrect', type: 'boolean', example: true)
+                                ]
+                            )
+                        )
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'No Question found',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'error', type: 'string', example: 'No Question found')
+                    ]
+                )
+            )
+        ]
+    )]
+    #[route('/category/{categoryId}',name: 'app_questions_by_category', methods:['GET'])]
+    public function getQuestionsByCategory (int $categoryId, QuestionsRepository $questionsRepository) : JsonResponse
+    {
+        $questions = $questionsRepository->findByCategoryId($categoryId);
+
+        $data = [];
+        $opt= [];
+        $cat= [];
+
+        foreach ($questions as $question) {
+            $options = $question->getOptions();
+            $categories = $question->getCategories();
+
+            foreach($options as $option) {
+                $opt[]= [
+                    'text' => $option->getOptionText(),
+                    'is_correct' => $option->isIsCorrect()
+                ];
+            } 
+
+            foreach($categories as $category) {
+                $cat[]= [
+                    'category' => $category->getCategoryName()
+                ];
+            }
+
+            $data[]= [
+                'questiontext' => $question->getQuestionText(), 
+                // 'categories' => $cat,
+                'options' => $opt,
+            ];
+            $opt= [];
+            $cat= [];
+        }
+        return new JsonResponse($data, JsonResponse::HTTP_OK);
+    }
 }
