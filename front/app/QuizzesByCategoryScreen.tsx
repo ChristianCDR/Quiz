@@ -1,24 +1,13 @@
 import { useState, useEffect } from "react"
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ActivityIndicator} from "react-native"
-import { RouteProp, useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native"
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
-import { Question } from "../constants/types";
-
-type RootStackParamList = {
-    QuizzesByCategory: {categoryId: number};
-    Quiz: {quizData: Question[]}
-}
-
-type QuizzesByCategoryScreenRouteProp = RouteProp<RootStackParamList, 'QuizzesByCategory'>
-
-type QuizzesByCategoryNavigationProp = NativeStackNavigationProp<RootStackParamList, 'QuizzesByCategory'>;
+import { Question, QuizzesByCategoryScreenRouteProp, QuizzesByCategoryNavigationProp, ErrorType } from "../constants/types";
+import BackButton from "@/components/BackButton";
 
 type Props = {
     route: QuizzesByCategoryScreenRouteProp
 }
-
-type ErrorType = string | null;
 
 export default function QuizzesByCategoryScreen ({route} : Props) {
     const {categoryId} = route.params
@@ -74,6 +63,7 @@ export default function QuizzesByCategoryScreen ({route} : Props) {
     }, [data])
     return (
         <View style={styles.container}>
+            <BackButton navigation={navigation} />
             { error ?
                 <Text style={styles.errorText}> {error} </Text>
                 : <ScrollView style={styles.scrollView}>
@@ -81,18 +71,8 @@ export default function QuizzesByCategoryScreen ({route} : Props) {
                     quizzes.map((quiz, index) => (
                       <View key={index}>
                         <TouchableOpacity style={styles.quiz} onPress={()=> navigation.navigate('Quiz', {quizData: quizzes[index]})}>
-                            <Text>Quiz {index + 1}</Text>
+                            <Text style={styles.quizText}>Quiz {index + 1}</Text>
                         </TouchableOpacity>
-                        {/* <View key = {index}>
-                            {quiz.map((q, index) => (
-                                <View key={index} style={{borderColor: 'red', borderWidth: 1, marginBottom: 10}}>
-                                    <Text>{q.questiontext}</Text>
-                                    {q.options.map((option, optionIndex) => (
-                                    <Text key={optionIndex}>{option.text}</Text>
-                              ))}
-                                </View>
-                            ))}
-                        </View> */}
                       </View>
                     ))
                   ) : (
@@ -108,7 +88,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        backgroundColor: "#ECE6D6"
     },
     errorText: {
         fontSize: 18,
@@ -119,10 +100,18 @@ const styles = StyleSheet.create({
     },
     quiz: {
         width: '90%',
-        height: 50,
-        backgroundColor: 'white',
-        borderRadius: 15,
         marginHorizontal: 'auto',
-        marginVertical: 10
+        marginVertical: 10,
+        backgroundColor: '#1E3C58',
+        borderRadius: 20,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        height: 70,
+        marginBottom: 15
+    },
+    quizText: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold'
     }
 })

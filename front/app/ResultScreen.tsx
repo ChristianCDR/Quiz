@@ -1,11 +1,5 @@
 import { StyleSheet, View, Text, Image } from 'react-native';
-import { RouteProp } from '@react-navigation/native';
-
-type RootStackParamList = {
-  Result: {score: number};
-};
-
-type ResultScreenRouteProp = RouteProp<RootStackParamList, 'Result'>;
+import { ResultScreenRouteProp } from "../constants/types";
 
 type Props = {
     route: ResultScreenRouteProp
