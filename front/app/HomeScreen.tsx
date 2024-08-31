@@ -1,27 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, StatusBar, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Svg, Path } from 'react-native-svg';
 import axios from 'axios';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
-type RootStackParamList = {
-    Home: undefined;
-    Quiz: undefined;
-    Result: undefined;
-    QuizzesByCategory: {categoryId: number};
-
-};
-
-type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
-
-type ErrorType = string | null;
-
-interface Category {
-    id: number,
-    categoryName: string,
-    categoryImage: string
-}
+import { HomeScreenNavigationProp, ErrorType, Category } from "../constants/types";
+import Footer from '@/components/Footer';
 
 export default function HomeScreen() {
     const [data, setData] = useState<Category[]>([]);
@@ -71,10 +53,6 @@ export default function HomeScreen() {
         { id: 5, name: 'Quiz 5' }
     ];
 
-    const handlePress = () => {
-        alert('top!')
-    }
-
     const handleNavigation = (id: number) => {
         navigation.navigate('QuizzesByCategory', {categoryId: id})
     }
@@ -82,7 +60,7 @@ export default function HomeScreen() {
     return (
         <View  style={styles.container}>
             <StatusBar
-                    backgroundColor="#2A2B31"
+                    backgroundColor="#1E3C58"
                     barStyle="light-content"
             />
             <ScrollView style={styles.verticalScroll}>
@@ -97,7 +75,10 @@ export default function HomeScreen() {
                 </View>
 
                 <View style={styles.card}>
-                    <Image  style={styles.cardImage} source ={require('../assets/images/question.jpg')}/>
+                    <View style={styles.cardImageView}>
+                        <Image  style={styles.cardImage} source ={require('../assets/images/brain_v3.png')}/>
+                    </View>
+                    
                     <View style={styles.cardText}>
                         <Text style={styles.cardText1}> Joue & {"\n"} Gagne !</Text>
                         <Text style={styles.cardText2}>
@@ -132,29 +113,11 @@ export default function HomeScreen() {
                     </TouchableOpacity>
                     ))}
                 </View>
+
+                <Footer/>
                 
             </ScrollView>
-            <View style={styles.footer}>
-                    <TouchableOpacity onPress={()=>{handlePress()}}>
-                        <Svg width="34" height="34" viewBox="0 0 24 24">
-                            <Path fill="#2A2B31" d="M5 20V9.5l7-5.288L19 9.5V20h-5.192v-6.384h-3.616V20z"/>
-                        </Svg> 
-                        <Text>Home</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>{handlePress()}}>
-                        <Svg width="28" height="28" viewBox="0 0 32 32">
-                            <Path fill="#2A2B31" d="M14 23h8v2h-8zm-4 0h2v2h-2zm4-5h8v2h-8zm-4 0h2v2h-2zm4-5h8v2h-8zm-4 0h2v2h-2z"/>
-                            <Path fill="#2A2B31" d="M25 5h-3V4a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v1H7a2 2 0 0 0-2 2v21a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2M12 4h8v4h-8Zm13 24H7V7h3v3h12V7h3Z"/>
-                        </Svg>
-                        <Text>Scores</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>{handlePress()}}>
-                        <Svg width="32" height="32" viewBox="0 0 24 24">
-                            <Path fill="#2A2B31" stroke="#2A2B31" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0M3 6v13m9-13v13m9-13v13"/>
-                        </Svg>
-                        <Text>Cours</Text>
-                    </TouchableOpacity>    
-            </View>
+            
         </View>
     );
 }
@@ -163,7 +126,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        backgroundColor: "#ECE6D6"
     },
     verticalScroll: {
         width: '100%',
@@ -178,7 +142,7 @@ const styles = StyleSheet.create({
         height: 200,
         borderBottomLeftRadius: 10,
         borderBottomRightRadius: 10,
-        backgroundColor: '#2A2B31'
+        backgroundColor: '#1E3C58'
     },
     userName: {
         color: 'white',
@@ -200,14 +164,20 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 100,
         alignSelf: 'center',
-        backgroundColor: '#000',
+        backgroundColor: '#1E2644',
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center'
     },
-    cardImage: {
+    cardImageView: {
         width: '40%',
-        height: '90%'
+        aspectRatio: 1, // Maintient le ratio pour garder la View carrée
+        overflow: 'hidden',   
+    },
+    cardImage: {
+        width: '100%',
+        height: '100%',
+        resizeMode: 'contain'
     },
     cardText: {
         justifyContent: 'center',
@@ -227,16 +197,6 @@ const styles = StyleSheet.create({
         height: 60,
         margin: 'auto'
     },
-    footer: {
-        width: '100%',
-        paddingTop: 5,
-        backgroundColor: 'white',
-        position: 'absolute',
-        bottom: 0,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center'
-    },
     categoryScrollContainer: {
         paddingHorizontal: 10,
         height: 120,
@@ -248,7 +208,7 @@ const styles = StyleSheet.create({
         paddingBottom: 100
     },
     category: {
-        backgroundColor: '#fff',
+        backgroundColor: '#1E3C58',
         height: '100%',
         width: 140,
         borderRadius: 20,
@@ -257,7 +217,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
     },
     recentQuiz: {
-        backgroundColor: '#fff',
+        backgroundColor: '#1E3C58',
         borderRadius: 20,
         paddingVertical: 10,
         paddingHorizontal: 20,
@@ -282,13 +242,13 @@ const styles = StyleSheet.create({
         textAlign: 'left'
     },
     categoryText: {
-        color: '#000',
+        color: 'white',
         fontSize: 18,
         fontWeight: 'bold',
         textAlign: 'center'
     },
     recentText: {
-        color: '#000',
+        color: 'white',
         fontSize: 18,
         fontWeight: 'bold'
     }

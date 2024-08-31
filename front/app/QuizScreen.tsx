@@ -1,19 +1,9 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Svg, Path } from 'react-native-svg';
 import { useState } from "react";
-import { RouteProp, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import CountdownTimer from "@/components/CountdownTimer";
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Question } from "../constants/types";
-
-type RootStackParamList = {
-  Quiz: {quizData: Question[]}
-  Result: {score: number};
-};
-
-type QuizScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Quiz'>;
-
-type QuizScreenRouteProp = RouteProp<RootStackParamList, 'Quiz'>
+import { QuizScreenNavigationProp, QuizScreenRouteProp } from "../constants/types";
 
 type Props = {
   route: QuizScreenRouteProp
