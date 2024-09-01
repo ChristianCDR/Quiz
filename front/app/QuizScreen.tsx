@@ -16,38 +16,37 @@ type Props = {
 export default function QuizScreen({route} : Props) {
   const {quizData, categoryName} = route.params
   // console.log(JSON.stringify(quizData, null, "\t"))
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [nextQuestion, setNextQuestion] = useState(2);
-  const [score, setScore] = useState(0);
-  const [reset, setReset] = useState(false);
-  const [isLastQuestion, setIsLastQuestion] = useState(false);
-  const navigation = useNavigation<QuizScreenNavigationProp>();
+  const [currentQuestion, setCurrentQuestion] = useState(0)
+  const [nextQuestion, setNextQuestion] = useState(2)
+  const [score, setScore] = useState(0)
+  const [reset, setReset] = useState(false)
+  const [isLastQuestion, setIsLastQuestion] = useState(false)
+  const navigation = useNavigation<QuizScreenNavigationProp>()
   const [showCorrectAnswer, setShowCorrectAnswer] = useState<boolean>(false)
-  const [userAnswers, setUserAnswers] = useState<(boolean | null)[]>(Array(quizData.length).fill(null)); // Tableau rempli de Null pour avoir la couleur grise
-  const newAnswers = [...userAnswers]; // Deuxieme tableau qui va progressivement se substituer au premier
+  const [userAnswers, setUserAnswers] = useState<(boolean | null)[]>(Array(quizData.length).fill(null)) // Tableau rempli de Null pour avoir la couleur grise
+  const newAnswers = [...userAnswers] // Deuxieme tableau qui va progressivement se substituer au premier
+  const [selectedOption, setSelectedOption] = useState()
 
 
-  const getOptionStyle = (item: any) => {
-    if (!showCorrectAnswer) return styles.itemButton
-
-    else if(item.is_correct) {
-      return [styles.itemButton, styles.correctAnswer]
-    }
+  const getOptionStyle = (item: any) => { 
+    if (selectedOption != item) return styles.itemButton
     
-    else if (!item.is_correct) {
+    if (item.is_correct) {
+      return [styles.itemButton, styles.correctAnswer]
+    }   
+    else {
       return [styles.itemButton, styles.wrongAnswer]
     }
     
   }
 
   const getIcon = (item: any) => {
-    if (!showCorrectAnswer) return <Feather name="circle" size={24} color="#1E3C58" />
+    if (selectedOption != item) return <Feather name="circle" size={24} color="#1E3C58" />
 
-    else if(item.is_correct) {
+    if (item.is_correct) {
       return <AntDesign name="checkcircle" size={24} color="#5ce65c" />
-    }
-    
-    else if (!item.is_correct) {
+    } 
+    else {
       return <Entypo name="circle-with-cross" size={24} color="#ff0000" />
     }
   }
@@ -59,9 +58,9 @@ export default function QuizScreen({route} : Props) {
     setTimeout(() => setReset(false), 100)
   }
   
-  const handleAnswer = (item: any) => {  
+  const handleAnswer = (item: any) => { 
+    setSelectedOption(item) 
     setShowCorrectAnswer(true) 
-
     setNextQuestion((prevQuestion) => {
       const nextQuestion = prevQuestion + 1;
       
@@ -142,12 +141,6 @@ export default function QuizScreen({route} : Props) {
         
           <View style={styles.questionContainer}>
             <Text style={styles.questionText}> {quizData[currentQuestion]?.questiontext} </Text>
-            <Text>
-              score : {score}
-            </Text>
-            <Text>
-              nextQuestion : {nextQuestion}
-            </Text>
           </View> 
           
         <View style={styles.optionContainer}>
