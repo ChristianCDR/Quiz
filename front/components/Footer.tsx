@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     pressedButton: {
-        backgroundColor: '#1E3C58',
+        backgroundColor: '#ECE6D6',
         paddingHorizontal: 10,
         borderRadius: 30
     }

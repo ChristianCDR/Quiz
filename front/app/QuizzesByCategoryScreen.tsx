@@ -10,7 +10,7 @@ type Props = {
 }
 
 export default function QuizzesByCategoryScreen ({route} : Props) {
-    const {categoryId} = route.params
+    const {categoryId, categoryName} = route.params
     const [data, setData] = useState<Question[]>([]);
     const [error, setError] = useState<ErrorType>();
     const [loading, setLoading] = useState<boolean>(true);
@@ -70,7 +70,7 @@ export default function QuizzesByCategoryScreen ({route} : Props) {
                     {quizzes.length > 0 ? (
                     quizzes.map((quiz, index) => (
                       <View key={index}>
-                        <TouchableOpacity style={styles.quiz} onPress={()=> navigation.navigate('Quiz', {quizData: quizzes[index]})}>
+                        <TouchableOpacity style={styles.quiz} onPress={()=> navigation.navigate('Quiz', {quizData: quizzes[index], 'categoryName': categoryName})}>
                             <Text style={styles.quizText}>Quiz {index + 1}</Text>
                         </TouchableOpacity>
                       </View>

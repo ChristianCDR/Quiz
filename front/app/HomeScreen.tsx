@@ -53,8 +53,8 @@ export default function HomeScreen() {
         { id: 5, name: 'Quiz 5' }
     ];
 
-    const handleNavigation = (id: number) => {
-        navigation.navigate('QuizzesByCategory', {categoryId: id})
+    const handleNavigation = (id: number, name: string) => {
+        navigation.navigate('QuizzesByCategory', {categoryId: id, categoryName: name})
     }
  
     return (
@@ -96,7 +96,7 @@ export default function HomeScreen() {
                 >
                     {data.length > 0 ? (
                         data.map((category) => ( 
-                            <TouchableOpacity key={category.id} style={styles.category} onPress={()=> handleNavigation(category.id)}>
+                            <TouchableOpacity key={category.id} style={styles.category} onPress={()=> handleNavigation(category.id, category.categoryName)}>
                                 <Image style={styles.categoryImage} source ={images[category.categoryImage]}/>
                                 <Text style={styles.categoryText}>{category.categoryName}</Text>
                             </TouchableOpacity>
@@ -193,9 +193,10 @@ const styles = StyleSheet.create({
         color: 'white'
     },
     categoryImage: {
-        width: 60,
-        height: 60,
-        margin: 'auto'
+        width: '80%',
+        height: '80%',
+        margin: 'auto',
+        resizeMode: 'contain'
     },
     categoryScrollContainer: {
         paddingHorizontal: 10,
@@ -210,7 +211,6 @@ const styles = StyleSheet.create({
     category: {
         backgroundColor: '#1E3C58',
         height: '100%',
-        width: 140,
         borderRadius: 20,
         paddingVertical: 10,
         marginRight: 10,
@@ -245,7 +245,8 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 18,
         fontWeight: 'bold',
-        textAlign: 'center'
+        textAlign: 'center',
+        paddingHorizontal: 15
     },
     recentText: {
         color: 'white',
