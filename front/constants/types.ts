@@ -14,9 +14,9 @@ export interface Category {
 
 export type RootStackParamList = {
     Home: undefined; 
-    Quiz: {quizData: Question[]}
+    Quiz: {quizData: Question[], categoryName: string}
     Result: { score: number };
-    QuizzesByCategory: {categoryId: number};
+    QuizzesByCategory: {categoryId: number, categoryName: string};
 }
 
 
