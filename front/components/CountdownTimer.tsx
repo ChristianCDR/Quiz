@@ -5,10 +5,10 @@ interface CountdownTimerProps {
   initialSeconds: number;
   reset: boolean;
   onTimerEnd: () => void; // Fonction appelée lorsque le timer atteint 0
-  lastQuestion: boolean;
+  isLastQuestion: boolean;
 }
 
-const CountdownTimer: React.FC<CountdownTimerProps> = ({initialSeconds, reset, onTimerEnd, lastQuestion}) => {
+const CountdownTimer: React.FC<CountdownTimerProps> = ({initialSeconds, reset, onTimerEnd, isLastQuestion}) => {
   const [secondsRemaining, setSecondsRemaining] = useState(initialSeconds);
 
   useEffect(()=>{
@@ -18,10 +18,10 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({initialSeconds, reset, o
   },[reset]);
 
   useEffect(()=>{
-    if(lastQuestion) {
-      setSecondsRemaining(0);
+    if(isLastQuestion) {
+      setSecondsRemaining(30);
     }
-  },[lastQuestion]);
+  },[isLastQuestion]);
 
   useEffect(() => {
     if (secondsRemaining > 0) {
