@@ -15,7 +15,7 @@ export interface Category {
 export type RootStackParamList = {
     Home: undefined; 
     Quiz: {quizData: Question[], categoryName: string}
-    Result: { score: number };
+    Result: { score: number, quizLength: number };
     QuizzesByCategory: {categoryId: number, categoryName: string};
 }
 
@@ -23,13 +23,15 @@ export type RootStackParamList = {
 
 export type ErrorType = string | null;
 
-export type QuizzesByCategoryScreenRouteProp = RouteProp<RootStackParamList, 'QuizzesByCategory'>
-
 export type QuizzesByCategoryNavigationProp = NativeStackNavigationProp<RootStackParamList, 'QuizzesByCategory'>;
+
+export type QuizzesByCategoryScreenRouteProp = RouteProp<RootStackParamList, 'QuizzesByCategory'>
 
 export type QuizScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Quiz'>;
 
 export type QuizScreenRouteProp = RouteProp<RootStackParamList, 'Quiz'>
+
+export type ResultScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Result'>;
 
 export type ResultScreenRouteProp = RouteProp<RootStackParamList, 'Result'>;
 
