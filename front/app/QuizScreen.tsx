@@ -80,14 +80,14 @@ export default function QuizScreen({route} : Props) {
           setScore((prevScore) => {
             const updatedScore = prevScore + 1;
             setTimeout(() => {
-              navigation.replace('Result', { score: updatedScore });
+              navigation.replace('Result', { score: updatedScore, quizLength: quizData.length });
             }, 100);
             return updatedScore;
           })
         break
         case (!item.is_correct && isLastQuestion): 
           setTimeout(() => {
-            navigation.replace('Result', { score: score });
+            navigation.replace('Result', { score: score, quizLength: quizData.length  });
           }, 100);
         break
         case (!item.is_correct && !isLastQuestion):
