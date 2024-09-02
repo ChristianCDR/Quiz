@@ -11,10 +11,10 @@ export default function HomeScreen() {
     const [loading, setLoading] = useState<boolean>(true);
 
     let images: { [key: string]: any } = {
-        'fire.png': require('../assets/images/fire.png'),
-        'fender-bender.png': require('../assets/images/fender-bender.png'),
+        'fire.png': require('../assets/images/fire_v2.png'),
+        'fender-bender.png': require('../assets/images/car_accident.png'),
         'chainsaw.png': require('../assets/images/chainsaw.png'),
-        'rescue.png': require('../assets/images/rescue.png')
+        'rescue.png': require('../assets/images/sap.png')
     }
 
     const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -193,9 +193,9 @@ const styles = StyleSheet.create({
         color: 'white'
     },
     categoryImage: {
-        width: '80%',
-        height: '80%',
-        margin: 'auto',
+        width: '100%',
+        height: '60%',
+        marginHorizontal: 'auto',
         resizeMode: 'contain'
     },
     categoryScrollContainer: {
