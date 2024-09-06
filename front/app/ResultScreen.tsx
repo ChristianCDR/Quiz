@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, Image, TouchableOpacity, Share } from 'react-native'
+import { StyleSheet, View, Text, Image, TouchableOpacity, Share, Animated, Easing, StatusBar } from 'react-native'
 import { ResultScreenNavigationProp, ResultScreenRouteProp } from "../constants/types"
 import { Platform, PermissionsAndroid } from 'react-native';
 import { useEffect, useState, useRef } from 'react'
@@ -14,21 +14,45 @@ type Props = {
 export default function ResultScreen ({route}: Props) {
     const [comment, setComment] = useState<string>()
     const [scoreColor, setScoreColor] = useState<string>()
+    const [fruitImage, setFruitImage] = useState()
     const navigation = useNavigation<ResultScreenNavigationProp>()
     const { score, quizLength} = route.params
     const formattedScore = (score) < 10 ? `0${score}` : score.toString()
     const viewRef = useRef<View>(null)
+    const scaleValue = useRef(new Animated.Value(0.1)).current 
+
+    const fruitImages = {
+        strawberry : require('../assets/images/strawberry.png'),
+        thumb: require('../assets/images/thumb.png'),
+        medal: require('../assets/images/medal.png')
+    }
+
+    const startAnimation: any = () => {
+        Animated.timing (scaleValue, {
+            toValue: 2,
+            duration: 600,
+            easing: Easing.ease,
+            useNativeDriver: true
+        }).start()
+    }
 
     useEffect(() =>  {
         if (score < 5) {
             setComment('Fruitos !')
             setScoreColor('#ff0000')
+            setFruitImage(fruitImages.strawberry)
+            
         }  
-        else if (score >= 5 && score < 9) setComment('Pas mal..')  
+        else if (score >= 5 && score < 9) {
+            setComment('Pas mal..')
+            setFruitImage(fruitImages.thumb)
+        }  
         else {
             setComment('Sarce !') 
             setScoreColor('#5ce65c')
+            setFruitImage(fruitImages.medal)
         }
+        startAnimation()
     }, [])
 
     const handleShare = async () => {
@@ -36,32 +60,20 @@ export default function ResultScreen ({route}: Props) {
  
             PermissionsAndroid.request(
            
-              PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-           
+              PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,  
               {
-           
                 title: "Permission d'enregistrer une capture d'écran",
-           
                 message: "Vous devez autoriser l'application à enregister une capture d'écran",
-           
+    
                 buttonNeutral: 'Plus tard',
-           
                 buttonNegative: 'Non',
-           
                 buttonPositive: 'OK',
-           
               }
-           
             ).then((result) => {
-           
               if (result !== PermissionsAndroid.RESULTS.GRANTED) {
-           
                 console.log('Storage permission denied.');
-           
               }
-           
-            });
-           
+            });        
         }
 
         try {
@@ -84,11 +96,18 @@ export default function ResultScreen ({route}: Props) {
 
     return (
         <View style={styles.container} ref={viewRef}>
+            <StatusBar
+                backgroundColor="#1E3C58"
+                barStyle="light-content"   
+            />
             <BackButton navigation={navigation} color= '#fff'/>
             <Text style={styles.pageName}>Résultats</Text>
             <Text style={styles.comment}>{comment}</Text>
-            {/* <Text style={styles.comment}>Image</Text>
-            <Text style={styles.comment}>conseil</Text> */}
+            <Animated.Image 
+                source = {fruitImage}
+                style = {[styles.fruitImage, {transform: [{scale: scaleValue}]} ]}
+            />
+            {/* <Text style={styles.comment}>conseil</Text>  */}
             <View style={styles.details}>
                 <Image
                     source={require('../assets/images/myAvatar.png')}
@@ -186,5 +205,11 @@ const styles = StyleSheet.create({
     },
     detailsSecondButtonsText: {
         color: 'white',   
+    },
+    fruitImage: {
+        width: 140,
+        height: 250, 
+        resizeMode: 'contain',
+        marginHorizontal: 'auto'
     }
 })

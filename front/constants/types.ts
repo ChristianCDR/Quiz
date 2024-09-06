@@ -13,10 +13,10 @@ export interface Category {
 }
 
 export type RootStackParamList = {
-    Home: undefined; 
+    Home: undefined
     Quiz: {quizData: Question[], categoryName: string}
-    Result: { score: number, quizLength: number };
-    QuizzesByCategory: {categoryId: number, categoryName: string};
+    Result: { score: number, quizLength: number }
+    QuizzesByCategory: {categoryId: number, categoryName: string}
 }
 
 
