@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, StatusBar } from "react-native";
 import { Svg, Path } from 'react-native-svg';
 import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -65,54 +65,57 @@ export default function QuizScreen({route} : Props) {
       const nextQuestion = prevQuestion + 1;
       
       if (nextQuestion < quizData.length +1) {
-        setIsLastQuestion(false);
+        setIsLastQuestion(false)
       } else {
-        setIsLastQuestion(true);
+        setIsLastQuestion(true)
       }
 
       switch (true) {
         case (item.is_correct && !isLastQuestion):
-          setScore((prevScore) => prevScore + 1);
-          newAnswers[currentQuestion] = true;
-          setTimeout(()=> goToNextQuestion(), 400); //Pour laisser le temps au user de voir le changement de couleur des options
+          setScore((prevScore) => prevScore + 1)
+          newAnswers[currentQuestion] = true
+          setTimeout(()=> goToNextQuestion(), 400) //Pour laisser le temps au user de voir le changement de couleur des options
         break
         case (item.is_correct && isLastQuestion):
           setScore((prevScore) => {
-            const updatedScore = prevScore + 1;
+            const updatedScore = prevScore + 1
             setTimeout(() => {
-              navigation.replace('Result', { score: updatedScore, quizLength: quizData.length });
-            }, 100);
-            return updatedScore;
+              navigation.replace('Result', { score: updatedScore, quizLength: quizData.length })
+            }, 100)
+            return updatedScore
           })
         break
         case (!item.is_correct && isLastQuestion): 
           setTimeout(() => {
             navigation.replace('Result', { score: score, quizLength: quizData.length  });
-          }, 100);
+          }, 100)
         break
         case (!item.is_correct && !isLastQuestion):
-          newAnswers[currentQuestion] = false;
-          setTimeout(()=> goToNextQuestion(), 400); //Pour laisser le temps au user de voir le changement de couleur des options
+          newAnswers[currentQuestion] = false
+          setTimeout(()=> goToNextQuestion(), 400) //Pour laisser le temps au user de voir le changement de couleur des options
         break
       }
 
-      setUserAnswers(newAnswers);
-      return nextQuestion;
+      setUserAnswers(newAnswers)
+      return nextQuestion
     });
      
   }
 
   const handleTimerEnd = () => {
     handleAnswer ({"is_correct": false})
-    if(newAnswers[currentQuestion] == null) newAnswers[currentQuestion] = false;
-    setUserAnswers(newAnswers);
+    if(newAnswers[currentQuestion] == null) newAnswers[currentQuestion] = false
   }
   
   const number = currentQuestion +1
-  const formattedNumber = (number) < 10 ? `0${number}` : number.toString();
+  const formattedNumber = (number) < 10 ? `0${number}` : number.toString()
 
   return (
     <View style={styles.container}>
+      <StatusBar
+        backgroundColor="#1E3C58"
+        barStyle="light-content"   
+      />
       <View style={styles.topScreen}>
         <View style={styles.topContainer}>
           <Text style= {styles.category}>{categoryName}</Text>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, StatusBar, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, SafeAreaView, Text, StatusBar, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { HomeScreenNavigationProp, ErrorType, Category } from "../constants/types";
@@ -22,7 +22,7 @@ export default function HomeScreen() {
     useEffect(() => {
         const fetchCategories = async () => {
            try {
-                const apiUrl= 'http://192.168.1.161:8000/api/categories/'
+                const apiUrl= 'http://192.168.133.43:8000/api/categories/'
                 const response = await axios.get(apiUrl);
                 setData(response.data)
            }
@@ -58,10 +58,10 @@ export default function HomeScreen() {
     }
  
     return (
-        <View  style={styles.container}>
+        <SafeAreaView  style={styles.container}>
             <StatusBar
-                    backgroundColor="#1E3C58"
-                    barStyle="light-content"
+                backgroundColor="#1E3C58"
+                barStyle="light-content"   
             />
             <ScrollView style={styles.verticalScroll}>
                 <View style={styles.user}>
@@ -116,9 +116,8 @@ export default function HomeScreen() {
 
                 <Footer/>
                 
-            </ScrollView>
-            
-        </View>
+            </ScrollView>      
+        </SafeAreaView>
     );
 }
 
@@ -127,7 +126,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#ECE6D6"
+        backgroundColor: "#ECE6D6",
     },
     verticalScroll: {
         width: '100%',

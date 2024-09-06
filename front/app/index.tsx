@@ -26,6 +26,7 @@ export default function index () {
           name="Result" 
           component={ResultScreen} 
           options={{headerShown: false}}
+          // initialParams={{ score: 9, quizLength: 10 }}
         />
         <Stack.Screen 
           name="QuizzesByCategory"

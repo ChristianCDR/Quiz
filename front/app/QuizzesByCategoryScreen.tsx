@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from "react-native"
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ActivityIndicator, StatusBar } from "react-native"
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { Question, QuizzesByCategoryScreenRouteProp, QuizzesByCategoryNavigationProp, ErrorType } from "../constants/types";
@@ -21,7 +21,7 @@ export default function QuizzesByCategoryScreen ({route} : Props) {
     useEffect(() => {
         const fetchByCategoryId = async () => {
            try {
-                const apiUrl= `http://192.168.1.161:8000/api/questions/category/${categoryId}`
+                const apiUrl= `http://192.168.133.43:8000/api/questions/category/${categoryId}`
                 const response = await axios.get(apiUrl);
                 setData(response.data)
            }
@@ -63,23 +63,24 @@ export default function QuizzesByCategoryScreen ({route} : Props) {
     }, [data])
     return (
         <View style={styles.container}>
+            <StatusBar
+                backgroundColor="#1E3C58"
+                barStyle="light-content"   
+            />
             <BackButton navigation={navigation} />
-            { error ?
-                <Text style={styles.errorText}> {error} </Text>
-                : <ScrollView style={styles.scrollView}>
-                    {quizzes.length > 0 ? (
-                    quizzes.map((quiz, index) => (
-                      <View key={index}>
+            <ScrollView style={styles.scrollView}>
+                {quizzes.length > 0 ? (
+                    quizzes.map((_, index) => (
+                        <View key={index}>
                         <TouchableOpacity style={styles.quiz} onPress={()=> navigation.navigate('Quiz', {quizData: quizzes[index], 'categoryName': categoryName})}>
                             <Text style={styles.quizText}>Quiz {index + 1}</Text>
                         </TouchableOpacity>
-                      </View>
+                        </View>
                     ))
-                  ) : (
-                    <Text>No quizzes available</Text>
-                  )}
-                </ScrollView>
-            }         
+                ) : (
+                <Text style = {{textAlign: 'center'}} >No quizzes available</Text>
+                )}
+            </ScrollView>       
         </View>
     );
 }
