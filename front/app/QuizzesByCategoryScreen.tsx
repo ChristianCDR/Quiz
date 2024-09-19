@@ -21,7 +21,7 @@ export default function QuizzesByCategoryScreen ({route} : Props) {
     useEffect(() => {
         const fetchByCategoryId = async () => {
            try {
-                const apiUrl= `http://192.168.133.43:8000/api/questions/category/${categoryId}`
+                const apiUrl= `http://192.168.1.161:8000/api/questions/category/${categoryId}`
                 const response = await axios.get(apiUrl);
                 setData(response.data)
            }

@@ -22,7 +22,7 @@ export default function HomeScreen() {
     useEffect(() => {
         const fetchCategories = async () => {
            try {
-                const apiUrl= 'http://192.168.133.43:8000/api/categories/'
+                const apiUrl= 'http://192.168.1.161:8000/api/categories/'
                 const response = await axios.get(apiUrl);
                 setData(response.data)
            }
