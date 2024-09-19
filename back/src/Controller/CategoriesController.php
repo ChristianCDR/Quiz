@@ -242,7 +242,7 @@ class CategoriesController extends AbstractController
             )
         ]
     )]
-    public function edit(Request $request, Categories $category, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Categories $category, EntityManagerInterface $entityManager): JsonResponse
     {
         if (!$category) {
             return new JsonResponse([
@@ -304,7 +304,7 @@ class CategoriesController extends AbstractController
             )
         ]
     )]
-    public function delete(Request $request, Categories $category, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Categories $category, EntityManagerInterface $entityManager): JsonResponse
     {
         if (!$category) {
             return new JsonResponse([
