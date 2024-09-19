@@ -3,6 +3,7 @@ import { useState } from 'react';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Entypo from '@expo/vector-icons/Entypo';
 
 
 export default function Footer () {
@@ -35,7 +36,14 @@ export default function Footer () {
                     >
                         <FontAwesome name="book" size={24} color="black" />
                         <Text>Cours</Text>
-                    </TouchableOpacity>    
+                    </TouchableOpacity>  
+                    <TouchableOpacity 
+                        onPress={()=>{handlePress(4)}} 
+                        style={[styles.button, activeButton === 4 && styles.pressedButton]}
+                    >
+                        <Entypo name="dots-three-vertical" size={24} color="black" />
+                        <Text>Plus</Text>
+                    </TouchableOpacity>   
             </View>
     )
 }
@@ -59,7 +67,7 @@ const styles = StyleSheet.create({
     },
     pressedButton: {
         backgroundColor: '#ECE6D6',
-        paddingHorizontal: 10,
+        paddingHorizontal: 20,
         borderRadius: 30
     }
 })

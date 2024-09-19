@@ -1,5 +1,5 @@
-import { RouteProp } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RouteProp } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 export interface Question  {
     "questiontext": string, //à modifier en questionText
@@ -13,6 +13,7 @@ export interface Category {
 }
 
 export type RootStackParamList = {
+    Register: undefined
     Home: undefined
     Quiz: {quizData: Question[], categoryName: string}
     Result: { score: number, quizLength: number }
@@ -21,18 +22,20 @@ export type RootStackParamList = {
 
 
 
-export type ErrorType = string | null;
+export type ErrorType = string | null
 
-export type QuizzesByCategoryNavigationProp = NativeStackNavigationProp<RootStackParamList, 'QuizzesByCategory'>;
+export type QuizzesByCategoryNavigationProp = NativeStackNavigationProp<RootStackParamList, 'QuizzesByCategory'>
 
 export type QuizzesByCategoryScreenRouteProp = RouteProp<RootStackParamList, 'QuizzesByCategory'>
 
-export type QuizScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Quiz'>;
+export type QuizScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Quiz'>
 
 export type QuizScreenRouteProp = RouteProp<RootStackParamList, 'Quiz'>
 
-export type ResultScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Result'>;
+export type ResultScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Result'>
 
-export type ResultScreenRouteProp = RouteProp<RootStackParamList, 'Result'>;
+export type ResultScreenRouteProp = RouteProp<RootStackParamList, 'Result'>
 
-export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
+export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>
+
+export type RegisterScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Register'>

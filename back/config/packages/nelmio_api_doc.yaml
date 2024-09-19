@@ -9,6 +9,8 @@ nelmio_api_doc:
               description: 'Endpoints related to categories'
             - name: 'Questions'
               description: 'Endpoints related to questions'
+            - name: 'User'
+              description: 'Endpoints related to user management'
     areas: # to filter documented areas
         path_patterns:
             - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
