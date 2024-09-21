@@ -4,6 +4,7 @@ import HomeScreen from './HomeScreen';
 import QuizScreen from './QuizScreen';
 import ResultScreen from './ResultScreen';
 import RegisterScreen from './RegisterScreen';
+import LoginScreen from './LoginScreen';
 import QuizzesByCategoryScreen from './QuizzesByCategoryScreen';
 import { RootStackParamList } from "../constants/types";
 
@@ -12,7 +13,12 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export default function index () {
   return ( 
     <>
-      <Stack.Navigator initialRouteName='Home'>
+      <Stack.Navigator initialRouteName='Login'>
+        <Stack.Screen 
+          name="Login" 
+          component={LoginScreen} 
+          options={{headerShown: false}}                                                                                                                           
+        />
         <Stack.Screen 
           name="Register" 
           component={RegisterScreen} 
