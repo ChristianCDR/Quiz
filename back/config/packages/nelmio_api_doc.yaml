@@ -1,7 +1,7 @@
 nelmio_api_doc:
     documentation:
         info:
-            title: Quiz 96 API Documentation
+            title: ResQ18 API Documentation
             description: An awesome app!
             version: 1.0.0
         tags:

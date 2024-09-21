@@ -14,18 +14,27 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-        main:
-            lazy: true
+        api:
+            pattern: ^/api/
+            stateless: true
             provider: app_user_provider
-            form_login:
-                login_path: app_login
-                check_path: app_login
-                default_target_path: app_user_index
-                enable_csrf: true
-            logout:
-                path: app_logout
-                # where to redirect after logout
-                target: app_login
+            json_login:
+                check_path: /api/login
+                username_path: email
+                password_path: password
+
+        # main:
+        #     lazy: true
+        #     provider: app_user_provider
+        #     form_login:
+        #         login_path: app_login
+        #         check_path: app_login
+        #         default_target_path: app_user_index
+        #         enable_csrf: true
+        #     logout:
+        #         path: app_logout
+        #         # where to redirect after logout
+        #         target: app_login
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall

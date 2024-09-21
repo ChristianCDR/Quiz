@@ -23,10 +23,10 @@ export default function HomeScreen() {
         const fetchCategories = async () => {
            try {
                 const apiUrl= 'http://192.168.1.161:8000/api/categories/'
-                const response = await axios.get(apiUrl);
+                const response = await axios.get(apiUrl)
                 setData(response.data)
            }
-           catch (error: unknown) {
+           catch (error) {
                 const errMessage = (error as Error).message
                 setError(errMessage)
            }
