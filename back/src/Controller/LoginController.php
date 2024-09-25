@@ -68,11 +68,13 @@ class LoginController extends AbstractController
         }
 
         $user = $userRepository->findOneBy(['email'=>$email]);
+
         if (!$user || !$passwordHasher->isPasswordValid($user, $password)) {
             return new JsonResponse(['error' => 'E-mail ou mot de passe invalide'], JsonResponse::HTTP_UNAUTHORIZED);
         }
         return new JsonResponse ([
             'message' => 'Login successful',
+            'userName' => $user->getUsername()
         ], JsonResponse::HTTP_OK);
     }
 
