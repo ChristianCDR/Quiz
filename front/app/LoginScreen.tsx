@@ -1,8 +1,12 @@
 import React, { useState } from 'react'
 import axios from 'axios'
-import { LoginScreenNavigationProp } from '../constants/types'
+import { LoginScreenNavigationProp } from '@/constants/types'
 import { useNavigation } from '@react-navigation/native'
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native'
+
+// JWT
+// envoi de mail de confirmation
+// Oauth2
 
 export default function LoginScreen () {
     const [email, setEmail] = useState<string>()
@@ -11,24 +15,25 @@ export default function LoginScreen () {
     const navigation = useNavigation<LoginScreenNavigationProp>()
 
     const handleLogin = async () => {
-        const apiUrl = 'http://192.168.1.161:8000/api/login'
-        const body = {
-            "email": email,
-            "password": password
-        }
-        try {
-            const response = await axios.post(apiUrl, body, {
-                headers: {
-                    'Content-Type': 'application/json', 
-                     Accept: 'application/json'
-                }
-            })
 
-            if (response.status == 200) navigation.navigate('Home')
-        }
-        catch (error) {
-            console.log(error)
-        }        
+      const apiUrl = 'http://192.168.5.43:8000/api/login'
+      const body = {
+          "email": email,
+          "password": password
+      }
+      try {
+          const response = await axios.post(apiUrl, body, {
+              headers: {
+                  'Content-Type': 'application/json', 
+                    Accept: 'application/json'
+              }
+          })
+          if (response.status == 200) navigation.navigate('Home', {userName: response.data.userName})
+      }
+      catch (error) {
+          setError('La connexion a échoué.. Veuillez réessayer..')
+          console.log(error)
+      }
     }
 
     return (
@@ -62,6 +67,11 @@ export default function LoginScreen () {
             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
                 <Text style={styles.linkText}>Pas encore inscrit ? Inscrivez-vous</Text>
             </TouchableOpacity>
+            {error? 
+              <View>
+                <Text style={styles.errorText}>{error}</Text>
+              </View>: ''
+          }
         </View>
     )
 }
@@ -112,8 +122,9 @@ const styles = StyleSheet.create({
       marginTop: 10,
     },
     errorText: {
-      color: 'red',
-      marginBottom: 10,
+      color: '#F15743',
+      marginVertical: 10,
       textAlign: 'center',
-    },
+      fontSize: 16
+    }
 })
