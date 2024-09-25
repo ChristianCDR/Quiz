@@ -2,13 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, SafeAreaView, Text, StatusBar, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
-import { HomeScreenNavigationProp, ErrorType, Category } from "../constants/types";
+import { HomeScreenNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "../constants/types";
 import Footer from '@/components/Footer';
 
-export default function HomeScreen() {
+type Props = {
+    route: HomeScreenRouteProp
+}
+
+export default function HomeScreen({route}: Props) {
     const [data, setData] = useState<Category[]>([]);
     const [error, setError] = useState<ErrorType>();
     const [loading, setLoading] = useState<boolean>(true);
+    const {userName} = route.params
 
     let images: { [key: string]: any } = {
         'fire.png': require('../assets/images/fire_v2.png'),
@@ -22,7 +27,7 @@ export default function HomeScreen() {
     useEffect(() => {
         const fetchCategories = async () => {
            try {
-                const apiUrl= 'http://192.168.1.161:8000/api/categories/'
+                const apiUrl= 'http://192.168.5.43:8000/api/categories/'
                 const response = await axios.get(apiUrl)
                 setData(response.data)
            }
@@ -64,14 +69,12 @@ export default function HomeScreen() {
                 barStyle="light-content"   
             />
             <ScrollView style={styles.verticalScroll}>
-                <View style={styles.user}>
-                    <TouchableOpacity>
-                        <Image
-                            source={require('../assets/images/myAvatar.png')}
-                            style={styles.circularImgView}
-                        />
-                    </TouchableOpacity>
-                    <Text style={styles.userName}>Christian CDR</Text>
+                <View style={styles.user}>              
+                    <Image
+                        source={require('../assets/images/myAvatar.png')}
+                        style={styles.circularImgView}
+                    />
+                    <Text style={styles.userName}>{userName}</Text>
                 </View>
 
                 <View style={styles.card}>
@@ -146,7 +149,8 @@ const styles = StyleSheet.create({
     userName: {
         color: 'white',
         fontWeight: 'bold', 
-        paddingTop: 45
+        paddingTop: 45,
+        textTransform: 'capitalize'
     },
     circularImgView: {
         width: 50,
