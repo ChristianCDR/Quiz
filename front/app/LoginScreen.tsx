@@ -3,15 +3,17 @@ import axios from 'axios'
 import { LoginScreenNavigationProp } from '@/constants/types'
 import { useNavigation } from '@react-navigation/native'
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native'
+import FontAwesome from '@expo/vector-icons/FontAwesome'
 
 // JWT
-// envoi de mail de confirmation
 // Oauth2
+// envoi de mail de confirmation
 
 export default function LoginScreen () {
     const [email, setEmail] = useState<string>()
     const [password, setPassword] = useState<string>()
     const [error, setError] = useState<string>()
+    const [secureText, setSecureText] = useState<boolean>(true)
     const navigation = useNavigation<LoginScreenNavigationProp>()
 
     const handleLogin = async () => {
@@ -36,6 +38,10 @@ export default function LoginScreen () {
       }
     }
 
+    const toggleSecureText = () => {
+      setSecureText(!secureText)
+    }
+
     return (
         <View style={styles.container}>
             <StatusBar
@@ -54,13 +60,18 @@ export default function LoginScreen () {
                 keyboardType="email-address"
                 autoCapitalize="none"
             />
-            <TextInput
-                style={styles.input}
-                placeholder="Mot de passe"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-            />
+            <View>
+              <TextInput
+                  style={styles.input}
+                  placeholder="Mot de passe"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={secureText}
+              />
+              <TouchableOpacity  style={styles.eye} onPress={toggleSecureText}>
+                <FontAwesome name={secureText? "eye" : "eye-slash"} size={24} color="black" />
+              </TouchableOpacity>
+            </View>
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
                 <Text style={styles.buttonText}>Se connecter</Text>
             </TouchableOpacity>
@@ -103,6 +114,11 @@ const styles = StyleSheet.create({
       paddingHorizontal: 15,
       marginBottom: 20,
       backgroundColor: '#fff',
+    },
+    eye: {
+      position: 'absolute',
+      right: 15,
+      top: 12
     },
     button: {
       backgroundColor: '#2A2B31',

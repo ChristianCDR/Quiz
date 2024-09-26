@@ -4,6 +4,7 @@ import { emailValidator, passwordValidator, userNameValidator }  from '@/compone
 import { RegisterScreenNavigationProp } from '../constants/types'
 import { useNavigation } from '@react-navigation/native'
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native'
+import FontAwesome from '@expo/vector-icons/FontAwesome'
 
 
 export default function RegisterScreen () {
@@ -13,6 +14,7 @@ export default function RegisterScreen () {
   const [userName, setUserName] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [error, setError] = useState<string>()
+  const [secureText, setSecureText] = useState<boolean>(true)
   const navigation = useNavigation<RegisterScreenNavigationProp>()
   
   const handleRegister = async () => {
@@ -46,6 +48,10 @@ export default function RegisterScreen () {
         console.log(errMessage)
       }  
     }    
+  }
+
+  const toggleSecureText = () => {
+    setSecureText(!secureText)
   }
 
   return (
@@ -82,13 +88,18 @@ export default function RegisterScreen () {
               keyboardType="default"
               autoCapitalize="none"
           />
-          <TextInput
-              style={styles.input}
-              placeholder="Mot de passe"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-          />
+          <View>
+            <TextInput
+                style={styles.input}
+                placeholder="Mot de passe"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={secureText}
+            />
+            <TouchableOpacity  style={styles.eye} onPress={toggleSecureText}>
+              <FontAwesome name={secureText? "eye" : "eye-slash"} size={24} color="black" />
+            </TouchableOpacity>
+          </View>
           <TouchableOpacity style={styles.button} onPress={handleRegister}>
               <Text style={styles.buttonText}>S'inscrire</Text>
           </TouchableOpacity>
@@ -135,6 +146,11 @@ const styles = StyleSheet.create({
       paddingHorizontal: 15,
       marginBottom: 20,
       backgroundColor: '#fff',
+    },
+    eye: {
+      position: 'absolute',
+      right: 15,
+      top: 12
     },
     button: {
       backgroundColor: '#2A2B31',
