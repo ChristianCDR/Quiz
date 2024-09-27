@@ -3,17 +3,18 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Attributes as OA;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 
 #[Route('/api/user')]
 class UserController extends AbstractController
@@ -72,6 +73,83 @@ class UserController extends AbstractController
         }
 
         return new JsonResponse ($data, JsonResponse::HTTP_OK);
+    }
+
+    #[Route('/new', name: 'app_user_new', methods: ['POST'])]
+    #[OA\Post(
+        summary: 'Create a new user',
+        tags: ['User'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                required: ['email', 'userName', 'password'],
+                properties: [
+                    new OA\Property(property: 'email', type: 'string', example: 'mail@mail.com'),
+                    new OA\Property(property: 'userName', type: 'string', example: 'christian CDR'),
+                    new OA\Property(property: 'password', type: 'string', example: 'plainTextPassword')
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 201,
+                description: 'User created successfully',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'id', type: 'integer', example: 1),
+                        new OA\Property(property: 'email', type: 'string', example: 'mail@mail.com'),
+                        new OA\Property(property: 'userName', type: 'string', example: 'christian CDR'),
+                        new OA\Property(property: 'password', type: 'string', example: 'hashedPassword')
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Invalid input',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'error', type: 'string', example: 'Invalid user')
+                    ]
+                )
+            )
+        ]
+    )]
+    public function new(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $user = new User();
+
+        $user 
+        ->setEmail($data['email'] ?? '')
+        ->setUserName($data['userName'] ?? '')
+        ->setPassword($data['password'] ?? '')
+        ;
+
+        if (empty($user->getEmail()) || empty($user->getUserName()) || empty($user->getPassword())) {
+            return new JsonResponse([
+                'error' => 'Les champs email, username et password sont obligatoires.'
+            ], JsonResponse::HHTP_BAD_REQUEST);
+        };
+
+        $hashedPassword = $passwordHasher->hashPassword(
+            $user,
+            $data['password']
+        );
+
+        $user->setPassword($hashedPassword);
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return new JsonResponse ([
+            'userId' => $user->getId(),
+            'email' => $user->getEmail(), 
+            'userName' => $user->getUserName(), 
+            'password' => $user->getPassword()
+        ], JsonResponse::HTTP_CREATED);
     }
 
     #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]

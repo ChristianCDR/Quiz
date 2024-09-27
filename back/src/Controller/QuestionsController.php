@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\Questions;
 use App\Entity\Options;
 use App\Entity\Categories;
-namespace App\Controller;
+use App\Repository\QuestionsRepository;
 use App\Repository\CategoriesRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

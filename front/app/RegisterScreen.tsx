@@ -27,7 +27,7 @@ export default function RegisterScreen () {
     } 
 
     else if (emailValidator(email, confirmEmail) && userNameValidator(userName.trim()) && passwordValidator(password)) {
-      const apiUrl = 'http://192.168.5.43:8000/api/register'
+      const apiUrl = 'http://192.168.5.43:8000/api/user/new'
       const body = {
         "email": email,
         "userName": userName.trim(),
@@ -82,7 +82,7 @@ export default function RegisterScreen () {
           />
           <TextInput
               style={styles.input}
-              placeholder="Nom d'utilisateur"
+              placeholder="Nom d'utilsateur"
               value={userName}
               onChangeText={setUserName}
               keyboardType="default"

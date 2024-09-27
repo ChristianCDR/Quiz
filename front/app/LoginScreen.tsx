@@ -5,9 +5,9 @@ import { useNavigation } from '@react-navigation/native'
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
 
-
-// envoi de mail de confirmation
+// JWT
 // Oauth2
+// envoi de mail de confirmation
 
 export default function LoginScreen () {
     const [email, setEmail] = useState<string>()

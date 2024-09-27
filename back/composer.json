@@ -10,7 +10,6 @@
         "doctrine/doctrine-bundle": "^2.10",
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.16",
-        "lexik/jwt-authentication-bundle": "^2.21",
         "nelmio/api-doc-bundle": "^4.26",
         "symfony/asset": "6.3.*",
         "symfony/console": "6.3.*",
@@ -18,7 +17,6 @@
         "symfony/flex": "^2",
         "symfony/form": "6.3.*",
         "symfony/framework-bundle": "6.3.*",
-        "symfony/mailer": "6.3.*",
         "symfony/runtime": "6.3.*",
         "symfony/security-bundle": "6.3.*",
         "symfony/security-csrf": "6.3.*",
@@ -26,7 +24,6 @@
         "symfony/validator": "6.3.*",
         "symfony/webpack-encore-bundle": "^2.1",
         "symfony/yaml": "6.3.*",
-        "symfonycasts/verify-email-bundle": "^1.17",
         "zircote/swagger-php": "^4.10"
     },
     "require-dev": {
