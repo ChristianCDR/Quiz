@@ -1,108 +1,125 @@
-import React from 'react';
-import { StyleSheet, View, Text, Button, StatusBar, Image, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, SafeAreaView, Text, StatusBar, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Svg, Path } from 'react-native-svg';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import axios from 'axios';
+import { HomeScreenNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "../constants/types";
+import Footer from '@/components/Footer';
 
-type RootStackParamList = {
-    Home: undefined;
-    Quiz: undefined;
-    Result: undefined;
-  };
-type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
+type Props = {
+    route: HomeScreenRouteProp
+}
 
-export default function HomeScreen() {
+export default function HomeScreen({route}: Props) {
+    const [data, setData] = useState<Category[]>([]);
+    const [error, setError] = useState<ErrorType>();
+    const [loading, setLoading] = useState<boolean>(true);
+    const {userName} = route.params
+
+    let images: { [key: string]: any } = {
+        'fire.png': require('../assets/images/fire_v2.png'),
+        'fender-bender.png': require('../assets/images/car_accident.png'),
+        'chainsaw.png': require('../assets/images/chainsaw.png'),
+        'rescue.png': require('../assets/images/sap.png')
+    }
+
     const navigation = useNavigation<HomeScreenNavigationProp>();
-    const categories = [
-        { id: 1, name: 'Science' },
-        { id: 2, name: 'Mathématiques' },
-        { id: 3, name: 'Histoire' },
-        { id: 4, name: 'Géographie' },
-        { id: 5, name: 'Informatique' }
-      ];
 
-      const recentQuiz = [
+    useEffect(() => {
+        const fetchCategories = async () => {
+           try {
+                const apiUrl= 'http://192.168.5.43:8000/api/categories/'
+                const response = await axios.get(apiUrl)
+                setData(response.data)
+           }
+           catch (error) {
+                const errMessage = (error as Error).message
+                setError(errMessage)
+           }
+           finally {
+            setLoading(false)
+           }   
+        }
+        fetchCategories();
+    },[])
+
+    if (loading) {
+        return (
+          <View style={styles.container}>
+            <ActivityIndicator size="large" color="#0000ff" />
+          </View>
+        );
+    }
+    
+    const recentQuiz = [
         { id: 1, name: 'Quiz 1' },
         { id: 2, name: 'Quiz 2' },
         { id: 3, name: 'Quiz 3' },
         { id: 4, name: 'Quiz 4' },
         { id: 5, name: 'Quiz 5' }
-      ];
+    ];
 
-    const handlePress = () => {
-        alert('top!')
+    const handleNavigation = (id: number, name: string) => {
+        navigation.navigate('QuizzesByCategory', {categoryId: id, categoryName: name})
     }
+ 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView  style={styles.container}>
             <StatusBar
-                backgroundColor="#2A2B31"
-                barStyle="light-content"
+                backgroundColor="#1E3C58"
+                barStyle="light-content"   
             />
-
-            <View style={styles.user}>
-                <TouchableOpacity>
+            <ScrollView style={styles.verticalScroll}>
+                <View style={styles.user}>              
                     <Image
                         source={require('../assets/images/myAvatar.png')}
                         style={styles.circularImgView}
                     />
-                </TouchableOpacity>
-                <Text style={styles.userName}>Jean Dupont</Text>
-            </View>
-
-            <View style={styles.card}>
-                <Image  style={styles.cardImage} source ={require('../assets/images/question.jpg')}/>
-                <View style={styles.cardText}>
-                    <Text style={styles.cardText1}> Joue & {"\n"} Gagne !</Text>
-                    <Text style={styles.cardText2}>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                    </Text>
+                    <Text style={styles.userName}>{userName}</Text>
                 </View>
-            </View>
 
-            <Text style={[styles.title, styles.categoryTitle]}>Catégories</Text>
+                <View style={styles.card}>
+                    <View style={styles.cardImageView}>
+                        <Image  style={styles.cardImage} source ={require('../assets/images/brain_v3.png')}/>
+                    </View>
+                    
+                    <View style={styles.cardText}>
+                        <Text style={styles.cardText1}> Joue & {"\n"} Gagne !</Text>
+                        <Text style={styles.cardText2}>
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                        </Text>
+                    </View>
+                </View>
 
-            <ScrollView 
-                horizontal 
-                showsHorizontalScrollIndicator={false} 
-                contentContainerStyle={styles.categoryScrollContainer}
-            >
-                {categories.map(category => (
-                <TouchableOpacity key={category.id} style={styles.category}>
-                    <Text style={styles.categoryText}>{category.name}</Text>
-                </TouchableOpacity>
-                ))}
-            </ScrollView>
+                <Text style={[styles.title, styles.categoryTitle]}>Catégories</Text>
+                
+                <ScrollView 
+                    horizontal 
+                    showsHorizontalScrollIndicator={false} 
+                    contentContainerStyle={styles.categoryScrollContainer}
+                >
+                    {data.length > 0 ? (
+                        data.map((category) => ( 
+                            <TouchableOpacity key={category.id} style={styles.category} onPress={()=> handleNavigation(category.id, category.categoryName)}>
+                                <Image style={styles.categoryImage} source ={images[category.categoryImage]}/>
+                                <Text style={styles.categoryText}>{category.categoryName}</Text>
+                            </TouchableOpacity>
+                            ))
+                        ) : <Text style={styles.errorText}>{error}</Text>
+                    }
+                </ScrollView>
+                <Text style={[styles.title, styles.recentTitle]}>Récents</Text>
 
-            <Text style={[styles.title, styles.recentTitle]}>Récents</Text>
+                <View style={styles.recentScrollContainer}>
+                    {recentQuiz.map(recentQuiz => (
+                    <TouchableOpacity key={recentQuiz.id} style={styles.recentQuiz}>
+                        <Text style={styles.recentText}>{recentQuiz.name}</Text>
+                    </TouchableOpacity>
+                    ))}
+                </View>
 
-            <ScrollView style={styles.recentScrollContainer}>
-                {recentQuiz.map(recentQuiz => (
-                <TouchableOpacity key={recentQuiz.id} style={styles.recentQuiz}>
-                    <Text style={styles.categoryText}>{recentQuiz.name}</Text>
-                </TouchableOpacity>
-                ))}
-            </ScrollView>
-
-            <View style={styles.footer}>
-                <TouchableOpacity style={styles.homeButton} onPress={()=>{handlePress()}}>
-                    <Svg width="34" height="34" viewBox="0 0 24 24">
-                        <Path fill="#2A2B31" d="M5 20V9.5l7-5.288L19 9.5V20h-5.192v-6.384h-3.616V20z"/>
-                    </Svg> 
-                    <Text style={styles.homeButtonText}>Home</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=>{handlePress()}}>
-                    <Svg width="28" height="28" viewBox="0 0 32 32">
-                        <Path fill="#2A2B31" d="M14 23h8v2h-8zm-4 0h2v2h-2zm4-5h8v2h-8zm-4 0h2v2h-2zm4-5h8v2h-8zm-4 0h2v2h-2z"/>
-                        <Path fill="#2A2B31" d="M25 5h-3V4a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v1H7a2 2 0 0 0-2 2v21a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2M12 4h8v4h-8Zm13 24H7V7h3v3h12V7h3Z"/>
-                    </Svg>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=>{handlePress()}}>
-                    <Svg width="32" height="32" viewBox="0 0 24 24">
-                        <Path fill="#2A2B31" stroke="#2A2B31" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0M3 6v13m9-13v13m9-13v13"/>
-                    </Svg>
-                </TouchableOpacity>    
-            </View>
+                <Footer/>
+                
+            </ScrollView>      
         </SafeAreaView>
     );
 }
@@ -111,23 +128,29 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        backgroundColor: "#ECE6D6",
+    },
+    verticalScroll: {
+        width: '100%',
+    },
+    errorText: {
+        fontSize: 18,
+        color: 'red',
     },
     user: {
         flexDirection: 'row',
-        position: 'absolute',
-        top:0,
-        left:0,
         width: '100%',
         height: 200,
         borderBottomLeftRadius: 10,
         borderBottomRightRadius: 10,
-        backgroundColor: '#2A2B31'
+        backgroundColor: '#1E3C58'
     },
     userName: {
         color: 'white',
-        fontWeight: 'bold',
-        paddingTop: 45
+        fontWeight: 'bold', 
+        paddingTop: 45,
+        textTransform: 'capitalize'
     },
     circularImgView: {
         width: 50,
@@ -143,14 +166,21 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         position: 'absolute',
         top: 100,
-        backgroundColor: '#000',
+        alignSelf: 'center',
+        backgroundColor: '#1E2644',
         flexDirection: 'row',
         justifyContent: 'space-around',
-        alignItems: 'center',
+        alignItems: 'center'
+    },
+    cardImageView: {
+        width: '40%',
+        aspectRatio: 1, // Maintient le ratio pour garder la View carrée
+        overflow: 'hidden',   
     },
     cardImage: {
-        width: '40%',
-        height: '70%'
+        width: '100%',
+        height: '100%',
+        resizeMode: 'contain'
     },
     cardText: {
         justifyContent: 'center',
@@ -159,48 +189,38 @@ const styles = StyleSheet.create({
     cardText1: {
         color: 'white',
         fontSize: 26,
+        justifyContent: 'center',
         fontWeight: 'bold',
     },
     cardText2: {
         color: 'white'
     },
-    footer: {
-        height: 50,
+    categoryImage: {
         width: '100%',
-        backgroundColor: 'white',
-        position: 'absolute',
-        bottom: 0,
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center'
-    },
-    homeButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    homeButtonText: {
-        paddingTop: 4
+        height: '60%',
+        marginHorizontal: 'auto',
+        resizeMode: 'contain'
     },
     categoryScrollContainer: {
-      paddingHorizontal: 10,
-      height: 100,
-      marginTop: 10,
+        paddingHorizontal: 10,
+        height: 120,
+        marginTop: 10,
     },
     recentScrollContainer: {
-        flex:1,
         paddingHorizontal: 10,
         width: '100%',
         paddingBottom: 100
     },
     category: {
-      backgroundColor: '#000',
-      borderRadius: 20,
-      paddingVertical: 10,
-      paddingHorizontal: 20,
-      marginRight: 10, 
+        backgroundColor: '#1E3C58',
+        height: '100%',
+        borderRadius: 20,
+        paddingVertical: 10,
+        marginRight: 10,
+        justifyContent: 'space-around',
     },
     recentQuiz: {
-        backgroundColor: '#000',
+        backgroundColor: '#1E3C58',
         borderRadius: 20,
         paddingVertical: 10,
         paddingHorizontal: 20,
@@ -208,23 +228,32 @@ const styles = StyleSheet.create({
         marginBottom: 15
     },
     categoryTitle: {
-        marginTop: 300,
+        marginHorizontal: 'auto',
+        marginTop: 120,
         marginBottom: 10
     },
     recentTitle: {
-        marginTop: -200,
-        marginBottom: 10
+        marginHorizontal: 'auto',
+        marginTop: 20,
+        marginBottom: 20
     },
     title: {
-      color: '#000',
-      fontSize: 18,
-      fontWeight: 'bold',
-      width: '90%',
-      textAlign: 'left'
+        color: '#000',
+        fontSize: 18,
+        fontWeight: 'bold',
+        width: '90%',
+        textAlign: 'left'
     },
     categoryText: {
-      color: '#fff',
-      fontSize: 18,
-      fontWeight: 'bold',
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        paddingHorizontal: 15
+    },
+    recentText: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold'
     }
 });
