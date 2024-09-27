@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,7 +13,7 @@ use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Attributes as OA;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use App\Repository\UserRepository;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 
 class LoginController extends AbstractController
 {
@@ -57,7 +58,7 @@ class LoginController extends AbstractController
             )
         ]
     )]
-    public function login(Request $request, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher): JsonResponse
+    public function login(Request $request, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher, JWTTokenManagerInterface $JWTManager): JsonResponse
     {
         $data=json_decode($request->getContent(), true);
         $email= $data['email'];
@@ -74,7 +75,8 @@ class LoginController extends AbstractController
         }
         return new JsonResponse ([
             'message' => 'Login successful',
-            'userName' => $user->getUsername()
+            'userName' => $user->getUsername(),
+            'token' => $JWTManager->create($user)
         ], JsonResponse::HTTP_OK);
     }
 
