@@ -13,7 +13,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export default function index () {
   return ( 
     <>
-      <Stack.Navigator initialRouteName='Register'>
+      <Stack.Navigator initialRouteName='Login'>
         <Stack.Screen 
           name="Login" 
           component={LoginScreen} 
