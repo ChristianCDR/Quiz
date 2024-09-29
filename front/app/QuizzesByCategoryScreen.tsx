@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { Question, QuizzesByCategoryScreenRouteProp, QuizzesByCategoryNavigationProp, ErrorType } from "@/constants/types";
 import BackButton from "@/components/BackButton";
+import { urlDomain } from '@/constants/variables'
 
 type Props = {
     route: QuizzesByCategoryScreenRouteProp
@@ -21,7 +22,7 @@ export default function QuizzesByCategoryScreen ({route} : Props) {
     useEffect(() => {
         const fetchByCategoryId = async () => {
            try {
-                const apiUrl= `http://192.168.5.43:8000/api/questions/category/${categoryId}`
+                const apiUrl= urlDomain + `/api/questions/category/${categoryId}`
                 const response = await axios.get(apiUrl);
                 setData(response.data)
            }

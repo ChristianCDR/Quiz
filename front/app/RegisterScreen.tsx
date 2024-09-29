@@ -5,7 +5,7 @@ import { RegisterScreenNavigationProp } from '../constants/types'
 import { useNavigation } from '@react-navigation/native'
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
-
+import { urlDomain } from '@/constants/variables'
 
 export default function RegisterScreen () {
 
@@ -15,7 +15,11 @@ export default function RegisterScreen () {
   const [password, setPassword] = useState<string>('')
   const [error, setError] = useState<string>()
   const [secureText, setSecureText] = useState<boolean>(true)
+  const [message, setMessage] = useState<string>('')
+  const [userId, setUserId] = useState<boolean>(false)
   const navigation = useNavigation<RegisterScreenNavigationProp>()
+
+  
   
   const handleRegister = async () => {
 
@@ -27,20 +31,24 @@ export default function RegisterScreen () {
     } 
 
     else if (emailValidator(email, confirmEmail) && userNameValidator(userName.trim()) && passwordValidator(password)) {
-      const apiUrl = 'http://192.168.5.43:8000/api/register'
+      
+      const apiUrl = urlDomain + '/api/register'
       const body = {
         "email": email,
         "userName": userName.trim(),
         "password": password
       }
+      const headers = {
+        'Content-Type': 'application/json', 
+        Accept: 'application/json'
+      }
+
       try {   
-        const response = await axios.post(apiUrl, body, {
-            headers: {
-              'Content-Type': 'application/json', 
-              Accept: 'application/json'
-            }
-        })        
-        if (response.status == 201) navigation.navigate('Home', {userName : response.data.userName})
+        const response = await axios.post(apiUrl, body, { headers: headers })       
+        if (response.data) {
+          setMessage(response.data.message)
+          setUserId(response.data.userId)
+        }
       }
       catch(error) {
         const errMessage = (error as Error).message
@@ -110,6 +118,11 @@ export default function RegisterScreen () {
           {error? 
             <View>
               <Text style={styles.errorText}>{error}</Text>
+            </View>: ''
+          }
+          {message? 
+            <View>
+              <Text style={styles.linkText}>{message}</Text>
             </View>: ''
           }
       </View>

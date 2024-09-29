@@ -6,11 +6,12 @@ import ResultScreen from './ResultScreen';
 import RegisterScreen from './RegisterScreen';
 import LoginScreen from './LoginScreen';
 import QuizzesByCategoryScreen from './QuizzesByCategoryScreen';
-import { RootStackParamList } from "../constants/types";
+import { RootStackParamList } from "@/constants/types";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function index () {
+
   return ( 
     <>
       <Stack.Navigator initialRouteName='Login'>
