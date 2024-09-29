@@ -4,9 +4,10 @@ import { LoginScreenNavigationProp } from '@/constants/types'
 import { useNavigation } from '@react-navigation/native'
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
+import { urlDomain } from '@/constants/variables'
 
 
-// envoi de mail de confirmation
+// ngrok
 // Oauth2
 
 export default function LoginScreen () {
@@ -18,7 +19,7 @@ export default function LoginScreen () {
 
     const handleLogin = async () => {
 
-      const apiUrl = 'http://192.168.5.43:8000/api/login'
+      const apiUrl = urlDomain + '/api/login'
       const body = {
           "email": email,
           "password": password

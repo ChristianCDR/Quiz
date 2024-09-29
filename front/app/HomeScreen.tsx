@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { HomeScreenNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "../constants/types";
 import Footer from '@/components/Footer';
+import { urlDomain } from '@/constants/variables';
 
 type Props = {
     route: HomeScreenRouteProp
@@ -27,7 +28,7 @@ export default function HomeScreen({route}: Props) {
     useEffect(() => {
         const fetchCategories = async () => {
            try {
-                const apiUrl= 'http://192.168.5.43:8000/api/categories/'
+                const apiUrl= urlDomain + '/api/categories/'
                 const response = await axios.get(apiUrl)
                 setData(response.data)
            }
