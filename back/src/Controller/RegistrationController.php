@@ -18,6 +18,7 @@ use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class RegistrationController extends AbstractController 
 {   
@@ -40,7 +41,7 @@ class RegistrationController extends AbstractController
                 properties: [
                     new OA\Property(property: 'email', type: 'string', example: 'mail@mail.com'),
                     new OA\Property(property: 'userName', type: 'string', example: 'christian CDR'),
-                    new OA\Property(property: 'password', type: 'string', example: 'plainTextPassword')
+                    new OA\Property(property: 'password', type: 'string', example: 'Azerty1@')
                 ]
             )
         ),
@@ -70,7 +71,7 @@ class RegistrationController extends AbstractController
             )
         ]
     )]
-    public function register (Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager): JsonResponse
+    public function register (Request $request, UserPasswordHasherInterface $passwordHasher, ValidatorInterface $validator, EntityManagerInterface $entityManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $user = new User();
@@ -82,10 +83,14 @@ class RegistrationController extends AbstractController
         ->setIsVerified(false)
         ;
 
-        if (empty($user->getEmail()) || empty($user->getUserName()) || empty($user->getPassword())) {
-            return new JsonResponse([
-                'error' => 'Les champs email, username et password sont obligatoires.'
-            ], JsonResponse::HTTP_BAD_REQUEST);
+        $errors = $validator->validate($user);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+            return new JsonResponse(['errors' => $errorMessages], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         $hashedPassword = $passwordHasher->hashPassword(
@@ -108,7 +113,7 @@ class RegistrationController extends AbstractController
                 ->subject('E-mail de confirmation')
                 ->htmlTemplate('/registration/confirmation_email.html.twig')
             );
-            
+
             return new JsonResponse($user, JsonResponse::HTTP_CREATED);         
         } 
         catch (UniqueConstraintViolationException $e) {
@@ -128,11 +133,9 @@ class RegistrationController extends AbstractController
             $this->emailVerifier->handleEmailConfirmation($request, $user);
         }
         catch (VerifyEmailExceptionInterface $exception) {
-            $this->addFlash('verify_email_error', $exception->getReason());
+            return $this->render('email_confirmation.html.twig', ['message' => $exception->getReason()]);
         }
 
-        $this->addFlash('success', 'Votre adresse e-mail a été vérifiée.');
-
-        return $this->render('email_confirmation.html.twig');
+        return $this->render('email_confirmation.html.twig', ['message' => 'Votre adresse e-mail a été confirmée.']);
     }
 }

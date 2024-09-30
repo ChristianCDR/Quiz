@@ -7,9 +7,10 @@ import FontAwesome from '@expo/vector-icons/FontAwesome'
 import { urlDomain } from '@/constants/variables'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// gerer les identifiants vides en front -> en rouge lorsque vide
-// validation des identifiants en back
+
+// gérer les erreurs en front -> en rouge lorsque vide
 // logout
+
 // Oauth2
 
 type Props = {
@@ -52,7 +53,6 @@ export default function LoginScreen ({route}: Props) {
             storeData(token)
             navigation.navigate('Home', {userName: response.data.userName})
           }
-
       }
       catch (error) {
           setError('La connexion a échoué.. Veuillez réessayer..')

@@ -7,7 +7,7 @@ export function emailValidator (email: string, confirmEmail: string) {
 }
 
 export function userNameValidator (userName: string) {
-    const reg = /^[\w\.-\s]{1,30}$/ 
+    const reg = /^[\w\s\-]{1,30}$/ 
     return reg.test(userName)
 }
 
