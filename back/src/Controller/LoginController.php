@@ -70,6 +70,10 @@ class LoginController extends AbstractController
 
         $user = $userRepository->findOneBy(['email'=>$email]);
 
+        if (!$user->isVerified()) {
+            return new JsonResponse(['error' => 'Veuillez confirmer votre adresse mail avant de vous connecter '], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+
         if (!$user || !$passwordHasher->isPasswordValid($user, $password)) {
             return new JsonResponse(['error' => 'E-mail ou mot de passe invalide'], JsonResponse::HTTP_UNAUTHORIZED);
         }

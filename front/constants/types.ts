@@ -14,7 +14,7 @@ export interface Category {
 
 export type RootStackParamList = {
     Register: undefined
-    Login: undefined
+    Login: {message: string}
     Home: {userName: string}
     Quiz: {quizData: Question[], categoryName: string}
     Result: {score: number, quizLength: number}
@@ -44,3 +44,5 @@ export type HomeScreenRouteProp = RouteProp<RootStackParamList, 'Home'>
 export type RegisterScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Register'>
 
 export type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>
+
+export type LoginScreenRouteProp = RouteProp<RootStackParamList, 'Login'>

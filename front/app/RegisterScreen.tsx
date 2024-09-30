@@ -15,11 +15,7 @@ export default function RegisterScreen () {
   const [password, setPassword] = useState<string>('')
   const [error, setError] = useState<string>()
   const [secureText, setSecureText] = useState<boolean>(true)
-  const [message, setMessage] = useState<string>('')
-  const [userId, setUserId] = useState<boolean>(false)
   const navigation = useNavigation<RegisterScreenNavigationProp>()
-
-  
   
   const handleRegister = async () => {
 
@@ -45,15 +41,17 @@ export default function RegisterScreen () {
 
       try {   
         const response = await axios.post(apiUrl, body, { headers: headers })       
-        if (response.data) {
-          setMessage(response.data.message)
-          setUserId(response.data.userId)
+        if (response.status === 201) {
+          navigation.navigate('Login', { message: 'Inscription réussie.' + '\n' + 'Confirmez votre adresse mail avant de vous connecter.' })
         }
       }
-      catch(error) {
-        const errMessage = (error as Error).message
-        setError("L'inscription a échoué.. Veuillez réessayer..")
-        console.log(errMessage)
+      catch(error: any) {
+        if (error.response) {
+          setError(error.response.data.error);
+          console.log(error.response)
+        } else {
+          setError('Une erreur est survenue. Veuillez réessayer.');
+        }
       }  
     }    
   }
@@ -71,6 +69,11 @@ export default function RegisterScreen () {
           <View style={styles.logoView}>
             <Image style={styles.logo} source={require('../assets/images/resq18.png')}/>
           </View>
+          {error? 
+            <View>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>: ''
+          }
           <Text style={styles.title}>Inscription</Text>
           <TextInput
               style={styles.input}
@@ -112,19 +115,9 @@ export default function RegisterScreen () {
               <Text style={styles.buttonText}>S'inscrire</Text>
           </TouchableOpacity>
   
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <TouchableOpacity onPress={() => navigation.navigate('Login', {message: ''})}>
               <Text style={styles.linkText}>Déjà inscrit ? Connectez-vous</Text>
-          </TouchableOpacity>
-          {error? 
-            <View>
-              <Text style={styles.errorText}>{error}</Text>
-            </View>: ''
-          }
-          {message? 
-            <View>
-              <Text style={styles.linkText}>{message}</Text>
-            </View>: ''
-          }
+          </TouchableOpacity>   
       </View>
   )
 }

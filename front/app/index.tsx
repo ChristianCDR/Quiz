@@ -18,7 +18,8 @@ export default function index () {
         <Stack.Screen 
           name="Login" 
           component={LoginScreen} 
-          options={{headerShown: false}}                                                                                                                           
+          options={{headerShown: false}}   
+          initialParams={{ message: '' }}                                                                                                                        
         />
         <Stack.Screen 
           name="Register" 
