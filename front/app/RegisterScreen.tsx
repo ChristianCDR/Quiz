@@ -5,7 +5,7 @@ import { RegisterScreenNavigationProp } from '../constants/types'
 import { useNavigation } from '@react-navigation/native'
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
-
+import { urlDomain } from '@/constants/variables'
 
 export default function RegisterScreen () {
 
@@ -27,25 +27,31 @@ export default function RegisterScreen () {
     } 
 
     else if (emailValidator(email, confirmEmail) && userNameValidator(userName.trim()) && passwordValidator(password)) {
-      const apiUrl = 'http://192.168.5.43:8000/api/register'
+      
+      const apiUrl = urlDomain + '/api/register'
       const body = {
         "email": email,
         "userName": userName.trim(),
         "password": password
       }
-      try {   
-        const response = await axios.post(apiUrl, body, {
-            headers: {
-              'Content-Type': 'application/json', 
-              Accept: 'application/json'
-            }
-        })        
-        if (response.status == 201) navigation.navigate('Home', {userName : response.data.userName})
+      const headers = {
+        'Content-Type': 'application/json', 
+        Accept: 'application/json'
       }
-      catch(error) {
-        const errMessage = (error as Error).message
-        setError("L'inscription a échoué.. Veuillez réessayer..")
-        console.log(errMessage)
+
+      try {   
+        const response = await axios.post(apiUrl, body, { headers: headers })       
+        if (response.status === 201) {
+          navigation.navigate('Login', { message: 'Inscription réussie.' + '\n' + 'Confirmez votre adresse mail avant de vous connecter.' })
+        }
+      }
+      catch(error: any) {
+        if (error.response) {
+          setError(error.response.data.error);
+          console.log(error.response)
+        } else {
+          setError('Une erreur est survenue. Veuillez réessayer.');
+        }
       }  
     }    
   }
@@ -63,6 +69,11 @@ export default function RegisterScreen () {
           <View style={styles.logoView}>
             <Image style={styles.logo} source={require('../assets/images/resq18.png')}/>
           </View>
+          {error? 
+            <View>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>: ''
+          }
           <Text style={styles.title}>Inscription</Text>
           <TextInput
               style={styles.input}
@@ -104,14 +115,9 @@ export default function RegisterScreen () {
               <Text style={styles.buttonText}>S'inscrire</Text>
           </TouchableOpacity>
   
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <TouchableOpacity onPress={() => navigation.navigate('Login', {message: ''})}>
               <Text style={styles.linkText}>Déjà inscrit ? Connectez-vous</Text>
-          </TouchableOpacity>
-          {error? 
-            <View>
-              <Text style={styles.errorText}>{error}</Text>
-            </View>: ''
-          }
+          </TouchableOpacity>   
       </View>
   )
 }

@@ -67,17 +67,23 @@ class LoginController extends AbstractController
         if (!$email || !$password) {
             return new JsonResponse(['error' => 'Veuillez renseigner votre e-mail et votre mot de passe'], JsonResponse::HTTP_BAD_REQUEST);
         }
-
+   
         $user = $userRepository->findOneBy(['email'=>$email]);
+        
+        if (!$user->isVerified()) {
+            return new JsonResponse(['error' => 'Veuillez confirmer votre adresse mail avant de vous connecter '], JsonResponse::HTTP_UNAUTHORIZED);
+        }
 
         if (!$user || !$passwordHasher->isPasswordValid($user, $password)) {
             return new JsonResponse(['error' => 'E-mail ou mot de passe invalide'], JsonResponse::HTTP_UNAUTHORIZED);
         }
+
         return new JsonResponse ([
             'message' => 'Login successful',
             'userName' => $user->getUsername(),
             'token' => $JWTManager->create($user)
         ], JsonResponse::HTTP_OK);
+        
     }
 
     #[Route(path: '/logout', name: 'app_logout')]
