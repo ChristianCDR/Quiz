@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -17,6 +18,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Assert\NotBlank(message: "L'adresse email ne peut pas être vide.")]
+    #[Assert\Email(
+        mode: 'html5', 
+        message: "Veuillez entrer une adresse email valide."
+    )]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -26,9 +32,46 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Assert\NotBlank(message: "Le mot de passe ne peut pas être vide.")]
+    #[Assert\Length(
+        min: 8,
+        minMessage: "Votre mot de passe doit comporter au moins {{ limit }} caractères."
+    )]
+    #[Assert\Regex(
+        pattern: "/[A-Z]/",
+        match: true,
+        message: "Votre mot de passe doit contenir au moins une lettre majuscule."
+    )]
+    #[Assert\Regex(
+        pattern: "/[a-z]/",
+        match: true,
+        message: "Votre mot de passe doit contenir au moins une lettre minuscule."
+    )]
+    #[Assert\Regex(
+        pattern: "/\d/",
+        match: true,
+        message: "Votre mot de passe doit contenir au moins un chiffre."
+    )]
+    #[Assert\Regex(
+        pattern: "/[@$!%*?&]/",
+        match: true,
+        message:"Votre mot de passe doit contenir au moins un caractère spécial."
+    )]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le nom d'utilisateur ne peut pas être vide.")]
+    #[Assert\Length(
+        min: 1,
+        minMessage: "Votre nom d'utilisateur doit comporter au moins {{ limit }} caractère.",
+        max: 30,
+        maxMessage: "Votre nom d'utilisateur doit comporter au maximum {{ limit }} caractères."
+    )]
+    #[Assert\Regex(
+        pattern: "/^[\w\s\-]+$/",
+        match: true,
+        message: "Votre nom d'utilisateur peut contenir des lettres, chiffres, underscores, tirets et espaces"
+    )]
     private ?string $userName = null;
 
     #[ORM\Column]
