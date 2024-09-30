@@ -8,15 +8,17 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Attributes as OA;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class RegistrationController extends AbstractController 
 {   
@@ -39,7 +41,7 @@ class RegistrationController extends AbstractController
                 properties: [
                     new OA\Property(property: 'email', type: 'string', example: 'mail@mail.com'),
                     new OA\Property(property: 'userName', type: 'string', example: 'christian CDR'),
-                    new OA\Property(property: 'password', type: 'string', example: 'plainTextPassword')
+                    new OA\Property(property: 'password', type: 'string', example: 'Azerty1@')
                 ]
             )
         ),
@@ -69,59 +71,71 @@ class RegistrationController extends AbstractController
             )
         ]
     )]
-    public function register (Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager, JWTTokenManagerInterface $JWTManager, UserRepository $userRepository): JsonResponse
+    public function register (Request $request, UserPasswordHasherInterface $passwordHasher, ValidatorInterface $validator, EntityManagerInterface $entityManager): JsonResponse
     {
-        // $data = json_decode($request->getContent(), true);
-        // $user = new User();
+        $data = json_decode($request->getContent(), true);
+        $user = new User();
 
-        // $user 
-        // ->setEmail($data['email'] ?? '')
-        // ->setUserName($data['userName'] ?? '')
-        // ->setPassword($data['password'] ?? '')
-        // ->setIsVerified(false)
-        // ;
+        $user 
+        ->setEmail($data['email'] ?? '')
+        ->setUserName($data['userName'] ?? '')
+        ->setPassword($data['password'] ?? '')
+        ->setIsVerified(false)
+        ;
 
-        // if (empty($user->getEmail()) || empty($user->getUserName()) || empty($user->getPassword())) {
-        //     return new JsonResponse([
-        //         'error' => 'Les champs email, username et password sont obligatoires.'
-        //     ], JsonResponse::HHTP_BAD_REQUEST);
-        // };
+        $errors = $validator->validate($user);
 
-        // $hashedPassword = $passwordHasher->hashPassword(
-        //     $user,
-        //     $data['password']
-        // );
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+            return new JsonResponse(['errors' => $errorMessages], JsonResponse::HTTP_BAD_REQUEST);
+        }
 
-        // $user->setPassword($hashedPassword);
-
-        // $entityManager->persist($user);
-        // $entityManager->flush();
-
-        $user = $userRepository->findOneBy(['email'=>'azerty50@mail.com']);
-        $this->emailVerifier->sendEmailConfirmation(
-            'app_verify_email', 
-            $user, 
-            (new TemplatedEmail())
-            ->from(new Address('no-reply@resq.com', 'ResQ 18'))
-            ->to($user->getEmail())
-            ->subject('E-mail de confirmation')
-            ->htmlTemplate('/registration/confirmation_email.html.twig')
+        $hashedPassword = $passwordHasher->hashPassword(
+            $user,
+            $data['password']
         );
 
-        return new JsonResponse ([
-            'userId' => $user->getId(),
-            'token' => $JWTManager->create($user)
-        ], JsonResponse::HTTP_CREATED);
+        $user->setPassword($hashedPassword);            
+
+        try {
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            $this->emailVerifier->sendEmailConfirmation(
+                'app_verify_email', 
+                $user, 
+                (new TemplatedEmail())
+                ->from(new Address('no-reply@resq.com', 'ResQ 18'))
+                ->to($user->getEmail())
+                ->subject('E-mail de confirmation')
+                ->htmlTemplate('/registration/confirmation_email.html.twig')
+            );
+
+            return new JsonResponse($user, JsonResponse::HTTP_CREATED);         
+        } 
+        catch (UniqueConstraintViolationException $e) {
+            return new JsonResponse(['error' => 'Cette adresse e-mail est déjà utilisée.'], JsonResponse::HTTP_BAD_REQUEST);
+        } 
+        catch (\Exception $e) {
+            return new JsonResponse(['error' => 'Une erreur est survenue.'], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }  
     }
 
     #[Route('/verify/email', name: 'app_verify_email')]
-    public function verifyEmail (Request $request, UserRepository $userRepository) {
-        // try {
-        //     $this->emailVerifier->handleEmailConfirmation($request, $this->getUser());
-        // }
-        // catch (VerifyEmailExceptionInterface $exception) {
-        //     $this->addFlash('verify_email_error', $exception->getReason());
-        // }
-        echo ('Mail bien envoyé!');
+    public function verifyEmail (Request $request, UserRepository $userRepository): Response
+    {
+        try {
+            $id = $request->query->get('id'); 
+            if ($id) $user = $userRepository->find($id);
+            $this->emailVerifier->handleEmailConfirmation($request, $user);
+        }
+        catch (VerifyEmailExceptionInterface $exception) {
+            return $this->render('email_confirmation.html.twig', ['message' => $exception->getReason()]);
+        }
+
+        return $this->render('email_confirmation.html.twig', ['message' => 'Votre adresse e-mail a été confirmée.']);
     }
 }
