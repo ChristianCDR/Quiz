@@ -54,9 +54,12 @@ export default function LoginScreen ({route}: Props) {
             navigation.navigate('Home', {userName: response.data.userName})
           }
       }
-      catch (error) {
+      catch (error: any) {
+        if (error.response) {
+          setError(error.response.data.error)
+        } else {
           setError('La connexion a échoué.. Veuillez réessayer..')
-          console.log(error)
+        }
       }
     }
 
