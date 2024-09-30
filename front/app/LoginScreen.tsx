@@ -1,21 +1,37 @@
 import React, { useState } from 'react'
 import axios from 'axios'
-import { LoginScreenNavigationProp } from '@/constants/types'
+import { LoginScreenNavigationProp, LoginScreenRouteProp } from '@/constants/types'
 import { useNavigation } from '@react-navigation/native'
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
 import { urlDomain } from '@/constants/variables'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-// ngrok
+// gerer les identifiants vides en front -> en rouge lorsque vide
+// validation des identifiants en back
+// logout
 // Oauth2
 
-export default function LoginScreen () {
+type Props = {
+  route: LoginScreenRouteProp
+}
+
+export default function LoginScreen ({route}: Props) {
     const [email, setEmail] = useState<string>()
     const [password, setPassword] = useState<string>()
     const [error, setError] = useState<string>()
     const [secureText, setSecureText] = useState<boolean>(true)
     const navigation = useNavigation<LoginScreenNavigationProp>()
+    const {message} = route.params
+
+    const storeData = async (token: string) => {
+      try {
+        await AsyncStorage.setItem('jwtToken', token)
+      }
+      catch (error) {
+        console.log(error)
+      }
+    }
 
     const handleLogin = async () => {
 
@@ -31,7 +47,12 @@ export default function LoginScreen () {
                     Accept: 'application/json'
               }
           })
-          if (response.status == 200) navigation.navigate('Home', {userName: response.data.userName})
+          if (response.status === 200) {
+            const token = response.data.token
+            storeData(token)
+            navigation.navigate('Home', {userName: response.data.userName})
+          }
+
       }
       catch (error) {
           setError('La connexion a échoué.. Veuillez réessayer..')
@@ -52,6 +73,16 @@ export default function LoginScreen () {
             <View>
               <Image style={styles.logo} source={require('../assets/images/resq18.png')}/>
             </View>
+            { error? 
+              <View>
+                <Text style={styles.errorText}>{error}</Text>
+              </View>: ''
+            }
+            
+            <View>
+              <Text style={styles.linkText}>{message}</Text>
+            </View>
+    
             <Text style={styles.title}>Connexion</Text>
             <TextInput
                 style={styles.input}
@@ -79,11 +110,6 @@ export default function LoginScreen () {
             <TouchableOpacity onPress={() => navigation.navigate('Register')}>
                 <Text style={styles.linkText}>Pas encore inscrit ? Inscrivez-vous</Text>
             </TouchableOpacity>
-            {error? 
-              <View>
-                <Text style={styles.errorText}>{error}</Text>
-              </View>: ''
-          }
         </View>
     )
 }
