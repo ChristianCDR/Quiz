@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import axios from 'axios'
-import { emailValidator, passwordValidator, userNameValidator }  from '@/components/utils'
+import { emailValidator, passwordValidator, usernameValidator }  from '@/components/utils'
 import { RegisterScreenNavigationProp } from '../constants/types'
 import { useNavigation } from '@react-navigation/native'
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native'
@@ -11,7 +11,7 @@ export default function RegisterScreen () {
 
   const [email, setEmail] = useState<string>('')
   const [confirmEmail, setConfirmEmail] = useState<string>('')
-  const [userName, setUserName] = useState<string>('')
+  const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [error, setError] = useState<string>()
   const [secureText, setSecureText] = useState<boolean>(true)
@@ -26,12 +26,12 @@ export default function RegisterScreen () {
       setError("Le mot de passe doit contenir au minimum: " + '\n' + "1 chiffre" + '\n' + "8 caractères" + '\n' + "1 lettre miniscule" + '\n' + "1 lettre majuscule"  + '\n' + "1 caractère spécial: @ $ ! % * ? & " )
     } 
 
-    else if (emailValidator(email, confirmEmail) && userNameValidator(userName.trim()) && passwordValidator(password)) {
+    else if (emailValidator(email, confirmEmail) && usernameValidator(username.trim()) && passwordValidator(password)) {
       
       const apiUrl = urlDomain + '/api/register'
       const body = {
         "email": email,
-        "userName": userName.trim(),
+        "username": username.trim(),
         "password": password
       }
       const headers = {
@@ -94,8 +94,8 @@ export default function RegisterScreen () {
           <TextInput
               style={styles.input}
               placeholder="Nom d'utilisateur"
-              value={userName}
-              onChangeText={setUserName}
+              value={username}
+              onChangeText={setUsername}
               keyboardType="default"
               autoCapitalize="none"
           />

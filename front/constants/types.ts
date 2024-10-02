@@ -15,7 +15,7 @@ export interface Category {
 export type RootStackParamList = {
     Register: undefined
     Login: {message: string}
-    Home: {userName: string}
+    Home: {username: string}
     Quiz: {quizData: Question[], categoryName: string}
     Result: {score: number, quizLength: number}
     QuizzesByCategory: {categoryId: number, categoryName: string}

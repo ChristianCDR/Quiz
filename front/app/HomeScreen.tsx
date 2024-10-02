@@ -14,7 +14,7 @@ export default function HomeScreen({route}: Props) {
     const [data, setData] = useState<Category[]>([]);
     const [error, setError] = useState<ErrorType>();
     const [loading, setLoading] = useState<boolean>(true);
-    const {userName} = route.params
+    const {username} = route.params
 
     let images: { [key: string]: any } = {
         'fire.png': require('../assets/images/fire_v2.png'),
@@ -75,7 +75,7 @@ export default function HomeScreen({route}: Props) {
                         source={require('../assets/images/myAvatar.png')}
                         style={styles.circularImgView}
                     />
-                    <Text style={styles.userName}>{userName}</Text>
+                    <Text style={styles.username}>{username}</Text>
                 </View>
 
                 <View style={styles.card}>
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 10,
         backgroundColor: '#1E3C58'
     },
-    userName: {
+    username: {
         color: 'white',
         fontWeight: 'bold', 
         paddingTop: 45,
