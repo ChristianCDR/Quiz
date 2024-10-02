@@ -39,7 +39,7 @@ class RegistrationController extends AbstractController
                 type: 'object',
                 required: ['email', 'userName', 'password'],
                 properties: [
-                    new OA\Property(property: 'email', type: 'string', example: 'mail@mail.com'),
+                    new OA\Property(property: 'email', type: 'string', example: 'chris@mail.com'),
                     new OA\Property(property: 'userName', type: 'string', example: 'christian CDR'),
                     new OA\Property(property: 'password', type: 'string', example: 'Azerty1@')
                 ]
@@ -77,10 +77,10 @@ class RegistrationController extends AbstractController
         $user = new User();
 
         $user 
-        ->setEmail($data['email'] ?? '')
-        ->setUserName($data['userName'] ?? '')
-        ->setPassword($data['password'] ?? '')
-        ->setIsVerified(false)
+            ->setEmail($data['email'] ?? '')
+            ->setUserName($data['userName'] ?? '')
+            ->setPassword($data['password'] ?? '')
+            ->setIsVerified(false)
         ;
 
         $errors = $validator->validate($user);
@@ -108,10 +108,10 @@ class RegistrationController extends AbstractController
                 'app_verify_email', 
                 $user, 
                 (new TemplatedEmail())
-                ->from(new Address('no-reply@resq.com', 'ResQ 18'))
-                ->to($user->getEmail())
-                ->subject('E-mail de confirmation')
-                ->htmlTemplate('/registration/confirmation_email.html.twig')
+                    ->from(new Address('no-reply@resq.com', 'ResQ 18'))
+                    ->to($user->getEmail())
+                    ->subject('E-mail de confirmation')
+                    ->htmlTemplate('/registration/confirmation_email.html.twig')
             );
 
             return new JsonResponse($user, JsonResponse::HTTP_CREATED);         

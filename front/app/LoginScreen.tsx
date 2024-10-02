@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // gérer les erreurs en front -> en rouge lorsque vide
 // logout
-
+// Bruteforce
 // Oauth2
 
 type Props = {
@@ -34,6 +34,8 @@ export default function LoginScreen ({route}: Props) {
       }
     }
 
+
+
     const handleLogin = async () => {
 
       const apiUrl = urlDomain + '/api/login'
@@ -51,7 +53,7 @@ export default function LoginScreen ({route}: Props) {
           if (response.status === 200) {
             const token = response.data.token
             storeData(token)
-            navigation.navigate('Home', {userName: response.data.userName})
+            navigation.navigate('Home', {username: response.data.username})
           }
       }
       catch (error: any) {
