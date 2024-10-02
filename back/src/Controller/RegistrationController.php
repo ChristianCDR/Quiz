@@ -32,7 +32,7 @@ class RegistrationController extends AbstractController
     #[Route('/api/register', name: 'app_register', methods: ['POST'])]
     #[OA\Post(
         summary: 'Create a new user',
-        tags: ['User'],
+        tags: ['Auth'],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
@@ -71,6 +71,7 @@ class RegistrationController extends AbstractController
             )
         ]
     )]
+    #[Security(name: null)]
     public function register (Request $request, UserPasswordHasherInterface $passwordHasher, ValidatorInterface $validator, EntityManagerInterface $entityManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -108,7 +109,7 @@ class RegistrationController extends AbstractController
                 'app_verify_email', 
                 $user, 
                 (new TemplatedEmail())
-                    ->from(new Address('no-reply@resq.com', 'ResQ 18'))
+                    ->from(new Address('no-reply@resq18.com', 'ResQ 18'))
                     ->to($user->getEmail())
                     ->subject('E-mail de confirmation')
                     ->htmlTemplate('/registration/confirmation_email.html.twig')

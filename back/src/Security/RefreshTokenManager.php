@@ -16,6 +16,7 @@ class RefreshTokenManager
     public function __construct (EntityManagerInterface $entityManager, RefreshTokenRepository $refreshTokenRepository)
     {
         $this->entityManager = $entityManager;
+        $this->refreshTokenRepository = $refreshTokenRepository;
     }
 
     public function createRefreshToken (string $userIdentifier): RefreshToken 
@@ -41,17 +42,20 @@ class RefreshTokenManager
 
     public function revokeRefreshToken (string $token): void
     {
-        $refreshToken = $refreshTokenRepository->findOneBy(['token' => $token]);
-
-        if ($refreshToken) {
+        $refreshToken = $this->refreshTokenRepository->findOneBy(['token' => $token]);
+        
+        try {
             $this->entityManager->remove($refreshToken);
             $this->entityManager->flush();
+        }
+        catch (Exception $exception) {
+            throw new Exception ($exception);
         }
     }
 
     public function isValidToken (string $token): bool
     {
-        $refreshToken = $refreshTokenRepository->findOneBy(['token' => $token]);
+        $refreshToken = $this->refreshTokenRepository->findOneBy(['token' => $token]);
 
         if (!$refreshToken || new \DateTime() > $refreshToken->getExpiresAt()) {
             return false;
@@ -62,7 +66,7 @@ class RefreshTokenManager
 
     public function getUserIdentifierFromRefreshToken (string $token): ?RefreshToken
     {
-        $refreshToken = $refreshTokenRepository->findOneBy(['token' => $token]);
+        $refreshToken = $this->refreshTokenRepository->findOneBy(['token' => $token]);
 
         $refreshToken->getUserIdentifier();
 
@@ -71,7 +75,7 @@ class RefreshTokenManager
 
     public function updateRefreshToken(string $token, string $userIdentifier): ?RefreshToken
     {
-        $refreshToken = $refreshTokenRepository->findOneBy(['token' => $token]);
+        $refreshToken = $this->refreshTokenRepository->findOneBy(['token' => $token]);
 
         if (!$refreshToken || new \DateTime() > $refreshToken->getExpiresAt()) {
             return null; 
