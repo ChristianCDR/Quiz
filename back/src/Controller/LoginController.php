@@ -19,18 +19,20 @@ use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 class LoginController extends AbstractController
 {
     private $refreshTokenManager;
+    private $userRepository;
     private $JWTManager;
 
-    public function __construct(RefreshTokenManager $refreshTokenManager, JWTTokenManagerInterface $JWTManager)
+    public function __construct(RefreshTokenManager $refreshTokenManager, JWTTokenManagerInterface $JWTManager,  UserRepository $userRepository)
     {
         $this->refreshTokenManager = $refreshTokenManager;
+        $this->userRepository =$userRepository;
         $this->JWTManager = $JWTManager;
     }
 
     #[Route(path: '/api/login', name: 'app_login', methods: ['POST'])]
     #[OA\Post(
         summary: 'Log user',
-        tags: ['User'],
+        tags: ['Auth'],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
@@ -68,7 +70,8 @@ class LoginController extends AbstractController
             )
         ]
     )]
-    public function login(Request $request, RefreshTokenManager $refreshTokenManager, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher): JsonResponse
+    #[Security(name: null)]
+    public function login(Request $request, RefreshTokenManager $refreshTokenManager, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
         $data=json_decode($request->getContent(), true);
         $email= $data['email'];
@@ -78,7 +81,7 @@ class LoginController extends AbstractController
             return new JsonResponse(['error' => 'Veuillez renseigner votre e-mail et votre mot de passe'], JsonResponse::HTTP_BAD_REQUEST);
         }
    
-        $user = $userRepository->findOneBy(['email'=>$email]);
+        $user = $this->userRepository->findOneBy(['email'=>$email]);
         
         if (!$user->isVerified()) {
             return new JsonResponse(['error' => 'Veuillez confirmer votre adresse mail avant de vous connecter '], JsonResponse::HTTP_UNAUTHORIZED);
@@ -100,7 +103,44 @@ class LoginController extends AbstractController
         
     }
 
-    #[Route(path: '/refreshToken', name: 'app_refresh_token', methods: ['POST'])]
+    #[Route(path: '/api/refreshToken', name: 'app_refresh_token', methods: ['POST'])]
+    #[OA\Post(
+        summary: 'Refresh token',
+        tags: ['Auth'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                required: ['token'],
+                properties: [
+                    new OA\Property(property: 'token', type: 'string', example: 'b3a79766cb948ccdfbc9e23fda70461dff08db79da831a1ac5e31ecffe84608b'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Token refreshed successfully',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'token', type: 'string', example: 'jwt token'),
+                        new OA\Property(property: 'refreshToken', type: 'string', example: 'refresh token')
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Invalid token',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'error', type: 'string', example: 'Invalid Token')
+                    ]
+                )
+            )
+        ]
+    )]
     public function refreshToken(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -112,12 +152,14 @@ class LoginController extends AbstractController
             return new JsonResponse(['error' => 'Refresh token invalide ou expiré'], JsonResponse::HTTP_UNAUTHORIZED);  
         }
 
-        $userIdentifier = $this->refreshTokenManager->getUserIdentifierFromRefreshToken($token);
-        $newRefreshToken = $this->refreshTokenManager->updateRefreshToken($token, $userIdentifier);
+        $refreshToken = $this->refreshTokenManager->getUserIdentifierFromRefreshToken($token);
 
-        $user = $userRepository->findOneBy(['email'=>$userIdentifier]);
+        $userIdentifier = $refreshToken->getUserIdentifier();
+        
+        $user = $this->userRepository->findOneBy(['email'=>$userIdentifier]);
 
         $newJWTToken = $this->JWTManager->create($user);
+        $newRefreshToken = $this->refreshTokenManager->updateRefreshToken($token, $userIdentifier);
             
         return new JsonResponse([
             'token' => $newJWTToken,
@@ -126,12 +168,28 @@ class LoginController extends AbstractController
     }
 
     #[Route(path: '/api/logout', name: 'app_logout', methods: ['POST'])]
-    
-    public function logout(Request $request): void
+    #[OA\Post(
+        summary: 'Logout user',
+        tags: ['Auth'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                required: ['token'],
+                properties: [
+                    new OA\Property(property: 'token', type: 'string', example: '9fc8a9c7945daf1fa65a8956103809b2dd3560656fc2626aec508f8babd72117'),
+                ]
+            )
+        )
+    )]
+    #[Security(name: null)]
+    public function logout(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $token = $data['token'];
 
         $this->refreshTokenManager->revokeRefreshToken($token);
+
+        return new JsonResponse([], JsonResponse::HTTP_NO_CONTENT);
     }
 }
