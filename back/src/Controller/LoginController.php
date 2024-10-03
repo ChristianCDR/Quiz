@@ -97,7 +97,7 @@ class LoginController extends AbstractController
         return new JsonResponse ([
             'message' => 'Login successful',
             'username' => $user->getUsername(),
-            'token' => $token,
+            'accessToken' => $token,
             'refreshToken' => $refreshToken->getToken()
         ], JsonResponse::HTTP_OK);
         
@@ -144,25 +144,25 @@ class LoginController extends AbstractController
     public function refreshToken(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        $token = $data['token'];
+        $refreshToken = $data['refreshToken'];
 
-        $isValidToken = $this->refreshTokenManager->isValidToken($token);
+        $isValidToken = $this->refreshTokenManager->isValidToken($refreshToken);
        
         if (!$isValidToken) {
             return new JsonResponse(['error' => 'Refresh token invalide ou expiré'], JsonResponse::HTTP_UNAUTHORIZED);  
         }
 
-        $refreshToken = $this->refreshTokenManager->getUserIdentifierFromRefreshToken($token);
+        $refreshTokenUser = $this->refreshTokenManager->getUserIdentifierFromRefreshToken($refreshToken);
 
-        $userIdentifier = $refreshToken->getUserIdentifier();
+        $userIdentifier = $refreshTokenUser->getUserIdentifier();
         
         $user = $this->userRepository->findOneBy(['email'=>$userIdentifier]);
 
         $newJWTToken = $this->JWTManager->create($user);
-        $newRefreshToken = $this->refreshTokenManager->updateRefreshToken($token, $userIdentifier);
+        $newRefreshToken = $this->refreshTokenManager->updateRefreshToken($refreshToken, $userIdentifier);
             
         return new JsonResponse([
-            'token' => $newJWTToken,
+            'accessToken' => $newJWTToken,
             'refreshToken' => $newRefreshToken->getToken()
         ]);    
     }
@@ -186,9 +186,9 @@ class LoginController extends AbstractController
     public function logout(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        $token = $data['token'];
+        $refreshToken = $data['refreshToken'];
 
-        $this->refreshTokenManager->revokeRefreshToken($token);
+        $this->refreshTokenManager->revokeRefreshToken($refreshToken);
 
         return new JsonResponse([], JsonResponse::HTTP_NO_CONTENT);
     }

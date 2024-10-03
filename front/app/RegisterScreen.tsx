@@ -1,125 +1,119 @@
 import React, { useState } from 'react'
-import axios from 'axios'
 import { emailValidator, passwordValidator, usernameValidator }  from '@/components/utils'
 import { RegisterScreenNavigationProp } from '../constants/types'
 import { useNavigation } from '@react-navigation/native'
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native'
 import FontAwesome from '@expo/vector-icons/FontAwesome'
-import { urlDomain } from '@/constants/variables'
+import instance from '@/api/interceptors'
 
 export default function RegisterScreen () {
 
-  const [email, setEmail] = useState<string>('')
-  const [confirmEmail, setConfirmEmail] = useState<string>('')
-  const [username, setUsername] = useState<string>('')
-  const [password, setPassword] = useState<string>('')
-  const [error, setError] = useState<string>()
-  const [secureText, setSecureText] = useState<boolean>(true)
-  const navigation = useNavigation<RegisterScreenNavigationProp>()
+    const [email, setEmail] = useState<string>('')
+    const [confirmEmail, setConfirmEmail] = useState<string>('')
+    const [username, setUsername] = useState<string>('')
+    const [password, setPassword] = useState<string>('')
+    const [error, setError] = useState<string>()
+    const [secureText, setSecureText] = useState<boolean>(true)
+    const navigation = useNavigation<RegisterScreenNavigationProp>()
   
-  const handleRegister = async () => {
+    const handleRegister = async () => {
 
-    if (emailValidator(email, confirmEmail) === 'mail_mismatch') {
-      setError("Les e-mails ne correspondent pas.")
-    }
-    else if (!passwordValidator(password)) {
-      setError("Le mot de passe doit contenir au minimum: " + '\n' + "1 chiffre" + '\n' + "8 caractères" + '\n' + "1 lettre miniscule" + '\n' + "1 lettre majuscule"  + '\n' + "1 caractère spécial: @ $ ! % * ? & " )
-    } 
-
-    else if (emailValidator(email, confirmEmail) && usernameValidator(username.trim()) && passwordValidator(password)) {
-      
-      const apiUrl = urlDomain + '/api/register'
-      const body = {
-        "email": email,
-        "username": username.trim(),
-        "password": password
-      }
-      const headers = {
-        'Content-Type': 'application/json', 
-        Accept: 'application/json'
-      }
-
-      try {   
-        const response = await axios.post(apiUrl, body, { headers: headers })       
-        if (response.status === 201) {
-          navigation.navigate('Login', { message: 'Inscription réussie.' + '\n' + 'Confirmez votre adresse mail avant de vous connecter.' })
+        if (emailValidator(email, confirmEmail) === 'mail_mismatch') {
+            setError("Les e-mails ne correspondent pas.")
         }
-      }
-      catch(error: any) {
-        if (error.response) {
-          setError(error.response.data.error);
-          console.log(error.response)
-        } else {
-          setError('Une erreur est survenue. Veuillez réessayer.');
-        }
-      }  
-    }    
-  }
+        else if (!passwordValidator(password)) {
+            setError("Le mot de passe doit contenir au minimum: " + '\n' + "1 chiffre" + '\n' + "8 caractères" + '\n' + "1 lettre miniscule" + '\n' + "1 lettre majuscule"  + '\n' + "1 caractère spécial: @ $ ! % * ? & " )
+        } 
 
-  const toggleSecureText = () => {
-    setSecureText(!secureText)
-  }
-
-  return (
-      <View style={styles.container}>
-          <StatusBar
-              backgroundColor="#1E3C58"
-              barStyle="light-content"   
-          />
-          <View style={styles.logoView}>
-            <Image style={styles.logo} source={require('../assets/images/resq18.png')}/>
-          </View>
-          {error? 
-            <View>
-              <Text style={styles.errorText}>{error}</Text>
-            </View>: ''
+        else if (emailValidator(email, confirmEmail) && usernameValidator(username.trim()) && passwordValidator(password)) {
+          
+          const body = {
+              "email": email,
+              "username": username.trim(),
+              "password": password
           }
-          <Text style={styles.title}>Inscription</Text>
-          <TextInput
-              style={styles.input}
-              placeholder="Email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-          />
-          <TextInput
-              style={styles.input}
-              placeholder="Confirmez votre email"
-              value={confirmEmail}
-              onChangeText={setConfirmEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-          />
-          <TextInput
-              style={styles.input}
-              placeholder="Nom d'utilisateur"
-              value={username}
-              onChangeText={setUsername}
-              keyboardType="default"
-              autoCapitalize="none"
-          />
-          <View>
+          
+          try {   
+              const response = await instance.post('/api/register', body)       
+              if (response.status === 201) {
+                navigation.navigate('Login', { message: 'Inscription réussie.' + '\n' + 'Confirmez votre adresse mail avant de vous connecter.' })
+              }
+          }
+          catch(error: any) {
+              if (error.response) {
+                setError(error.response.data.error);
+                console.log(error.response)
+              } else {
+                setError('Une erreur est survenue. Veuillez réessayer.');
+              }
+          }  
+        }    
+    }
+
+    const toggleSecureText = () => {
+      setSecureText(!secureText)
+    }
+
+    return (
+        <View style={styles.container}>
+            <StatusBar
+                backgroundColor="#1E3C58"
+                barStyle="light-content"   
+            />
+            <View style={styles.logoView}>
+              <Image style={styles.logo} source={require('../assets/images/resq18.png')}/>
+            </View>
+            {error? 
+              <View>
+                <Text style={styles.errorText}>{error}</Text>
+              </View>: ''
+            }
+            <Text style={styles.title}>Inscription</Text>
             <TextInput
                 style={styles.input}
-                placeholder="Mot de passe"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={secureText}
+                placeholder="Email"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
             />
-            <TouchableOpacity  style={styles.eye} onPress={toggleSecureText}>
-              <FontAwesome name={secureText? "eye" : "eye-slash"} size={24} color="black" />
+            <TextInput
+                style={styles.input}
+                placeholder="Confirmez votre email"
+                value={confirmEmail}
+                onChangeText={setConfirmEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+            />
+            <TextInput
+                style={styles.input}
+                placeholder="Nom d'utilisateur"
+                value={username}
+                onChangeText={setUsername}
+                keyboardType="default"
+                autoCapitalize="none"
+            />
+            <View>
+              <TextInput
+                  style={styles.input}
+                  placeholder="Mot de passe"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={secureText}
+              />
+              <TouchableOpacity  style={styles.eye} onPress={toggleSecureText}>
+                <FontAwesome name={secureText? "eye" : "eye-slash"} size={24} color="black" />
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity style={styles.button} onPress={handleRegister}>
+                <Text style={styles.buttonText}>S'inscrire</Text>
             </TouchableOpacity>
-          </View>
-          <TouchableOpacity style={styles.button} onPress={handleRegister}>
-              <Text style={styles.buttonText}>S'inscrire</Text>
-          </TouchableOpacity>
-  
-          <TouchableOpacity onPress={() => navigation.navigate('Login', {message: ''})}>
-              <Text style={styles.linkText}>Déjà inscrit ? Connectez-vous</Text>
-          </TouchableOpacity>   
-      </View>
-  )
+    
+            <TouchableOpacity onPress={() => navigation.navigate('Login', {message: ''})}>
+                <Text style={styles.linkText}>Déjà inscrit ? Connectez-vous</Text>
+            </TouchableOpacity>   
+        </View>
+    )
 }
 
 const styles = StyleSheet.create({
@@ -181,4 +175,4 @@ const styles = StyleSheet.create({
       textAlign: 'center',
       fontSize: 16
     }
-  })
+})

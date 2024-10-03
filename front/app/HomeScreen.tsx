@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, SafeAreaView, Text, StatusBar, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
+import instance from '@/api/interceptors';
 import { HomeScreenNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "../constants/types";
 import Footer from '@/components/Footer';
-import { urlDomain } from '@/constants/variables';
 
 type Props = {
     route: HomeScreenRouteProp
@@ -28,8 +27,7 @@ export default function HomeScreen({route}: Props) {
     useEffect(() => {
         const fetchCategories = async () => {
            try {
-                const apiUrl= urlDomain + '/api/categories/'
-                const response = await axios.get(apiUrl)
+                const response = await instance.get('/api/categories/')
                 setData(response.data)
            }
            catch (error) {

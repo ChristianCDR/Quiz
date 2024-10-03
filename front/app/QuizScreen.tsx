@@ -1,6 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View, StatusBar } from "react-native";
 import { Svg, Path } from 'react-native-svg';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import CountdownTimer from "@/components/CountdownTimer";
 import { QuizScreenNavigationProp, QuizScreenRouteProp } from "../constants/types";
