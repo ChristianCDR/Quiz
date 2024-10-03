@@ -1,1 +1,0 @@
-export const urlDomain = 'http://192.168.5.43:8000'

@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react"
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ActivityIndicator, StatusBar } from "react-native"
 import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
 import { Question, QuizzesByCategoryScreenRouteProp, QuizzesByCategoryNavigationProp, ErrorType } from "@/constants/types";
 import BackButton from "@/components/BackButton";
-import { urlDomain } from '@/constants/variables'
+import instance from "@/api/interceptors";
 
 type Props = {
     route: QuizzesByCategoryScreenRouteProp
 }
 
 export default function QuizzesByCategoryScreen ({route} : Props) {
+
     const {categoryId, categoryName} = route.params
     const [data, setData] = useState<Question[]>([]);
     const [error, setError] = useState<ErrorType>();
@@ -22,8 +22,7 @@ export default function QuizzesByCategoryScreen ({route} : Props) {
     useEffect(() => {
         const fetchByCategoryId = async () => {
            try {
-                const apiUrl= urlDomain + `/api/questions/category/${categoryId}`
-                const response = await axios.get(apiUrl);
+                const response = await instance.get(`/api/questions/category/${categoryId}`);
                 setData(response.data)
            }
            catch (error: unknown) {
@@ -46,6 +45,7 @@ export default function QuizzesByCategoryScreen ({route} : Props) {
     // }
 
     const chunkData = (data: Question [], questionsPerQuiz: number) => {
+        
         const result: Question[][] = []
         const size = Math.ceil(data.length/questionsPerQuiz)
         for (let i = 0; i < size; i++) {
