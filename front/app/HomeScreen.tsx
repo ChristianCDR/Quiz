@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, SafeAreaView, Text, StatusBar, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
-import { HomeScreenNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "../constants/types";
+import instance from '@/api/Interceptors';
+import { HomeScreenNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "../utils/Types";
 import Footer from '@/components/Footer';
-import { urlDomain } from '@/constants/variables';
 
 type Props = {
     route: HomeScreenRouteProp
@@ -14,7 +13,7 @@ export default function HomeScreen({route}: Props) {
     const [data, setData] = useState<Category[]>([]);
     const [error, setError] = useState<ErrorType>();
     const [loading, setLoading] = useState<boolean>(true);
-    const {userName} = route.params
+    const {username} = route.params
 
     let images: { [key: string]: any } = {
         'fire.png': require('../assets/images/fire_v2.png'),
@@ -28,8 +27,7 @@ export default function HomeScreen({route}: Props) {
     useEffect(() => {
         const fetchCategories = async () => {
            try {
-                const apiUrl= urlDomain + '/api/categories/'
-                const response = await axios.get(apiUrl)
+                const response = await instance.get('/api/categories/')
                 setData(response.data)
            }
            catch (error) {
@@ -75,7 +73,7 @@ export default function HomeScreen({route}: Props) {
                         source={require('../assets/images/myAvatar.png')}
                         style={styles.circularImgView}
                     />
-                    <Text style={styles.userName}>{userName}</Text>
+                    <Text style={styles.username}>{username}</Text>
                 </View>
 
                 <View style={styles.card}>
@@ -147,7 +145,7 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 10,
         backgroundColor: '#1E3C58'
     },
-    userName: {
+    username: {
         color: 'white',
         fontWeight: 'bold', 
         paddingTop: 45,

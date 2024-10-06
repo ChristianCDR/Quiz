@@ -1,16 +1,14 @@
-import React, { useState } from 'react'
-import axios from 'axios'
-import { LoginScreenNavigationProp, LoginScreenRouteProp } from '@/constants/types'
-import { useNavigation } from '@react-navigation/native'
-import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native'
-import FontAwesome from '@expo/vector-icons/FontAwesome'
-import { urlDomain } from '@/constants/variables'
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import React, { useState } from 'react';
+import { storeTokens } from '@/api/Auth';
+import instance from '@/api/Interceptors';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useNavigation } from '@react-navigation/native';
+import { LoginScreenNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
+import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native';
 
 // gérer les erreurs en front -> en rouge lorsque vide
 // logout
-
+// Bruteforce
 // Oauth2
 
 type Props = {
@@ -18,102 +16,90 @@ type Props = {
 }
 
 export default function LoginScreen ({route}: Props) {
-    const [email, setEmail] = useState<string>()
-    const [password, setPassword] = useState<string>()
-    const [error, setError] = useState<string>()
-    const [secureText, setSecureText] = useState<boolean>(true)
-    const navigation = useNavigation<LoginScreenNavigationProp>()
-    const {message} = route.params
+    const [email, setEmail] = useState<string>();
+    const [password, setPassword] = useState<string>();
+    const [error, setError] = useState<string>();
+    const [secureText, setSecureText] = useState<boolean>(true);
 
-    const storeData = async (token: string) => {
-      try {
-        await AsyncStorage.setItem('jwtToken', token)
-      }
-      catch (error) {
-        console.log(error)
-      }
-    }
+    const navigation = useNavigation<LoginScreenNavigationProp>();
+    const {message} = route.params;
 
     const handleLogin = async () => {
 
-      const apiUrl = urlDomain + '/api/login'
       const body = {
           "email": email,
           "password": password
       }
+
       try {
-          const response = await axios.post(apiUrl, body, {
-              headers: {
-                  'Content-Type': 'application/json', 
-                    Accept: 'application/json'
-              }
-          })
+          const response = await instance.post('/api/login', body);
           if (response.status === 200) {
-            const token = response.data.token
-            storeData(token)
-            navigation.navigate('Home', {userName: response.data.userName})
+            const accessToken = response.data.accessToken;
+            const refreshToken = response.data.refreshToken;
+            await storeTokens(accessToken, refreshToken);
+            navigation.navigate('Home', {username: response.data.username});
           }
       }
       catch (error: any) {
         if (error.response) {
-          setError(error.response.data.error)
+          setError(error.response.data.error);
         } else {
-          setError('La connexion a échoué.. Veuillez réessayer..')
+          setError('La connexion a échoué.. Veuillez réessayer..');
         }
       }
     }
 
     const toggleSecureText = () => {
-      setSecureText(!secureText)
+      setSecureText(!secureText);
     }
 
     return (
-        <View style={styles.container}>
-            <StatusBar
-                backgroundColor="#1E3C58"
-                barStyle="light-content"   
-            />
+      <View style={styles.container}>
+          <StatusBar
+              backgroundColor="#1E3C58"
+              barStyle="light-content"   
+          />
+          <View>
+            <Image style={styles.logo} source={require('../assets/images/resq18.png')}/>
+          </View>
+          { error? 
             <View>
-              <Image style={styles.logo} source={require('../assets/images/resq18.png')}/>
-            </View>
-            { error? 
-              <View>
-                <Text style={styles.errorText}>{error}</Text>
-              </View>: ''
-            }
-            
-            <View>
-              <Text style={styles.linkText}>{message}</Text>
-            </View>
-    
-            <Text style={styles.title}>Connexion</Text>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>: ''
+          }
+          
+          <View>
+            <Text style={styles.linkText}>{message}</Text>
+          </View>
+  
+          <Text style={styles.title}>Connexion</Text>
+          <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+          />
+          <View>
             <TextInput
                 style={styles.input}
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
+                placeholder="Mot de passe"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={secureText}
             />
-            <View>
-              <TextInput
-                  style={styles.input}
-                  placeholder="Mot de passe"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={secureText}
-              />
-              <TouchableOpacity  style={styles.eye} onPress={toggleSecureText}>
-                <FontAwesome name={secureText? "eye" : "eye-slash"} size={24} color="black" />
-              </TouchableOpacity>
-            </View>
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                <Text style={styles.buttonText}>Se connecter</Text>
+            <TouchableOpacity  style={styles.eye} onPress={toggleSecureText}>
+              <FontAwesome name={secureText? "eye" : "eye-slash"} size={24} color="black" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-                <Text style={styles.linkText}>Pas encore inscrit ? Inscrivez-vous</Text>
-            </TouchableOpacity>
-        </View>
+          </View>
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+              <Text style={styles.buttonText}>Se connecter</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+              <Text style={styles.linkText}>Pas encore inscrit ? Inscrivez-vous</Text>
+          </TouchableOpacity>
+      </View>
     )
 }
 

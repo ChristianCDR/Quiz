@@ -1,5 +1,5 @@
 import { StyleSheet, View, Text, Image, TouchableOpacity, Share, Animated, Easing, StatusBar } from 'react-native'
-import { ResultScreenNavigationProp, ResultScreenRouteProp } from "../constants/types"
+import { ResultScreenNavigationProp, ResultScreenRouteProp } from "../utils/Types"
 import { Platform, PermissionsAndroid } from 'react-native';
 import { useEffect, useState, useRef } from 'react'
 import { useNavigation } from '@react-navigation/native'
@@ -113,7 +113,7 @@ export default function ResultScreen ({route}: Props) {
                     source={require('../assets/images/myAvatar.png')}
                     style={styles.circularImgView}
                 />
-                <Text style={styles.userName}> Christian CDR </Text>
+                <Text style={styles.username}> Christian CDR </Text>
                 <Text style={styles.yourScore}>Votre score</Text>
                 <Text style={styles.score}> <Text style={{color: scoreColor}}>{formattedScore}</Text> / {quizLength}</Text> 
                 <View style={styles.detailsButtons}>
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
         borderColor: 'orange',
         borderWidth: 1
     },
-    userName: {
+    username: {
         fontSize: 22,
     },
     yourScore: {
