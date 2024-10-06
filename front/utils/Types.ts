@@ -18,7 +18,8 @@ export type RootStackParamList = {
     Home: {username: string}
     Quiz: {quizData: Question[], categoryName: string}
     Result: {score: number, quizLength: number}
-    QuizzesByCategory: {categoryId: number, categoryName: string}
+    QuizzesByCategory: {categoryId: number, categoryName: string},
+    Profile: undefined
 }
 
 
@@ -46,3 +47,5 @@ export type RegisterScreenNavigationProp = NativeStackNavigationProp<RootStackPa
 export type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>
 
 export type LoginScreenRouteProp = RouteProp<RootStackParamList, 'Login'>
+
+export type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Profile'>

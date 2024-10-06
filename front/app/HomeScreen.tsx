@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, SafeAreaView, Text, StatusBar, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import instance from '@/api/interceptors';
-import { HomeScreenNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "../constants/types";
+import instance from '@/api/Interceptors';
+import { HomeScreenNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "../utils/Types";
 import Footer from '@/components/Footer';
 
 type Props = {

@@ -1,5 +1,5 @@
 import { StyleSheet, View, Text, Image, TouchableOpacity, Share, Animated, Easing, StatusBar } from 'react-native'
-import { ResultScreenNavigationProp, ResultScreenRouteProp } from "../constants/types"
+import { ResultScreenNavigationProp, ResultScreenRouteProp } from "../utils/Types"
 import { Platform, PermissionsAndroid } from 'react-native';
 import { useEffect, useState, useRef } from 'react'
 import { useNavigation } from '@react-navigation/native'

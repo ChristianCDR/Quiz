@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { getTokens, storeTokens } from '@/api/auth';
-import instance from '@/api/interceptors';
+import { storeTokens } from '@/api/Auth';
+import instance from '@/api/Interceptors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
-import { LoginScreenNavigationProp, LoginScreenRouteProp } from '@/constants/types';
+import { LoginScreenNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native';
 
 // gérer les erreurs en front -> en rouge lorsque vide

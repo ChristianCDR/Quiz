@@ -3,7 +3,7 @@ import { Svg, Path } from 'react-native-svg';
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import CountdownTimer from "@/components/CountdownTimer";
-import { QuizScreenNavigationProp, QuizScreenRouteProp } from "../constants/types";
+import { QuizScreenNavigationProp, QuizScreenRouteProp } from "../utils/Types";
 import Feather from '@expo/vector-icons/Feather';
 import Octicons from '@expo/vector-icons/Octicons';
 import AntDesign from '@expo/vector-icons/AntDesign';

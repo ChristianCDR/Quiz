@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react"
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ActivityIndicator, StatusBar } from "react-native"
 import { useNavigation } from '@react-navigation/native';
-import { Question, QuizzesByCategoryScreenRouteProp, QuizzesByCategoryNavigationProp, ErrorType } from "@/constants/types";
+import { Question, QuizzesByCategoryScreenRouteProp, QuizzesByCategoryNavigationProp, ErrorType } from "@/utils/Types";
 import BackButton from "@/components/BackButton";
-import instance from "@/api/interceptors";
+import instance from "@/api/Interceptors";
 
 type Props = {
     route: QuizzesByCategoryScreenRouteProp
