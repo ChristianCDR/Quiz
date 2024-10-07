@@ -77,6 +77,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?bool $isVerified = null;
 
+    #[ORM\OneToOne(mappedBy: 'player', cascade: ['persist', 'remove'])]
+    private ?UserScore $userScore = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -167,6 +170,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsVerified(bool $isVerified): static
     {
         $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    public function getUserScore(): ?UserScore
+    {
+        return $this->userScore;
+    }
+
+    public function setUserScore(UserScore $userScore): static
+    {
+        // set the owning side of the relation if necessary
+        if ($userScore->getPlayer() !== $this) {
+            $userScore->setPlayer($this);
+        }
+
+        $this->userScore = $userScore;
 
         return $this;
     }
