@@ -6,6 +6,7 @@ use App\Entity\Questions;
 use App\Entity\Options;
 use App\Entity\Categories;
 use App\Repository\CategoriesRepository;
+use App\Repository\QuestionsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
