@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, SafeAreaView, Text, StatusBar, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import instance from '@/api/Interceptors';
-import { HomeScreenNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "../utils/Types";
 import Footer from '@/components/Footer';
+import instance from '@/api/Interceptors';
+import { useNavigation } from '@react-navigation/native';
+import { HomeScreenNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "../utils/Types";
+import { StyleSheet, View, SafeAreaView, Text, StatusBar, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+
 
 type Props = {
     route: HomeScreenRouteProp
@@ -16,10 +17,10 @@ export default function HomeScreen({route}: Props) {
     const {username} = route.params
 
     let images: { [key: string]: any } = {
-        'fire.png': require('../assets/images/fire_v2.png'),
-        'fender-bender.png': require('../assets/images/car_accident.png'),
-        'chainsaw.png': require('../assets/images/chainsaw.png'),
-        'rescue.png': require('../assets/images/sap.png')
+        'inc': require('../assets/images/fire_v2.png'),
+        'vsr': require('../assets/images/car_accident.png'),
+        'opd': require('../assets/images/chainsaw.png'),
+        'sap': require('../assets/images/sap.png')
     }
 
     const navigation = useNavigation<HomeScreenNavigationProp>();

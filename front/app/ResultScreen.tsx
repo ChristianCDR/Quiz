@@ -1,10 +1,11 @@
-import { StyleSheet, View, Text, Image, TouchableOpacity, Share, Animated, Easing, StatusBar } from 'react-native'
-import { ResultScreenNavigationProp, ResultScreenRouteProp } from "../utils/Types"
-import { Platform, PermissionsAndroid } from 'react-native';
-import { useEffect, useState, useRef } from 'react'
-import { useNavigation } from '@react-navigation/native'
-import { captureRef } from 'react-native-view-shot'
-import BackButton from '@/components/BackButton'
+import { StyleSheet, View, Text, Image, TouchableOpacity, Share, Animated, Easing, StatusBar } from 'react-native';
+import { ResultScreenNavigationProp, ResultScreenRouteProp } from "../utils/Types";
+import { useEffect, useState, useRef, useContext } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import instance from '@/api/Interceptors';
+import { QuizContext } from '@/utils/QuizContext';
+import { captureRef } from 'react-native-view-shot';
+import BackButton from '@/components/BackButton';
 import Entypo from '@expo/vector-icons/Entypo';
 
 type Props = {
@@ -20,6 +21,7 @@ export default function ResultScreen ({route}: Props) {
     const formattedScore = (score) < 10 ? `0${score}` : score.toString()
     const viewRef = useRef<View>(null)
     const scaleValue = useRef(new Animated.Value(0.1)).current 
+    const quizContext = useContext(QuizContext);
 
     const fruitImages = {
         strawberry : require('../assets/images/strawberry.png'),
@@ -35,6 +37,31 @@ export default function ResultScreen ({route}: Props) {
             useNativeDriver: true
         }).start()
     }
+
+    useEffect(() => {
+
+        if (!quizContext) {
+            throw new Error ('QuizContext returned null')
+        }
+        const { quizNumber }  = quizContext;
+
+        const scoreRate = (score*100) / quizLength;
+
+        const body = {
+            'userId': userId,
+            'score': {
+                'quizNumber': quizNumber,
+                'scoreRate': scoreRate
+            }
+        }
+
+        const storeScore = async () => {
+            await instance.post('/api/newScore', body)
+            
+        }
+
+        storeScore();
+    }, [])
 
     useEffect(() =>  {
         if (score < 5) {
@@ -56,26 +83,6 @@ export default function ResultScreen ({route}: Props) {
     }, [])
 
     const handleShare = async () => {
-        if (Platform.OS === 'android' && Platform.Version >= 23) {
- 
-            PermissionsAndroid.request(
-           
-              PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,  
-              {
-                title: "Permission d'enregistrer une capture d'écran",
-                message: "Vous devez autoriser l'application à enregister une capture d'écran",
-    
-                buttonNeutral: 'Plus tard',
-                buttonNegative: 'Non',
-                buttonPositive: 'OK',
-              }
-            ).then((result) => {
-              if (result !== PermissionsAndroid.RESULTS.GRANTED) {
-                console.log('Storage permission denied.');
-              }
-            });        
-        }
-
         try {
             if(viewRef.current) {
                 const uri = await captureRef(viewRef, {

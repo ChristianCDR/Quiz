@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { Modal, View, Text, StyleSheet, TouchableWithoutFeedback, Pressable } from 'react-native';
+import { Modal, View, Text, StyleSheet, TouchableWithoutFeedback, Pressable, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ModalContext } from '../utils/ModalContext';
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -13,13 +13,32 @@ import { ProfileScreenNavigationProp } from '@/utils/Types';
 
 export default function ProfileModal () {
     const navigation = useNavigation<ProfileScreenNavigationProp>();
+    
     const modalContext = useContext(ModalContext);
 
     if (!modalContext) throw new Error ('Modal Provider returned null');
 
     const { isModalVisible, hideModal } = modalContext;
 
-    const logout = async () => {
+    const handleAlert = () => {
+        Alert.alert(
+            'Confirmation',
+            'Êtes-vous sûr de vouloir vous déconnecter ?',
+            [
+                {
+                    text: "Annuler",
+                    style: "cancel", // Style du bouton "Annuler"
+                },
+                {
+                    text: "Déconnexion",
+                    onPress: handleLogout,
+                    style: "destructive",
+                }
+            ]
+        )
+    }
+
+    const handleLogout = async () => {
         const {accessToken, refreshToken } = await getTokens() || { refreshToken: null }
 
         try {
@@ -62,7 +81,7 @@ export default function ProfileModal () {
                                 <Feather name="list" size={24} color="black" />
                                 <Text style={styles.modalText}>Informations légales</Text>
                             </Pressable>
-                            <Pressable onPress={logout} style = {styles.pressable}>
+                            <Pressable onPress={handleAlert} style = {styles.pressable}>
                                 <Feather name="log-out" size={22} color="black" />
                                 <Text style={styles.modalText}>Se déconnecter</Text>
                             </Pressable>
@@ -85,11 +104,12 @@ const styles = StyleSheet.create({
     },
     modalView: { 
         width: '100%', 
-        height: '50%',
+        height: '44%',
         padding: 20, 
-        paddingTop: 40,
+        paddingTop: 30,
         backgroundColor: 'white', 
-        borderRadius: 20,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
         position: 'absolute',
         bottom: 0,
         justifyContent: 'space-around'
