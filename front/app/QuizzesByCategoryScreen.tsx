@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react"
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ActivityIndicator, StatusBar } from "react-native"
+import { useState, useEffect, useContext } from "react";
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ActivityIndicator, StatusBar } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { Question, QuizzesByCategoryScreenRouteProp, QuizzesByCategoryNavigationProp, ErrorType } from "@/utils/Types";
 import BackButton from "@/components/BackButton";
 import instance from "@/api/Interceptors";
+import { QuizContext } from '@/utils/QuizContext';
 
 type Props = {
     route: QuizzesByCategoryScreenRouteProp
@@ -11,30 +12,31 @@ type Props = {
 
 export default function QuizzesByCategoryScreen ({route} : Props) {
 
-    const {categoryId, categoryName} = route.params
+    const {categoryId, categoryName} = route.params;
     const [data, setData] = useState<Question[]>([]);
     const [error, setError] = useState<ErrorType>();
     const [loading, setLoading] = useState<boolean>(true);
-    const [quizzes, setQuizzes] = useState<Question[][]>([])
+    const [quizzes, setQuizzes] = useState<Question[][]>([]);
+    const quizContext = useContext(QuizContext);
 
-    const navigation = useNavigation<QuizzesByCategoryNavigationProp>()
+    const navigation = useNavigation<QuizzesByCategoryNavigationProp>();
 
     useEffect(() => {
         const fetchByCategoryId = async () => {
            try {
                 const response = await instance.get(`/api/questions/category/${categoryId}`);
-                setData(response.data)
+                setData(response.data);
            }
            catch (error: unknown) {
-                const errMessage = (error as Error).message
-                setError(errMessage)
+                const errMessage = (error as Error).message;
+                setError(errMessage);
            }
            finally {
-            setLoading(false)
+            setLoading(false);
            }   
         }
-        fetchByCategoryId()
-    },[categoryId])
+        fetchByCategoryId();
+    },[categoryId]);
 
     // if (loading) {
     //     return (
@@ -46,22 +48,35 @@ export default function QuizzesByCategoryScreen ({route} : Props) {
 
     const chunkData = (data: Question [], questionsPerQuiz: number) => {
         
-        const result: Question[][] = []
-        const size = Math.ceil(data.length/questionsPerQuiz)
+        const result: Question[][] = [];
+        const size = Math.ceil(data.length/questionsPerQuiz);
         for (let i = 0; i < size; i++) {
-            const startIndex = i * questionsPerQuiz
-            const endIndex = startIndex + questionsPerQuiz
-            result.push(data.slice(startIndex, endIndex))
+            const startIndex = i * questionsPerQuiz;
+            const endIndex = startIndex + questionsPerQuiz;
+            result.push(data.slice(startIndex, endIndex));
         }
-        return result
+        return result;
     }
 
     useEffect(() => {
         if (data.length > 0) {
-            const result = chunkData (data, 10)
-            setQuizzes(result)
+            const result = chunkData (data, 10);
+            setQuizzes(result);
         }
-    }, [data])
+    }, [data]);    
+    
+    const handlePress = (index: number) => {
+    
+        if (!quizContext) throw new Error('QuizContext returned null');
+
+        const { setQuizNumber } = quizContext;
+
+        setQuizNumber(index +1);
+        
+        navigation.navigate('Quiz', {quizData: quizzes[index], 'categoryName': categoryName});
+
+    }
+    
     return (
         <View style={styles.container}>
             <StatusBar
@@ -73,7 +88,7 @@ export default function QuizzesByCategoryScreen ({route} : Props) {
                 {quizzes.length > 0 ? (
                     quizzes.map((_, index) => (
                         <View key={index}>
-                        <TouchableOpacity style={styles.quiz} onPress={()=> navigation.navigate('Quiz', {quizData: quizzes[index], 'categoryName': categoryName})}>
+                        <TouchableOpacity style={styles.quiz} onPress={() => handlePress(index)}>
                             <Text style={styles.quizText}>Quiz {index + 1}</Text>
                         </TouchableOpacity>
                         </View>
