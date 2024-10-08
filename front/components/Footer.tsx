@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useContext, useState } from 'react';
-import { ModalContext } from '../utils/ModalContext';
+import { Context } from '../utils/Context';
 import ProfileModal from '@/components/ProfileModal';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -17,11 +17,11 @@ export default function Footer () {
         id === 3 ? alert('Coming soon !') :  ''
     }
 
-    const modalContext = useContext(ModalContext);
+    const context = useContext(Context);
 
-    if(!modalContext) throw new Error ('ModalContext returned null. ModalContext must be used within a ModalProvider');
+    if(!context) throw new Error ('Context returned null. Context must be used within a ModalProvider');
 
-    const { showModal } = modalContext;
+    const { showModal } = context;
 
     return (
         <View style={styles.footer}>

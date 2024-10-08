@@ -22,7 +22,19 @@ export type RootStackParamList = {
     Profile: undefined
 }
 
+export type Children = {
+    children: React.ReactNode;
+}
 
+export type ContextType = {    
+    showModal: () => void;
+    hideModal: () => void;
+    isModalVisible: boolean;
+    quizNumber: number;
+    setQuizNumber: (value: number) => void;
+    userId:number; 
+    setUserId: (value: number) => void;
+}
 
 export type ErrorType = string | null
 

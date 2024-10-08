@@ -136,4 +136,10 @@ class UserScoreController extends AbstractController
             'scores' => $userScore->getScores()
         ], JsonResponse::HTTP_CREATED);
     }
+
+    #[Route('/api/showScore', name:'app_show_score', methods:['GET'])] 
+    public function show (Request $request): JsonResponse
+    {
+
+    }
 }

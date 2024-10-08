@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Modal, View, Text, StyleSheet, TouchableWithoutFeedback, Pressable, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { ModalContext } from '../utils/ModalContext';
+import { Context } from '../utils/Context';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
@@ -13,8 +13,8 @@ import { ProfileScreenNavigationProp } from '@/utils/Types';
 
 export default function ProfileModal () {
     const navigation = useNavigation<ProfileScreenNavigationProp>();
-    
-    const modalContext = useContext(ModalContext);
+
+    const modalContext = useContext(Context);
 
     if (!modalContext) throw new Error ('Modal Provider returned null');
 
