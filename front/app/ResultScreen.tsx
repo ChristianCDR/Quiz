@@ -3,7 +3,7 @@ import { ResultScreenNavigationProp, ResultScreenRouteProp } from "../utils/Type
 import { useEffect, useState, useRef, useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import instance from '@/api/Interceptors';
-import { QuizContext } from '@/utils/QuizContext';
+import { Context } from '@/utils/Context';
 import { captureRef } from 'react-native-view-shot';
 import BackButton from '@/components/BackButton';
 import Entypo from '@expo/vector-icons/Entypo';
@@ -21,7 +21,7 @@ export default function ResultScreen ({route}: Props) {
     const formattedScore = (score) < 10 ? `0${score}` : score.toString()
     const viewRef = useRef<View>(null)
     const scaleValue = useRef(new Animated.Value(0.1)).current 
-    const quizContext = useContext(QuizContext);
+    const context = useContext(Context);
 
     const fruitImages = {
         strawberry : require('../assets/images/strawberry.png'),
@@ -40,10 +40,9 @@ export default function ResultScreen ({route}: Props) {
 
     useEffect(() => {
 
-        if (!quizContext) {
-            throw new Error ('QuizContext returned null')
-        }
-        const { quizNumber }  = quizContext;
+        if (!context) throw new Error ('Context returned null')
+
+        const { userId, quizNumber }  = context;
 
         const scoreRate = (score*100) / quizLength;
 
@@ -56,8 +55,10 @@ export default function ResultScreen ({route}: Props) {
         }
 
         const storeScore = async () => {
-            await instance.post('/api/newScore', body)
-            
+            const response = await instance.post('/api/newScore', body);
+            if(response.data) {
+                console.log(response.data);
+            }
         }
 
         storeScore();
@@ -65,21 +66,21 @@ export default function ResultScreen ({route}: Props) {
 
     useEffect(() =>  {
         if (score < 5) {
-            setComment('Fruitos !')
-            setScoreColor('#ff0000')
-            setFruitImage(fruitImages.strawberry)
+            setComment('Fruitos !');
+            setScoreColor('#ff0000');
+            setFruitImage(fruitImages.strawberry);
             
         }  
         else if (score >= 5 && score < 9) {
-            setComment('Pas mal..')
-            setFruitImage(fruitImages.thumb)
+            setComment('Pas mal..');
+            setFruitImage(fruitImages.thumb);
         }  
         else {
-            setComment('Sarce !') 
-            setScoreColor('#5ce65c')
-            setFruitImage(fruitImages.medal)
+            setComment('Sarce !'); 
+            setScoreColor('#5ce65c');
+            setFruitImage(fruitImages.medal);
         }
-        startAnimation()
+        startAnimation();
     }, [])
 
     const handleShare = async () => {

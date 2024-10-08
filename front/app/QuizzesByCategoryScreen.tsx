@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Question, QuizzesByCategoryScreenRouteProp, QuizzesByCategoryNavigationProp, ErrorType } from "@/utils/Types";
 import BackButton from "@/components/BackButton";
 import instance from "@/api/Interceptors";
-import { QuizContext } from '@/utils/QuizContext';
+import { Context } from '@/utils/Context';
 
 type Props = {
     route: QuizzesByCategoryScreenRouteProp
@@ -17,7 +17,7 @@ export default function QuizzesByCategoryScreen ({route} : Props) {
     const [error, setError] = useState<ErrorType>();
     const [loading, setLoading] = useState<boolean>(true);
     const [quizzes, setQuizzes] = useState<Question[][]>([]);
-    const quizContext = useContext(QuizContext);
+    const quizContext = useContext(Context);
 
     const navigation = useNavigation<QuizzesByCategoryNavigationProp>();
 

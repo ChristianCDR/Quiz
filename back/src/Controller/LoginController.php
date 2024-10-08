@@ -97,6 +97,7 @@ class LoginController extends AbstractController
         return new JsonResponse ([
             'message' => 'Login successful',
             'username' => $user->getUsername(),
+            'userId' => $user->getId(),
             'accessToken' => $token,
             'refreshToken' => $refreshToken->getToken()
         ], JsonResponse::HTTP_OK);
