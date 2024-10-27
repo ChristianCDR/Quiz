@@ -2,7 +2,7 @@ import { RouteProp } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 export interface Question  {
-    "questiontext": string, //à modifier en questionText
+    "questionText": string, //à modifier en questionText
     "options": {'text': string, is_correct: boolean} []
 }
 
@@ -16,6 +16,7 @@ export type RootStackParamList = {
     Register: undefined
     Login: {message: string}
     Home: {username: string}
+    Score: undefined
     Quiz: {quizData: Question[], categoryName: string}
     Result: {score: number, quizLength: number}
     QuizzesByCategory: {categoryId: number, categoryName: string},
@@ -61,3 +62,5 @@ export type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParam
 export type LoginScreenRouteProp = RouteProp<RootStackParamList, 'Login'>
 
 export type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Profile'>
+
+export type ScoreScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Score'>

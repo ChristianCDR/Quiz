@@ -1,4 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { ScoreScreenNavigationProp } from '@/utils/Types';
+import { useNavigation } from '@react-navigation/native';
 import { useContext, useState } from 'react';
 import { Context } from '../utils/Context';
 import ProfileModal from '@/components/ProfileModal';
@@ -7,14 +9,15 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Entypo from '@expo/vector-icons/Entypo';
 
-
 export default function Footer () {
 
     const [activeButton, setAtiveButton] = useState<number>();
+    const navigation = useNavigation<ScoreScreenNavigationProp>();
 
     const handlePress = (id: number) => {
-        setAtiveButton(id)
-        id === 3 ? alert('Coming soon !') :  ''
+        setAtiveButton(id);
+        id === 3 ? alert('Coming soon !') :  '';
+        id === 2 ? navigation.navigate('Score'): '';
     }
 
     const context = useContext(Context);
