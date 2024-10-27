@@ -143,7 +143,7 @@ export default function QuizScreen({route} : Props) {
       <View style={styles.quiz}>
         
           <View style={styles.questionContainer}>
-            <Text style={styles.questionText}> {quizData[currentQuestion]?.questiontext} </Text>
+            <Text style={styles.questionText}> {quizData[currentQuestion]?.questionText} </Text>
           </View> 
           
         <View style={styles.optionContainer}>

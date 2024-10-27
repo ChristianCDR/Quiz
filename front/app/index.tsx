@@ -6,6 +6,7 @@ import QuizScreen from './QuizScreen';
 import ResultScreen from './ResultScreen';
 import RegisterScreen from './RegisterScreen';
 import LoginScreen from './LoginScreen';
+import ScoreScreen from './ScoreScreen';
 import QuizzesByCategoryScreen from './QuizzesByCategoryScreen';
 import { RootStackParamList } from "@/utils/Types";
 import { ContextProvider } from '@/utils/Context';
@@ -21,7 +22,7 @@ export default function index () {
     return (  
         <ContextProvider>
             <>
-                <Stack.Navigator initialRouteName='Login'>
+                <Stack.Navigator initialRouteName='Score'>
                     <Stack.Screen 
                       name="Login" 
                       component={LoginScreen} 
@@ -38,6 +39,11 @@ export default function index () {
                       component={HomeScreen} 
                       options={{headerShown: false}}  
                       initialParams={{username : 'Le Boss'}}                                                                                                                         
+                    />
+                    <Stack.Screen
+                      name="Score"
+                      component={ScoreScreen}
+                      options={{headerShown: false}}
                     />
                     <Stack.Screen 
                       name="Quiz" 
