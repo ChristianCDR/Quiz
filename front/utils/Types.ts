@@ -2,7 +2,7 @@ import { RouteProp } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 export interface Question  {
-    "questionText": string, //à modifier en questionText
+    "questionText": string,
     "options": {'text': string, is_correct: boolean} []
 }
 

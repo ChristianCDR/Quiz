@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -77,8 +79,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?bool $isVerified = null;
 
-    #[ORM\OneToOne(mappedBy: 'player', cascade: ['persist', 'remove'])]
-    private ?UserScore $userScore = null;
+    #[ORM\OneToMany(mappedBy: 'player', targetEntity: UserScore::class, orphanRemoval: true)]
+    private Collection $userScores;
+
+    public function __construct()
+    {
+        $this->userScores = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -174,19 +181,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getUserScore(): ?UserScore
+    /**
+     * @return Collection<int, UserScore>
+     */
+    public function getUserScores(): Collection
     {
-        return $this->userScore;
+        return $this->userScores;
     }
 
-    public function setUserScore(UserScore $userScore): static
+    public function addUserScore(UserScore $userScore): static
     {
-        // set the owning side of the relation if necessary
-        if ($userScore->getPlayer() !== $this) {
+        if (!$this->userScores->contains($userScore)) {
+            $this->userScores->add($userScore);
             $userScore->setPlayer($this);
         }
 
-        $this->userScore = $userScore;
+        return $this;
+    }
+
+    public function removeUserScore(UserScore $userScore): static
+    {
+        if ($this->userScores->removeElement($userScore)) {
+            // set the owning side to null (unless already changed)
+            if ($userScore->getPlayer() === $this) {
+                $userScore->setPlayer(null);
+            }
+        }
 
         return $this;
     }
