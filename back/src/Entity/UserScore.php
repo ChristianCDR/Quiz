@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\UserScoreRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserScoreRepository::class)]
@@ -14,38 +13,53 @@ class UserScore
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(inversedBy: 'userScore', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'userScores')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $player = null;
+    private ?user $player = null;
 
-    #[ORM\Column(type: Types::ARRAY)]
-    private array $scores = [];
+    #[ORM\Column]
+    private ?int $quiz_id = null;
+
+    #[ORM\Column]
+    private ?int $score_rate = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getPlayer(): ?User
+    public function getPlayer(): ?user
     {
         return $this->player;
     }
 
-    public function setPlayer(User $player): static
+    public function setPlayer(?user $player): static
     {
         $this->player = $player;
 
         return $this;
     }
 
-    public function getScores(): array
+    public function getQuizId(): ?int
     {
-        return $this->scores;
+        return $this->quiz_id;
     }
 
-    public function setScores(array $scores): static
+    public function setQuizId(int $quiz_id): static
     {
-        $this->scores = $scores;
+        $this->quiz_id = $quiz_id;
+
+        return $this;
+    }
+
+    public function getScoreRate(): ?int
+    {
+        return $this->score_rate;
+    }
+
+    public function setScoreRate(int $score_rate): static
+    {
+        $this->score_rate = $score_rate;
 
         return $this;
     }
