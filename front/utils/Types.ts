@@ -12,6 +12,13 @@ export interface Category {
     categoryImage: string
 }
 
+export interface Score {
+    id: number, 
+    player_id: number, 
+    quiz_id: number, 
+    score_rate: number
+}
+
 export type RootStackParamList = {
     Register: undefined
     Login: {message: string}
@@ -20,7 +27,8 @@ export type RootStackParamList = {
     Quiz: {quizData: Question[], categoryName: string}
     Result: {score: number, quizLength: number}
     QuizzesByCategory: {categoryId: number, categoryName: string},
-    Profile: undefined
+    Profile: undefined,
+    Lessons: undefined
 }
 
 export type Children = {
@@ -35,6 +43,8 @@ export type ContextType = {
     setQuizNumber: (value: number) => void;
     userId:number; 
     setUserId: (value: number) => void;
+    scores: Score[];
+    setScores: (value: Score[]) => void;
 }
 
 export type ErrorType = string | null
@@ -64,3 +74,5 @@ export type LoginScreenRouteProp = RouteProp<RootStackParamList, 'Login'>
 export type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Profile'>
 
 export type ScoreScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Score'>
+
+export type ScoreScreenRouteProp = RouteProp<RootStackParamList, 'Score'>

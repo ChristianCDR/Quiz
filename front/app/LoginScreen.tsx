@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { storeTokens } from '@/api/Auth';
 import instance from '@/api/Interceptors';
 import { Context } from '@/utils/Context';

@@ -18,6 +18,7 @@ use OpenApi\Attributes as OA;
 
     // s'assurer le token presenté appartient bien au user
     // empecher un meme user de creer plusieurs scores sur le meme quiz 
+    // retourner par les plus recents
 
 class UserScoreController extends AbstractController
 {
@@ -335,7 +336,7 @@ class UserScoreController extends AbstractController
         ], JsonResponse::HTTP_OK);
     }
 
-    #[Route('/api/deleteScore/', name:'app_delete_score', methods:['DELETE'])] 
+    // #[Route('/api/deleteScore/', name:'app_delete_score', methods:['DELETE'])] 
     #[OA\Delete(
         summary: 'Delete score',
         tags: ['User score'],

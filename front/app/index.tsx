@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react';
 import * as NavigationBar from 'expo-navigation-bar';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import HomeScreen from './HomeScreen';
-import QuizScreen from './QuizScreen';
-import ResultScreen from './ResultScreen';
-import RegisterScreen from './RegisterScreen';
-import LoginScreen from './LoginScreen';
-import ScoreScreen from './ScoreScreen';
-import QuizzesByCategoryScreen from './QuizzesByCategoryScreen';
+import HomeScreen from '@/app/HomeScreen';
+import QuizScreen from '@/app/QuizScreen';
+import ResultScreen from '@/app/ResultScreen';
+import RegisterScreen from '@/app/RegisterScreen';
+import LoginScreen from '@/app/LoginScreen';
+import ScoreScreen from '@/app/ScoreScreen';
+import LessonScreen from '@/app/LessonScreen';
+import QuizzesByCategoryScreen from '@/app/QuizzesByCategoryScreen';
 import { RootStackParamList } from "@/utils/Types";
 import { ContextProvider } from '@/utils/Context';
 
@@ -22,7 +23,7 @@ export default function index () {
     return (  
         <ContextProvider>
             <>
-                <Stack.Navigator initialRouteName='Score'>
+                <Stack.Navigator initialRouteName='Login'>
                     <Stack.Screen 
                       name="Login" 
                       component={LoginScreen} 
@@ -59,6 +60,11 @@ export default function index () {
                     <Stack.Screen 
                       name="QuizzesByCategory"
                       component={QuizzesByCategoryScreen}
+                      options={{headerShown: false}}
+                    />
+                    <Stack.Screen 
+                      name="Lessons"
+                      component={LessonScreen}
                       options={{headerShown: false}}
                     />
                   </Stack.Navigator> 
