@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { ScoreScreenNavigationProp } from '@/utils/Types';
-import { useNavigation } from '@react-navigation/native';
-import { useContext, useState } from 'react';
+import { useNavigation, useNavigationState } from '@react-navigation/native';
+import { useContext, useEffect, useState } from 'react';
 import { Context } from '../utils/Context';
 import ProfileModal from '@/components/ProfileModal';
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -14,11 +14,20 @@ export default function Footer () {
     const [activeButton, setAtiveButton] = useState<number>();
     const navigation = useNavigation<ScoreScreenNavigationProp>();
 
-    const handlePress = (id: number) => {
-        setAtiveButton(id);
-        id === 3 ? alert('Coming soon !') :  '';
-        id === 2 ? navigation.navigate('Score'): '';
-    }
+    const routeName = useNavigationState((state) => {
+        const route = state.routes [state.index]
+        return route.name;
+    });
+
+    useEffect(()=>{
+        switch (routeName) {
+            case 'Score':
+                setAtiveButton(2);
+                break;
+            default:
+                setAtiveButton(1);
+        }
+    },[routeName])
 
     const context = useContext(Context);
 
@@ -30,21 +39,20 @@ export default function Footer () {
         <View style={styles.footer}>
             <ProfileModal />
             <TouchableOpacity 
-                onPress={()=>{handlePress(1)}} 
                 style={[styles.button, activeButton === 1 && styles.pressedButton]}
             >
                 <AntDesign name="home" size={24} color="black" />
                 <Text>Home</Text>
             </TouchableOpacity>
             <TouchableOpacity 
-                onPress={()=>{handlePress(2)}} 
+                onPress={()=>{navigation.navigate('Score')}} 
                 style={[styles.button, activeButton === 2 && styles.pressedButton]}
             >
                 <Ionicons name="stats-chart-outline" size={24} color="black" />
                 <Text>Scores</Text>
             </TouchableOpacity>
             <TouchableOpacity 
-                onPress={()=>{handlePress(3)}} 
+                onPress={()=>{navigation.navigate('Lessons')}} 
                 style={[styles.button, activeButton === 3 && styles.pressedButton]}
             >
                 <FontAwesome name="book" size={24} color="black" />

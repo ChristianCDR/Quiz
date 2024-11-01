@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Footer from '@/components/Footer';
 import instance from '@/api/Interceptors';
+import { Context } from "@/utils/Context";
+import DisplayScores from '@/components/DisplayScores';
 import { useNavigation } from '@react-navigation/native';
-import { HomeScreenNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "../utils/Types";
+import { HomeScreenNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "@/utils/Types";
 import { StyleSheet, View, SafeAreaView, Text, StatusBar, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 
 
@@ -14,7 +16,7 @@ export default function HomeScreen({route}: Props) {
     const [data, setData] = useState<Category[]>([]);
     const [error, setError] = useState<ErrorType>();
     const [loading, setLoading] = useState<boolean>(true);
-    const {username} = route.params
+    const {username} = route.params;
 
     let images: { [key: string]: any } = {
         'inc': require('../assets/images/fire_v2.png'),
@@ -25,22 +27,46 @@ export default function HomeScreen({route}: Props) {
 
     const navigation = useNavigation<HomeScreenNavigationProp>();
 
+    const context = useContext(Context);
+
+    if(!context) throw new Error ('Context returned null');
+
+    const { scores, setScores } = context;
+
+    const scoresChunckedArray = scores.slice(0,5);
+
     useEffect(() => {
         const fetchCategories = async () => {
            try {
-                const response = await instance.get('/api/categories/')
-                setData(response.data)
+                const response = await instance.get('/api/categories/');
+                setData(response.data);
            }
            catch (error) {
-                const errMessage = (error as Error).message
-                setError(errMessage)
+                const errMessage = (error as Error).message;
+                setError(errMessage);
            }
            finally {
-            setLoading(false)
+            setLoading(false);
            }   
         }
+
         fetchCategories();
-    },[])
+    },[]);
+
+    useEffect(()=>{
+        const fetchScores = async () => {
+            try {
+                const response = await instance.get('/api/showScore/1');
+                setScores(response.data.scores);
+            }
+            catch (error) {
+                const errMessage = (error as Error).message;
+                setError(errMessage);
+            }
+        }
+
+        fetchScores();
+    },[]);
 
     if (loading) {
         return (
@@ -49,14 +75,6 @@ export default function HomeScreen({route}: Props) {
           </View>
         );
     }
-    
-    const recentQuiz = [
-        { id: 1, name: 'Quiz 1' },
-        { id: 2, name: 'Quiz 2' },
-        { id: 3, name: 'Quiz 3' },
-        { id: 4, name: 'Quiz 4' },
-        { id: 5, name: 'Quiz 5' }
-    ];
 
     const handleNavigation = (id: number, name: string) => {
         navigation.navigate('QuizzesByCategory', {categoryId: id, categoryName: name})
@@ -107,19 +125,15 @@ export default function HomeScreen({route}: Props) {
                         ) : <Text style={styles.errorText}>{error}</Text>
                     }
                 </ScrollView>
+
                 <Text style={[styles.title, styles.recentTitle]}>Récents</Text>
 
-                <View style={styles.recentScrollContainer}>
-                    {recentQuiz.map(recentQuiz => (
-                    <TouchableOpacity key={recentQuiz.id} style={styles.recentQuiz}>
-                        <Text style={styles.recentText}>{recentQuiz.name}</Text>
-                    </TouchableOpacity>
-                    ))}
-                </View>
+                <DisplayScores scores = {scoresChunckedArray}/>
+  
+            </ScrollView>   
 
-                <Footer/>
-                
-            </ScrollView>      
+            <Footer/> 
+
         </SafeAreaView>
     );
 }
@@ -206,11 +220,6 @@ const styles = StyleSheet.create({
         height: 120,
         marginTop: 10,
     },
-    recentScrollContainer: {
-        paddingHorizontal: 10,
-        width: '100%',
-        paddingBottom: 100
-    },
     category: {
         backgroundColor: '#1E3C58',
         height: '100%',
@@ -219,23 +228,10 @@ const styles = StyleSheet.create({
         marginRight: 10,
         justifyContent: 'space-around',
     },
-    recentQuiz: {
-        backgroundColor: '#1E3C58',
-        borderRadius: 20,
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        height: 70,
-        marginBottom: 15
-    },
     categoryTitle: {
         marginHorizontal: 'auto',
         marginTop: 120,
         marginBottom: 10
-    },
-    recentTitle: {
-        marginHorizontal: 'auto',
-        marginTop: 20,
-        marginBottom: 20
     },
     title: {
         color: '#000',
@@ -244,16 +240,16 @@ const styles = StyleSheet.create({
         width: '90%',
         textAlign: 'left'
     },
+    recentTitle: {
+        marginHorizontal: 'auto',
+        marginTop: 20,
+        marginBottom: 20
+    },
     categoryText: {
         color: 'white',
         fontSize: 18,
         fontWeight: 'bold',
         textAlign: 'center',
         paddingHorizontal: 15
-    },
-    recentText: {
-        color: 'white',
-        fontSize: 18,
-        fontWeight: 'bold'
     }
 });
