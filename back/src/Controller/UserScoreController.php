@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\UserScore;
 use App\Repository\UserRepository;
 use App\Repository\UserScoreRepository;
+use App\Repository\CategoriesRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -27,14 +28,22 @@ class UserScoreController extends AbstractController
     private $userScoreRepository;
     private $tokenStorageInterface;
     private $jwtManager;
+    private $categoriesRepository;
 
-    public function __construct(EntityManagerInterface $entityManager, UserRepository $userRepository, UserScoreRepository $userScoreRepository, TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager)
+    public function __construct(
+        EntityManagerInterface $entityManager, 
+        UserRepository $userRepository, 
+        UserScoreRepository $userScoreRepository, 
+        TokenStorageInterface $tokenStorageInterface, 
+        JWTTokenManagerInterface $jwtManager,
+        CategoriesRepository $categoriesRepository)
     {
         $this->entityManager = $entityManager;
         $this->userRepository = $userRepository;
         $this->userScoreRepository = $userScoreRepository;
         $this->jwtManager = $jwtManager;
         $this->tokenStorageInterface = $tokenStorageInterface;
+        $this->categoriesRepository = $categoriesRepository;
     }
 
     #[Route('/api/users/scores', name: 'app_users_score', methods: ['GET'])]
@@ -103,10 +112,11 @@ class UserScoreController extends AbstractController
             required: true,
             content: new OA\JsonContent(
                 type: 'object',
-                required: ['quiz_id', 'score_rate'],
+                required: ['quiz_id', 'score_rate', 'category_id'],
                 properties: [
                     new OA\Property(property: 'quiz_id', type: 'integer', example: 1),
-                    new OA\Property(property: 'score_rate', type: 'integer', example: 90)
+                    new OA\Property(property: 'score_rate', type: 'integer', example: 90),
+                    new OA\Property(property: 'category_id', type: 'integer', example: 2)
                 ]
             )
         ),
@@ -119,6 +129,7 @@ class UserScoreController extends AbstractController
                     properties: [
                         new OA\Property(property: 'player_id', type: 'integer', example: 1),
                         new OA\Property(property: 'quiz_id', type: 'integer', example: 1),
+                        new OA\Property(property: 'category_id', type: 'integer', example: 2),
                         new OA\Property(property: 'score_rate', type: 'integer', example: 90)
                     ]
                 )
@@ -138,19 +149,12 @@ class UserScoreController extends AbstractController
     public function newScore(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-
-        $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
-
-        $user= $this->userRepository->findOneBy(['email' => $decodedJwtToken['email']]);
-
-        if (!$user) {
-            throw $this->createNotFoundException('Utilisateur non trouvé');
-        }
         
         $quiz_id = $data['quiz_id'] ?? ''; 
         $score_rate = $data['score_rate'] ?? ''; 
+        $category_id = $data['category_id'] ?? '';
 
-        $values = array ($quiz_id, $score_rate);
+        $values = array ($quiz_id, $score_rate, $category_id);
 
         foreach ($values as $value) {
             if(empty($value)) {
@@ -165,7 +169,21 @@ class UserScoreController extends AbstractController
             return new JsonResponse(['Error' => 'Le taux de réussite ne peut pas dépasser 100%!'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        $existingScore = $this->userScoreRepository->findOneBy(['player' => $user->getId(), 'quiz_id' => $quiz_id]);
+        $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
+
+        $user= $this->userRepository->findOneBy(['email' => $decodedJwtToken['email']]);
+
+        if (!$user) {
+            throw $this->createNotFoundException('Utilisateur introuvable');
+        }
+
+        $category= $this->categoriesRepository->find($category_id);
+
+        if (!$category) {
+            throw $this->createNotFoundException('Catégorie introuvable');
+        }
+
+        $existingScore = $this->userScoreRepository->findOneBy(['player' => $user->getId(), 'quiz_id' => $quiz_id, 'category' => $category->getId()]);
        
         if ($existingScore) {
             return new JsonResponse([
@@ -179,6 +197,7 @@ class UserScoreController extends AbstractController
             ->setPlayer($user)
             ->setQuizId($quiz_id)
             ->setScoreRate($score_rate)
+            ->setCategory($category)
             ->setCreatedAt(new \DateTimeImmutable())
             ->setUpdatedAt(new \DateTime())
         ;    
@@ -189,6 +208,7 @@ class UserScoreController extends AbstractController
         return new JsonResponse([
             'player_id'=> $userScore->getPlayer()->getId(),
             'quiz_id' => $userScore->getQuizId(),
+            'category_id' => $userScore->getCategory()->getId(),
             'score' => $userScore->getScoreRate()
         ], JsonResponse::HTTP_CREATED);
     }
@@ -315,6 +335,7 @@ class UserScoreController extends AbstractController
                                     new OA\Property(property: 'id', type: 'integer', example: 29),
                                     new OA\Property(property: 'player_id', type: 'integer', example: 1),
                                     new OA\Property(property: 'quiz_id', type: 'integer', example: 1),
+                                    new OA\Property(property: 'category_id', type: 'integer', example: 2),
                                     new OA\Property(property: 'score_rate', type: 'integer', example: 90)
                                 ]
                             )
@@ -339,14 +360,18 @@ class UserScoreController extends AbstractController
         $player = $this->userRepository->findOneBy(['id' => $player_id]);
 
         $userScores = $this->userScoreRepository->findByPlayerIdOrderedByUpdatedAt($player);
-    
+
         $data = [];
 
         foreach($userScores as $userScore) {
+            $category = $this->categoriesRepository->find($userScore->getCategory()->getId());
+            
             $data[] = [
                 'id' => $userScore->getId(),
                 'player_id' => $userScore->getPlayer()->getId(),
                 'quiz_id' => $userScore->getQuizId(),
+                'category_id' => $category->getId(),
+                'category_name' => $category->getCategoryName(),
                 'score_rate' => $userScore->getScoreRate()
             ];
         }

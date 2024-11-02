@@ -13,7 +13,7 @@ type Props = {
 }
 
 export default function HomeScreen({route}: Props) {
-    const [data, setData] = useState<Category[]>([]);
+    const [data, setCategory] = useState<Category[]>([]);
     const [error, setError] = useState<ErrorType>();
     const [loading, setLoading] = useState<boolean>(true);
     const {username} = route.params;
@@ -31,7 +31,7 @@ export default function HomeScreen({route}: Props) {
 
     if(!context) throw new Error ('Context returned null');
 
-    const { scores, setScores } = context;
+    const { setCategoryId, setCategoryName, scores, setScores } = context;
 
     const scoresChunckedArray = scores.slice(0,5);
 
@@ -39,7 +39,7 @@ export default function HomeScreen({route}: Props) {
         const fetchCategories = async () => {
            try {
                 const response = await instance.get('/api/categories/');
-                setData(response.data);
+                setCategory(response.data);
            }
            catch (error) {
                 const errMessage = (error as Error).message;
@@ -68,6 +68,12 @@ export default function HomeScreen({route}: Props) {
         fetchScores();
     },[]);
 
+    const handleNavigation = (id: number, name: string) => {
+        setCategoryId(id);
+        setCategoryName(name);
+        navigation.navigate('QuizzesByCategory');
+    }
+
     if (loading) {
         return (
           <View style={styles.container}>
@@ -76,10 +82,6 @@ export default function HomeScreen({route}: Props) {
         );
     }
 
-    const handleNavigation = (id: number, name: string) => {
-        navigation.navigate('QuizzesByCategory', {categoryId: id, categoryName: name})
-    }
- 
     return (
         <SafeAreaView  style={styles.container}>
             <StatusBar
