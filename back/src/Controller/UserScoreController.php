@@ -15,22 +15,26 @@ use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Attributes as OA;
-
-    // s'assurer le token presenté appartient bien au user
-    // empecher un meme user de creer plusieurs scores sur le meme quiz 
-    // retourner par les plus recents
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+ 
+    // mise en cache
 
 class UserScoreController extends AbstractController
 {
     private $entityManager;
     private $userRepository;
     private $userScoreRepository;
+    private $tokenStorageInterface;
+    private $jwtManager;
 
-    public function __construct(EntityManagerInterface $entityManager, UserRepository $userRepository, UserScoreRepository $userScoreRepository)
+    public function __construct(EntityManagerInterface $entityManager, UserRepository $userRepository, UserScoreRepository $userScoreRepository, TokenStorageInterface $tokenStorageInterface, JWTTokenManagerInterface $jwtManager)
     {
         $this->entityManager = $entityManager;
         $this->userRepository = $userRepository;
         $this->userScoreRepository = $userScoreRepository;
+        $this->jwtManager = $jwtManager;
+        $this->tokenStorageInterface = $tokenStorageInterface;
     }
 
     #[Route('/api/users/scores', name: 'app_users_score', methods: ['GET'])]
@@ -91,6 +95,7 @@ class UserScoreController extends AbstractController
     }
 
     #[Route('/api/newScore', name: 'app_new_score', methods: ['POST'])]
+    #[IsGranted('post')]
     #[OA\Post(
         summary: 'New user score ',
         tags: ['User score'],
@@ -98,9 +103,8 @@ class UserScoreController extends AbstractController
             required: true,
             content: new OA\JsonContent(
                 type: 'object',
-                required: ['player_id', 'quiz_id', 'score_rate'],
+                required: ['quiz_id', 'score_rate'],
                 properties: [
-                    new OA\Property(property: 'player_id', type: 'integer', example: 1),
                     new OA\Property(property: 'quiz_id', type: 'integer', example: 1),
                     new OA\Property(property: 'score_rate', type: 'integer', example: 90)
                 ]
@@ -134,23 +138,26 @@ class UserScoreController extends AbstractController
     public function newScore(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
+
+        $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
+
+        $user= $this->userRepository->findOneBy(['email' => $decodedJwtToken['email']]);
+
+        if (!$user) {
+            throw $this->createNotFoundException('Utilisateur non trouvé');
+        }
         
-        $player_id = $data['player_id'] ?? '';
         $quiz_id = $data['quiz_id'] ?? ''; 
         $score_rate = $data['score_rate'] ?? ''; 
 
-        $values = array ($player_id, $quiz_id, $score_rate);
+        $values = array ($quiz_id, $score_rate);
 
         foreach ($values as $value) {
             if(empty($value)) {
-                return new JsonResponse([
-                    'error' => 'Empty request payload !'
-                ]);
+                return new JsonResponse(['Error' => 'Empty request payload !'], JsonResponse::HTTP_BAD_REQUEST);
             }
             else if(!is_int($value)) {
-                return new JsonResponse([
-                    'error' => 'Request must contain integers !'
-                ]);
+                return new JsonResponse(['Error' => 'Request must contain integers !'], JsonResponse::HTTP_BAD_REQUEST);
             }
         }
 
@@ -158,25 +165,30 @@ class UserScoreController extends AbstractController
             return new JsonResponse(['Error' => 'Le taux de réussite ne peut pas dépasser 100%!'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        $user = $this->userRepository->find($player_id);
-
-        if (!$user) {
-            throw $this->createNotFoundException('Utilisateur non trouvé');
+        $existingScore = $this->userScoreRepository->findOneBy(['player' => $user->getId(), 'quiz_id' => $quiz_id]);
+       
+        if ($existingScore) {
+            return new JsonResponse([
+                'Error' => 'Un score existe déjà sur ce quiz!'
+            ], JsonResponse::HTTP_BAD_REQUEST);
         }
-        
+
         $userScore = new UserScore();
 
         $userScore
             ->setPlayer($user)
             ->setQuizId($quiz_id)
             ->setScoreRate($score_rate)
-        ;
+            ->setCreatedAt(new \DateTimeImmutable())
+            ->setUpdatedAt(new \DateTime())
+        ;    
         
         $this->entityManager->persist($userScore);
         $this->entityManager->flush();
         
         return new JsonResponse([
             'player_id'=> $userScore->getPlayer()->getId(),
+            'quiz_id' => $userScore->getQuizId(),
             'score' => $userScore->getScoreRate()
         ], JsonResponse::HTTP_CREATED);
     }
@@ -189,9 +201,8 @@ class UserScoreController extends AbstractController
             required: true,
             content: new OA\JsonContent(
                 type: 'object',
-                required: ['player_id', 'quiz_id', 'score_rate'],
+                required: ['quiz_id', 'score_rate'],
                 properties: [
-                    new OA\Property(property: 'player_id', type: 'integer', example: 1),
                     new OA\Property(property: 'quiz_id', type: 'integer', example: 1),
                     new OA\Property(property: 'score_rate', type: 'integer', example: 100)
                 ]
@@ -227,11 +238,18 @@ class UserScoreController extends AbstractController
         // Lorsque le user refait un  quiz
         $data = json_decode($request->getContent(), true);
         
-        $player_id = $data['player_id'] ?? '';
+        $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
+
+        $user= $this->userRepository->findOneBy(['email' => $decodedJwtToken['email']]);
+
+        if (!$user) {
+            throw $this->createNotFoundException('Utilisateur non trouvé');
+        }
+
         $quiz_id = $data['quiz_id'] ?? ''; 
         $score_rate = $data['score_rate'] ?? ''; 
 
-        $values = array ($player_id, $quiz_id, $score_rate);
+        $values = array ($quiz_id, $score_rate);
 
         foreach ($values as $value) {
             if(empty($value)) {
@@ -246,23 +264,24 @@ class UserScoreController extends AbstractController
             return new JsonResponse(['Error' => 'Le taux de réussite ne peut pas dépasser 100%!'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        $userScore = $this->userScoreRepository->findOneBy(['player' => $player_id, 'quiz_id' => $quiz_id]);
+        $userScore = $this->userScoreRepository->findOneBy(['player' => $user->getId(), 'quiz_id' => $quiz_id]);
 
-        if (!$userScore) {
-            throw $this->createNotFoundException("Score utilisateur non trouvé");
+        if (!$userScore) {ootFoundException("Score utilisateur non trouvé");
         }
         
         $userScore
             ->setPlayer($userScore->getPlayer())
             ->setQuizId($quiz_id)
             ->setScoreRate($score_rate)
+            ->setUpdatedAt(new \DateTime())
         ;
         
         $this->entityManager->persist($userScore);
         $this->entityManager->flush();
         
         return new JsonResponse([
-            'player_id'=> $userScore->getPlayer()->getId(),
+            'player_id' => $userScore->getPlayer()->getId(),
+            'quiz_id' => $userScore->getQuizId(),
             'score' => $userScore->getScoreRate()
         ], JsonResponse::HTTP_OK);
     }
@@ -318,8 +337,9 @@ class UserScoreController extends AbstractController
     public function show (int $player_id): JsonResponse
     {
         $player = $this->userRepository->findOneBy(['id' => $player_id]);
-        $userScores = $this->userScoreRepository->findBy(['player' => $player]);
-        
+
+        $userScores = $this->userScoreRepository->findByPlayerIdOrderedByUpdatedAt($player);
+    
         $data = [];
 
         foreach($userScores as $userScore) {

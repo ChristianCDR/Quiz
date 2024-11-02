@@ -76,3 +76,5 @@ export type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackPar
 export type ScoreScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Score'>
 
 export type ScoreScreenRouteProp = RouteProp<RootStackParamList, 'Score'>
+
+export type LessonScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Lessons'>

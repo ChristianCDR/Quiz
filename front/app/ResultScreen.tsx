@@ -42,16 +42,13 @@ export default function ResultScreen ({route}: Props) {
 
         if (!context) throw new Error ('Context returned null')
 
-        const { userId, quizNumber }  = context;
+        const { quizNumber }  = context;
 
-        const scoreRate = (score*100) / quizLength;
-
-        const body = {
-            'userId': userId,
-            'score': {
-                'quizNumber': quizNumber,
-                'scoreRate': scoreRate
-            }
+        const scoreRate = (score*100) / quizLength;   
+        
+        const body = {        
+            "quiz_id": quizNumber,
+            "score_rate": scoreRate
         }
 
         const storeScore = async () => {
