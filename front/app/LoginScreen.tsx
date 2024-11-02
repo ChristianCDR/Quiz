@@ -7,8 +7,17 @@ import { useNavigation } from '@react-navigation/native';
 import { LoginScreenNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native';
 
+// edit userscore coté front
 // gérer les erreurs en front -> en rouge lorsque vide
-// logout
+// permettre l'upload de photo de profil
+// au clic sur un quiz recent, lancer le quiz
+// ajouter des + aux recents
+// Page Mon compte
+// Notifications
+// Aide  & contact => creer un mail gmail pour l'instant
+// mentionner  l'origine des pics de l'appli
+// info legales
+
 // Bruteforce
 // Oauth2
 
@@ -30,8 +39,6 @@ export default function LoginScreen ({route}: Props) {
     if (!context) throw new Error ('Context returned null');
       
     const { setUserId }  = context;
-      
-  
 
     const handleLogin = async () => {
 

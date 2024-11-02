@@ -16,6 +16,8 @@ export interface Score {
     id: number, 
     player_id: number, 
     quiz_id: number, 
+    category_id: number,
+    category_name: string,
     score_rate: number
 }
 
@@ -24,9 +26,9 @@ export type RootStackParamList = {
     Login: {message: string}
     Home: {username: string}
     Score: undefined
-    Quiz: {quizData: Question[], categoryName: string}
+    Quiz: {quizData: Question[], categoryName: string | undefined}
     Result: {score: number, quizLength: number}
-    QuizzesByCategory: {categoryId: number, categoryName: string},
+    QuizzesByCategory: undefined
     Profile: undefined,
     Lessons: undefined
 }
@@ -45,6 +47,12 @@ export type ContextType = {
     setUserId: (value: number) => void;
     scores: Score[];
     setScores: (value: Score[]) => void;
+    quizzes: Question[][];
+    setQuizzes: (value: Question[][]) => void;
+    categoryId: number;
+    setCategoryId: (value: number) => void
+    categoryName: string;
+    setCategoryName: (value: string) => void
 }
 
 export type ErrorType = string | null

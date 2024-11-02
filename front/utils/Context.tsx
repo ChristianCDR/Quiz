@@ -1,5 +1,5 @@
 import React, { useState, createContext } from "react";
-import { Children, ContextType, Score } from '@/utils/Types';
+import { Children, ContextType, Score, Question } from '@/utils/Types';
 
 export const Context = createContext<ContextType | null>(null);
 
@@ -8,6 +8,9 @@ export function ContextProvider ({children}: Children) {
     const [userId, setUserId] = useState<number>(0);
     const [isModalVisible, setModalVisible] = useState<boolean>(false);
     const [scores, setScores] = useState<Score[]>([]);
+    const [quizzes, setQuizzes] = useState<Question[][]>([]);  
+    const [categoryId, setCategoryId] = useState<number>();
+    const [categoryName, setCategoryName] = useState<string>('');
 
     const showModal = () => setModalVisible(true);
     const hideModal = () => setModalVisible(false);
@@ -22,7 +25,13 @@ export function ContextProvider ({children}: Children) {
             userId, 
             setUserId,
             scores, 
-            setScores 
+            setScores,
+            quizzes, 
+            setQuizzes,
+            categoryId,
+            setCategoryId, 
+            categoryName,
+            setCategoryName 
         }}>
         
             {children}
