@@ -53,10 +53,15 @@ export default function ResultScreen ({route}: Props) {
         }
 
         const storeScore = async () => {
-            const response = await instance.post('/api/newScore', body);
-            if(response.data) {
-                console.log(response.data);
-            }
+           try {
+                await instance.post('/api/newScore', body);
+           } 
+           catch (error: any) {
+                if (error.response.status === 400 ) {
+                    await instance.put('/api/editScore', body);
+                }
+           }
+           
         }
 
         storeScore();

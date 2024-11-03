@@ -7,29 +7,17 @@ import { useNavigation } from '@react-navigation/native';
 import { LoginScreenNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native';
 
-// edit userscore coté front
-// gérer les erreurs en front -> en rouge lorsque vide
-// permettre l'upload de photo de profil
-// au clic sur un quiz recent, lancer le quiz
-// ajouter des + aux recents
-// Page Mon compte
-// Notifications
-// Aide  & contact => creer un mail gmail pour l'instant
-// mentionner  l'origine des pics de l'appli
-// info legales
-
-// Bruteforce
-// Oauth2
-
 type Props = {
   route: LoginScreenRouteProp
 }
 
 export default function LoginScreen ({route}: Props) {
-    const [email, setEmail] = useState<string>();
-    const [password, setPassword] = useState<string>();
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string>();
     const [secureText, setSecureText] = useState<boolean>(true);
+    const [emptyEmail, setEmptyEmail] = useState<boolean>(false);
+    const [emptyPassword, setEmptyPassword] = useState<boolean>(false);
 
     const navigation = useNavigation<LoginScreenNavigationProp>();
     const {message} = route.params;
@@ -41,6 +29,8 @@ export default function LoginScreen ({route}: Props) {
     const { setUserId }  = context;
 
     const handleLogin = async () => {
+      if (email === '') setEmptyEmail(true);
+      if (password === '') setEmptyPassword(true);
 
       const body = {
           "email": email,
@@ -93,7 +83,7 @@ export default function LoginScreen ({route}: Props) {
   
           <Text style={styles.title}>Connexion</Text>
           <TextInput
-              style={styles.input}
+              style={[styles.input, emptyEmail && styles.errorBox]}
               placeholder="Email"
               value={email}
               onChangeText={setEmail}
@@ -102,7 +92,7 @@ export default function LoginScreen ({route}: Props) {
           />
           <View>
             <TextInput
-                style={styles.input}
+                style={[styles.input, emptyPassword && styles.errorBox]}
                 placeholder="Mot de passe"
                 value={password}
                 onChangeText={setPassword}
@@ -177,5 +167,8 @@ const styles = StyleSheet.create({
       marginVertical: 10,
       textAlign: 'center',
       fontSize: 16
+    },
+    errorBox: {
+      borderColor: 'red'
     }
 })

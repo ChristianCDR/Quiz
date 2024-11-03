@@ -17,7 +17,7 @@ export default function DisplayScores ({scores}: {scores: Score[]}) {
 
         const quizzes =  await fetchQuizzesByCategoryId(categoryId);
 
-        if (quizzes) navigation.navigate('Quiz', {quizData: quizzes[index], 'categoryName': categoryName });
+        if (quizzes) navigation.navigate('Quiz', {quizData: quizzes[index-1], 'categoryName': categoryName });
     }
 
     return (
