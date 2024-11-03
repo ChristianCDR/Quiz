@@ -132,8 +132,8 @@ export default function HomeScreen({route}: Props) {
 
                 <DisplayScores scores = {scoresChunckedArray}/>
   
-            </ScrollView>   
-
+            </ScrollView>  
+            
             <Footer/> 
 
         </SafeAreaView>

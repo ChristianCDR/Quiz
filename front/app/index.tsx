@@ -23,7 +23,7 @@ export default function index () {
     return (  
         <ContextProvider>
             <>
-                <Stack.Navigator initialRouteName='Login'>
+                <Stack.Navigator initialRouteName='Home'>
                     <Stack.Screen 
                       name="Login" 
                       component={LoginScreen} 
@@ -55,7 +55,7 @@ export default function index () {
                       name="Result" 
                       component={ResultScreen} 
                       options={{headerShown: false}}
-                      // initialParams={{ score: 9, quizLength: 10 }}
+                      initialParams={{ score: 9, quizLength: 10 }}
                     />
                     <Stack.Screen 
                       name="QuizzesByCategory"
