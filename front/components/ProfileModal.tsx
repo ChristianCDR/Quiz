@@ -65,7 +65,7 @@ export default function ProfileModal () {
                 <View style={styles.container}>
                     <TouchableWithoutFeedback>
                         <View style={styles.modalView}>
-                            <Pressable style = {styles.pressable}>
+                            <Pressable style = {styles.pressable} onPress={() => navigation.navigate('Account')}>
                                 <FontAwesome6 name="circle-user" size={24} color="black" />
                                 <Text style={styles.modalText}>Mon compte</Text>
                             </Pressable>

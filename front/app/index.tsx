@@ -11,6 +11,7 @@ import LessonScreen from '@/app/LessonScreen';
 import QuizzesByCategoryScreen from '@/app/QuizzesByCategoryScreen';
 import { RootStackParamList } from "@/utils/Types";
 import { ContextProvider } from '@/utils/Context';
+import AccountScreen from './AccountScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -23,7 +24,7 @@ export default function index () {
     return (  
         <ContextProvider>
             <>
-                <Stack.Navigator initialRouteName='Home'>
+                <Stack.Navigator initialRouteName='Account'>
                     <Stack.Screen 
                       name="Login" 
                       component={LoginScreen} 
@@ -55,7 +56,7 @@ export default function index () {
                       name="Result" 
                       component={ResultScreen} 
                       options={{headerShown: false}}
-                      initialParams={{ score: 9, quizLength: 10 }}
+                      // initialParams={{ score: 9, quizLength: 10 }}
                     />
                     <Stack.Screen 
                       name="QuizzesByCategory"
@@ -65,6 +66,11 @@ export default function index () {
                     <Stack.Screen 
                       name="Lessons"
                       component={LessonScreen}
+                      options={{headerShown: false}}
+                    />
+                    <Stack.Screen 
+                      name="Account"
+                      component={AccountScreen}
                       options={{headerShown: false}}
                     />
                   </Stack.Navigator> 

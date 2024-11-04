@@ -7,6 +7,18 @@ import { useNavigation } from '@react-navigation/native';
 import { LoginScreenNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native';
 
+// Page Mon compte
+// permettre l'upload de photo de profil
+
+// Notifications
+// Aide  & contact => creer un mail gmail pour l'instant
+// mentionner  l'origine des pics de l'appli
+// info legales
+// icone de l'appli
+
+// Bruteforce
+// Oauth2
+
 type Props = {
   route: LoginScreenRouteProp
 }

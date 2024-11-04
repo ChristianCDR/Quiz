@@ -20,9 +20,16 @@ export default function Footer () {
     });
 
     useEffect(()=>{
+        console.log(routeName)
         switch (routeName) {
             case 'Score':
                 setAtiveButton(2);
+                break;
+            case 'Lessons':
+                setAtiveButton(3);
+                break;
+            case 'Account':
+            setAtiveButton(4);
                 break;
             default:
                 setAtiveButton(1);
