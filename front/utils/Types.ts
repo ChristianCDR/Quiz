@@ -30,7 +30,8 @@ export type RootStackParamList = {
     Result: {score: number, quizLength: number}
     QuizzesByCategory: undefined
     Profile: undefined,
-    Lessons: undefined
+    Lessons: undefined,
+    Account: undefined
 }
 
 export type Children = {
@@ -86,3 +87,5 @@ export type ScoreScreenNavigationProp = NativeStackNavigationProp<RootStackParam
 export type ScoreScreenRouteProp = RouteProp<RootStackParamList, 'Score'>
 
 export type LessonScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Lessons'>
+
+export type AccountScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Account'>

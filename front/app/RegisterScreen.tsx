@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { emailValidator, passwordValidator, usernameValidator }  from '@/utils/Validators';
-import { RegisterScreenNavigationProp } from '../utils/Types';
+import { RegisterScreenNavigationProp } from '@/utils/Types';
 import { useNavigation } from '@react-navigation/native';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
