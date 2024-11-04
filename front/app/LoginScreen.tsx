@@ -1,13 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { storeTokens } from '@/api/Auth';
 import instance from '@/api/Interceptors';
+import { Context } from '@/utils/Context';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import { LoginScreenNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native';
 
-// gérer les erreurs en front -> en rouge lorsque vide
-// logout
+// Page Mon compte
+// permettre l'upload de photo de profil
+
+// Notifications
+// Aide  & contact => creer un mail gmail pour l'instant
+// mentionner  l'origine des pics de l'appli
+// info legales
+// icone de l'appli
+
 // Bruteforce
 // Oauth2
 
@@ -16,15 +24,25 @@ type Props = {
 }
 
 export default function LoginScreen ({route}: Props) {
-    const [email, setEmail] = useState<string>();
-    const [password, setPassword] = useState<string>();
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string>();
     const [secureText, setSecureText] = useState<boolean>(true);
+    const [emptyEmail, setEmptyEmail] = useState<boolean>(false);
+    const [emptyPassword, setEmptyPassword] = useState<boolean>(false);
 
     const navigation = useNavigation<LoginScreenNavigationProp>();
     const {message} = route.params;
+    
+    const context = useContext(Context);
+
+    if (!context) throw new Error ('Context returned null');
+      
+    const { setUserId }  = context;
 
     const handleLogin = async () => {
+      if (email === '') setEmptyEmail(true);
+      if (password === '') setEmptyPassword(true);
 
       const body = {
           "email": email,
@@ -36,7 +54,10 @@ export default function LoginScreen ({route}: Props) {
           if (response.status === 200) {
             const accessToken = response.data.accessToken;
             const refreshToken = response.data.refreshToken;
+            const userId = response.data.userId;
+
             await storeTokens(accessToken, refreshToken);
+            setUserId(userId);
             navigation.navigate('Home', {username: response.data.username});
           }
       }
@@ -74,7 +95,7 @@ export default function LoginScreen ({route}: Props) {
   
           <Text style={styles.title}>Connexion</Text>
           <TextInput
-              style={styles.input}
+              style={[styles.input, emptyEmail && styles.errorBox]}
               placeholder="Email"
               value={email}
               onChangeText={setEmail}
@@ -83,7 +104,7 @@ export default function LoginScreen ({route}: Props) {
           />
           <View>
             <TextInput
-                style={styles.input}
+                style={[styles.input, emptyPassword && styles.errorBox]}
                 placeholder="Mot de passe"
                 value={password}
                 onChangeText={setPassword}
@@ -158,5 +179,8 @@ const styles = StyleSheet.create({
       marginVertical: 10,
       textAlign: 'center',
       fontSize: 16
+    },
+    errorBox: {
+      borderColor: 'red'
     }
 })

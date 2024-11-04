@@ -24,9 +24,13 @@ class Categories
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $categoryImage = null;
 
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: UserScore::class, orphanRemoval: true)]
+    private Collection $userScores;
+
     public function __construct()
     {
         $this->questions = new ArrayCollection();
+        $this->userScores = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -80,6 +84,36 @@ class Categories
     {
         if ($this->questions->removeElement($question)) {
             $question->removeCategory($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserScore>
+     */
+    public function getUserScores(): Collection
+    {
+        return $this->userScores;
+    }
+
+    public function addUserScore(UserScore $userScore): static
+    {
+        if (!$this->userScores->contains($userScore)) {
+            $this->userScores->add($userScore);
+            $userScore->setCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserScore(UserScore $userScore): static
+    {
+        if ($this->userScores->removeElement($userScore)) {
+            // set the owning side to null (unless already changed)
+            if ($userScore->getCategory() === $this) {
+                $userScore->setCategory(null);
+            }
         }
 
         return $this;

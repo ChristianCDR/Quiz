@@ -1,14 +1,17 @@
 import React, { useEffect } from 'react';
 import * as NavigationBar from 'expo-navigation-bar';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import HomeScreen from './HomeScreen';
-import QuizScreen from './QuizScreen';
-import ResultScreen from './ResultScreen';
-import RegisterScreen from './RegisterScreen';
-import LoginScreen from './LoginScreen';
-import QuizzesByCategoryScreen from './QuizzesByCategoryScreen';
+import HomeScreen from '@/app/HomeScreen';
+import QuizScreen from '@/app/QuizScreen';
+import ResultScreen from '@/app/ResultScreen';
+import RegisterScreen from '@/app/RegisterScreen';
+import LoginScreen from '@/app/LoginScreen';
+import ScoreScreen from '@/app/ScoreScreen';
+import LessonScreen from '@/app/LessonScreen';
+import QuizzesByCategoryScreen from '@/app/QuizzesByCategoryScreen';
 import { RootStackParamList } from "@/utils/Types";
-import { ModalProvider } from '@/utils/ModalContext';
+import { ContextProvider } from '@/utils/Context';
+import AccountScreen from './AccountScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -18,10 +21,10 @@ export default function index () {
     NavigationBar.setBackgroundColorAsync('#FFF');
   }, []);
 
-    return ( 
-        <ModalProvider>
+    return (  
+        <ContextProvider>
             <>
-                <Stack.Navigator initialRouteName='Home'>
+                <Stack.Navigator initialRouteName='Account'>
                     <Stack.Screen 
                       name="Login" 
                       component={LoginScreen} 
@@ -39,6 +42,11 @@ export default function index () {
                       options={{headerShown: false}}  
                       initialParams={{username : 'Le Boss'}}                                                                                                                         
                     />
+                    <Stack.Screen
+                      name="Score"
+                      component={ScoreScreen}
+                      options={{headerShown: false}}
+                    />
                     <Stack.Screen 
                       name="Quiz" 
                       component={QuizScreen} 
@@ -55,8 +63,18 @@ export default function index () {
                       component={QuizzesByCategoryScreen}
                       options={{headerShown: false}}
                     />
+                    <Stack.Screen 
+                      name="Lessons"
+                      component={LessonScreen}
+                      options={{headerShown: false}}
+                    />
+                    <Stack.Screen 
+                      name="Account"
+                      component={AccountScreen}
+                      options={{headerShown: false}}
+                    />
                   </Stack.Navigator> 
             </>
-        </ModalProvider>
+        </ContextProvider>  
     );
 };

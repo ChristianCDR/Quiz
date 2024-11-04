@@ -1,31 +1,59 @@
-import React, { useState } from 'react'
-import { emailValidator, passwordValidator, usernameValidator }  from '@/utils/Validators'
-import { RegisterScreenNavigationProp } from '../utils/Types'
-import { useNavigation } from '@react-navigation/native'
-import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native'
-import FontAwesome from '@expo/vector-icons/FontAwesome'
-import instance from '@/api/Interceptors'
+import React, { useState } from 'react';
+import { emailValidator, passwordValidator, usernameValidator }  from '@/utils/Validators';
+import { RegisterScreenNavigationProp } from '@/utils/Types';
+import { useNavigation } from '@react-navigation/native';
+import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import instance from '@/api/Interceptors';
 
 export default function RegisterScreen () {
 
-    const [email, setEmail] = useState<string>('')
-    const [confirmEmail, setConfirmEmail] = useState<string>('')
-    const [username, setUsername] = useState<string>('')
-    const [password, setPassword] = useState<string>('')
-    const [error, setError] = useState<string>()
-    const [secureText, setSecureText] = useState<boolean>(true)
-    const navigation = useNavigation<RegisterScreenNavigationProp>()
+    const [email, setEmail] = useState<string>('');
+    const [confirmEmail, setConfirmEmail] = useState<string>('');
+    const [username, setUsername] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [error, setError] = useState<string>();
+    const [secureText, setSecureText] = useState<boolean>(true);
+    const [emptyEmail, setEmptyEmail] = useState<boolean>(false);
+    const [emptyUsername, setEmptyUsername] = useState<boolean>(false);
+    const [emptyConfirm, setEmptyConfirm] = useState<boolean>(false);
+    const [emptyPassword, setEmptyPassword] = useState<boolean>(false);
+    const navigation = useNavigation<RegisterScreenNavigationProp>();
   
     const handleRegister = async () => {
 
-        if (emailValidator(email, confirmEmail) === 'mail_mismatch') {
-            setError("Les e-mails ne correspondent pas.")
+        switch ('') {
+            case email: 
+                setEmptyEmail(true);
+                setError('Veuillez remplir tous les champs.');
+                break;
+            case confirmEmail: 
+                setEmptyConfirm(true);
+                break;
+            case username: 
+                setEmptyUsername(true);
+                setError('Veuillez remplir tous les champs.');
+                break;
+            case password: 
+                setEmptyPassword(true);
+                setError('Veuillez remplir tous les champs.');
+                break;            
         }
-        else if (!passwordValidator(password)) {
-            setError("Le mot de passe doit contenir au minimum: " + '\n' + "1 chiffre" + '\n' + "8 caractères" + '\n' + "1 lettre miniscule" + '\n' + "1 lettre majuscule"  + '\n' + "1 caractère spécial: @ $ ! % * ? & " )
+
+        if (password != '' && !passwordValidator(password)) {
+          setError("Le mot de passe doit contenir au minimum: " + '\n' 
+          + "1 chiffre" + '\n' 
+          + "8 caractères" + '\n' 
+          + "1 lettre miniscule" + '\n' 
+          + "1 lettre majuscule"  + '\n' 
+          + "1 caractère spécial: @ $ ! % * ? & ")
         } 
 
-        else if (emailValidator(email, confirmEmail) && usernameValidator(username.trim()) && passwordValidator(password)) {
+        if (emailValidator(email, confirmEmail) === 'mail_mismatch') {
+          setError("Les e-mails ne correspondent pas.");
+        }
+
+        if (emailValidator(email, confirmEmail) && usernameValidator(username.trim()) && passwordValidator(password)) {
           
           const body = {
               "email": email,
@@ -70,7 +98,7 @@ export default function RegisterScreen () {
             }
             <Text style={styles.title}>Inscription</Text>
             <TextInput
-                style={styles.input}
+                style={[styles.input, emptyEmail && styles.errorBox]}
                 placeholder="Email"
                 value={email}
                 onChangeText={setEmail}
@@ -78,7 +106,7 @@ export default function RegisterScreen () {
                 autoCapitalize="none"
             />
             <TextInput
-                style={styles.input}
+                style={[styles.input, emptyConfirm && styles.errorBox]}
                 placeholder="Confirmez votre email"
                 value={confirmEmail}
                 onChangeText={setConfirmEmail}
@@ -86,7 +114,7 @@ export default function RegisterScreen () {
                 autoCapitalize="none"
             />
             <TextInput
-                style={styles.input}
+                style={[styles.input, emptyUsername && styles.errorBox]}
                 placeholder="Nom d'utilisateur"
                 value={username}
                 onChangeText={setUsername}
@@ -95,7 +123,7 @@ export default function RegisterScreen () {
             />
             <View>
               <TextInput
-                  style={styles.input}
+                  style={[styles.input, emptyPassword && styles.errorBox]}
                   placeholder="Mot de passe"
                   value={password}
                   onChangeText={setPassword}
@@ -174,5 +202,8 @@ const styles = StyleSheet.create({
       marginVertical: 10,
       textAlign: 'center',
       fontSize: 16
+    },
+    errorBox: {
+      borderColor: 'red'
     }
 })
