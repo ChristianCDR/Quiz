@@ -1,10 +1,11 @@
-import { StyleSheet, View, Text, Image, TouchableOpacity, Share, Animated, Easing, StatusBar } from 'react-native'
-import { ResultScreenNavigationProp, ResultScreenRouteProp } from "../utils/Types"
-import { Platform, PermissionsAndroid } from 'react-native';
-import { useEffect, useState, useRef } from 'react'
-import { useNavigation } from '@react-navigation/native'
-import { captureRef } from 'react-native-view-shot'
-import BackButton from '@/components/BackButton'
+import { StyleSheet, View, Text, Image, TouchableOpacity, Share, Animated, Easing, StatusBar } from 'react-native';
+import { ResultScreenNavigationProp, ResultScreenRouteProp } from "../utils/Types";
+import { useEffect, useState, useRef, useContext } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import instance from '@/api/Interceptors';
+import { Context } from '@/utils/Context';
+import { captureRef } from 'react-native-view-shot';
+import BackButton from '@/components/BackButton';
 import Entypo from '@expo/vector-icons/Entypo';
 
 type Props = {
@@ -20,6 +21,7 @@ export default function ResultScreen ({route}: Props) {
     const formattedScore = (score) < 10 ? `0${score}` : score.toString()
     const viewRef = useRef<View>(null)
     const scaleValue = useRef(new Animated.Value(0.1)).current 
+    const context = useContext(Context);
 
     const fruitImages = {
         strawberry : require('../assets/images/strawberry.png'),
@@ -36,46 +38,55 @@ export default function ResultScreen ({route}: Props) {
         }).start()
     }
 
+    useEffect(() => {
+
+        if (!context) throw new Error ('Context returned null')
+
+        const { quizNumber, categoryId }  = context;
+
+        const scoreRate = (score*100) / quizLength;   
+        
+        const body = {        
+            "quiz_id": quizNumber,
+            "score_rate": scoreRate,
+            'category_id': categoryId
+        }
+
+        const storeScore = async () => {
+           try {
+                await instance.post('/api/newScore', body);
+           } 
+           catch (error: any) {
+                if (error.response.status === 400 ) {
+                    await instance.put('/api/editScore', body);
+                }
+           }
+           
+        }
+
+        storeScore();
+    }, [])
+
     useEffect(() =>  {
         if (score < 5) {
-            setComment('Fruitos !')
-            setScoreColor('#ff0000')
-            setFruitImage(fruitImages.strawberry)
+            setComment('Fruitos !');
+            setScoreColor('#ff0000');
+            setFruitImage(fruitImages.strawberry);
             
         }  
         else if (score >= 5 && score < 9) {
-            setComment('Pas mal..')
-            setFruitImage(fruitImages.thumb)
+            setComment('Pas mal..');
+            setFruitImage(fruitImages.thumb);
         }  
         else {
-            setComment('Sarce !') 
-            setScoreColor('#5ce65c')
-            setFruitImage(fruitImages.medal)
+            setComment('Sarce !'); 
+            setScoreColor('#5ce65c');
+            setFruitImage(fruitImages.medal);
         }
-        startAnimation()
+        startAnimation();
     }, [])
 
     const handleShare = async () => {
-        if (Platform.OS === 'android' && Platform.Version >= 23) {
- 
-            PermissionsAndroid.request(
-           
-              PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,  
-              {
-                title: "Permission d'enregistrer une capture d'écran",
-                message: "Vous devez autoriser l'application à enregister une capture d'écran",
-    
-                buttonNeutral: 'Plus tard',
-                buttonNegative: 'Non',
-                buttonPositive: 'OK',
-              }
-            ).then((result) => {
-              if (result !== PermissionsAndroid.RESULTS.GRANTED) {
-                console.log('Storage permission denied.');
-              }
-            });        
-        }
-
         try {
             if(viewRef.current) {
                 const uri = await captureRef(viewRef, {
