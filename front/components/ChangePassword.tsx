@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
       paddingHorizontal: 15,
       marginBottom: 20,
       backgroundColor: '#fff',
+      marginVertical: 20
     },
     errorBox: {
       borderColor: 'red'
@@ -69,7 +70,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: '#1E3C58',
         height: 40,
-        width: 150
+        width: 150,
+        marginTop: 20
     },
     buttonText: {
         fontSize: 16,

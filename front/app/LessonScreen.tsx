@@ -13,7 +13,6 @@ export default function LessonScreen () {
             <BackButton navigation={navigation} />
             <Text style={styles.title}>Cours</Text>
             <Text style = {styles.text}> Coming soon... </Text>
-            <Footer/>
         </View>
     )
 }

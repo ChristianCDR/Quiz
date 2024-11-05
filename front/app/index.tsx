@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { StatusBar } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from '@/app/HomeScreen';
@@ -12,6 +13,7 @@ import QuizzesByCategoryScreen from '@/app/QuizzesByCategoryScreen';
 import { RootStackParamList } from "@/utils/Types";
 import { ContextProvider } from '@/utils/Context';
 import AccountScreen from './AccountScreen';
+import SettingsModal from '@/components/SettingsModal';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -21,10 +23,15 @@ export default function index () {
     NavigationBar.setBackgroundColorAsync('#FFF');
   }, []);
 
+  useEffect(() => {
+    StatusBar.setBackgroundColor("#1E3C58");
+    StatusBar.setBarStyle("light-content");
+  }, []);
+
     return (  
         <ContextProvider>
             <>
-                <Stack.Navigator initialRouteName='Account'>
+                <Stack.Navigator initialRouteName='Login'>
                     <Stack.Screen 
                       name="Login" 
                       component={LoginScreen} 
@@ -39,8 +46,7 @@ export default function index () {
                     <Stack.Screen 
                       name="Home" 
                       component={HomeScreen} 
-                      options={{headerShown: false}}  
-                      initialParams={{username : 'Le Boss'}}                                                                                                                         
+                      options={{headerShown: false}}                                                                                                                         
                     />
                     <Stack.Screen
                       name="Score"
@@ -73,8 +79,9 @@ export default function index () {
                       component={AccountScreen}
                       options={{headerShown: false}}
                     />
-                  </Stack.Navigator> 
+                  </Stack.Navigator>
             </>
+            <SettingsModal/>
         </ContextProvider>  
     );
 };

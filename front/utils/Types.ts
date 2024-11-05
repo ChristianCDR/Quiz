@@ -24,12 +24,12 @@ export interface Score {
 export type RootStackParamList = {
     Register: undefined
     Login: {message: string}
-    Home: {username: string}
+    Home: undefined
     Score: undefined
     Quiz: {quizData: Question[], categoryName: string | undefined}
     Result: {score: number, quizLength: number}
     QuizzesByCategory: undefined
-    Profile: undefined,
+    Settings: undefined,
     Lessons: undefined,
     Account: undefined
 }
@@ -46,6 +46,8 @@ export type ContextType = {
     setQuizNumber: (value: number) => void;
     userId:number; 
     setUserId: (value: number) => void;
+    username: string, 
+    setUsername: (value: string) => void;
     scores: Score[];
     setScores: (value: Score[]) => void;
     quizzes: Question[][];
@@ -80,7 +82,7 @@ export type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParam
 
 export type LoginScreenRouteProp = RouteProp<RootStackParamList, 'Login'>
 
-export type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Profile'>
+export type SettingsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Settings'>
 
 export type ScoreScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Score'>
 

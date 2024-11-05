@@ -6,24 +6,27 @@ export const Context = createContext<ContextType | null>(null);
 export function ContextProvider ({children}: Children) {
     const [quizNumber, setQuizNumber] = useState<number>(0);
     const [userId, setUserId] = useState<number>(0);
+    const [username, setUsername] = useState<string>('');
     const [isModalVisible, setModalVisible] = useState<boolean>(false);
     const [scores, setScores] = useState<Score[]>([]);
     const [quizzes, setQuizzes] = useState<Question[][]>([]);  
-    const [categoryId, setCategoryId] = useState<number>();
+    const [categoryId, setCategoryId] = useState<number>(0);
     const [categoryName, setCategoryName] = useState<string>('');
 
     const showModal = () => setModalVisible(true);
     const hideModal = () => setModalVisible(false);
-
+    
     return (
         <Context.Provider value={{ 
             isModalVisible, 
             showModal, 
-            hideModal, 
+            hideModal,
             quizNumber, 
             setQuizNumber, 
             userId, 
             setUserId,
+            username, 
+            setUsername,
             scores, 
             setScores,
             quizzes, 

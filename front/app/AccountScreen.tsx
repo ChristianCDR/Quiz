@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import Footer from '@/components/Footer';
+import { Context } from '@/utils/Context';
 import Informations from '@/components/Informations';
 import ChangePassword from '@/components/ChangePassword';
 import { useNavigation } from '@react-navigation/native';
@@ -11,6 +12,16 @@ export default function AccountScreen () {
     const [passwordPressed, setPasswordPressed] = useState<boolean>(false);
 
     const navigation = useNavigation<AccountScreenNavigationProp>();
+
+    const context = useContext(Context);
+
+    if (!context) throw new Error ('Context returned null');
+
+    const { hideModal } = context;
+
+    useEffect (() => {
+        hideModal();
+    }, [])
 
     const handlePress = (screen : string) => {
 
@@ -37,7 +48,6 @@ export default function AccountScreen () {
             
             {passwordPressed ? <ChangePassword/> : <Informations/>}
 
-            <Footer/>
         </View>
     )
 }

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Modal, View, Text, StyleSheet, TouchableWithoutFeedback, Pressable, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -9,10 +9,10 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import instance from '@/api/Interceptors';
 import { getTokens } from '@/api/Auth';
-import { ProfileScreenNavigationProp } from '@/utils/Types';
+import { SettingsScreenNavigationProp } from '@/utils/Types';
 
-export default function ProfileModal () {
-    const navigation = useNavigation<ProfileScreenNavigationProp>();
+export default function SettingsModal () {
+    const navigation = useNavigation<SettingsScreenNavigationProp>();
 
     const modalContext = useContext(Context);
 
@@ -55,6 +55,10 @@ export default function ProfileModal () {
         }
     }
 
+    useEffect(()=>{
+        console.log(isModalVisible)
+    },[isModalVisible])
+
     return (
         <Modal 
           visible={isModalVisible} 
@@ -65,7 +69,7 @@ export default function ProfileModal () {
                 <View style={styles.container}>
                     <TouchableWithoutFeedback>
                         <View style={styles.modalView}>
-                            <Pressable style = {styles.pressable} onPress={() => navigation.navigate('Account')}>
+                            <Pressable style = {styles.pressable} onPress={() => {navigation.navigate('Account')}}>
                                 <FontAwesome6 name="circle-user" size={24} color="black" />
                                 <Text style={styles.modalText}>Mon compte</Text>
                             </Pressable>
