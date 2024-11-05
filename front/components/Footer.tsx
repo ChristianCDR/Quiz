@@ -3,7 +3,6 @@ import { ScoreScreenNavigationProp } from '@/utils/Types';
 import { useNavigation, useNavigationState } from '@react-navigation/native';
 import { useContext, useEffect, useState } from 'react';
 import { Context } from '../utils/Context';
-import ProfileModal from '@/components/ProfileModal';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -19,9 +18,12 @@ export default function Footer () {
         return route.name;
     });
 
-    useEffect(()=>{
-        console.log(routeName)
+    useEffect(() => {
+        // console.log(routeName)
         switch (routeName) {
+            case 'Home':
+                setAtiveButton(1);
+                break;
             case 'Score':
                 setAtiveButton(2);
                 break;
@@ -32,7 +34,7 @@ export default function Footer () {
             setAtiveButton(4);
                 break;
             default:
-                setAtiveButton(1);
+                break;
         }
     },[routeName])
 
@@ -44,8 +46,8 @@ export default function Footer () {
 
     return (
         <View style={styles.footer}>
-            <ProfileModal />
             <TouchableOpacity 
+                onPress={()=>{navigation.navigate('Home')}} 
                 style={[styles.button, activeButton === 1 && styles.pressedButton]}
             >
                 <AntDesign name="home" size={24} color="black" />

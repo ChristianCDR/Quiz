@@ -5,10 +5,13 @@ import { Context } from '@/utils/Context';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import { LoginScreenNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native';
+import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 // Page Mon compte
 // permettre l'upload de photo de profil
+
+// diriger vers 'account' depuis Home
+// Permettre de quitter le quiz
 
 // Notifications
 // Aide  & contact => creer un mail gmail pour l'instant
@@ -38,7 +41,7 @@ export default function LoginScreen ({route}: Props) {
 
     if (!context) throw new Error ('Context returned null');
       
-    const { setUserId }  = context;
+    const { setUserId, setUsername }  = context;
 
     const handleLogin = async () => {
       if (email === '') setEmptyEmail(true);
@@ -58,7 +61,8 @@ export default function LoginScreen ({route}: Props) {
 
             await storeTokens(accessToken, refreshToken);
             setUserId(userId);
-            navigation.navigate('Home', {username: response.data.username});
+            setUsername(response.data.username);
+            navigation.navigate('Home');
           }
       }
       catch (error: any) {
@@ -76,10 +80,6 @@ export default function LoginScreen ({route}: Props) {
 
     return (
       <View style={styles.container}>
-          <StatusBar
-              backgroundColor="#1E3C58"
-              barStyle="light-content"   
-          />
           <View>
             <Image style={styles.logo} source={require('../assets/images/resq18.png')}/>
           </View>

@@ -16,7 +16,6 @@ export default function HomeScreen({route}: Props) {
     const [data, setCategory] = useState<Category[]>([]);
     const [error, setError] = useState<ErrorType>();
     const [loading, setLoading] = useState<boolean>(true);
-    const {username} = route.params;
 
     let images: { [key: string]: any } = {
         'inc': require('../assets/images/fire_v2.png'),
@@ -31,7 +30,7 @@ export default function HomeScreen({route}: Props) {
 
     if(!context) throw new Error ('Context returned null');
 
-    const { setCategoryId, setCategoryName, scores, setScores } = context;
+    const { username, setCategoryId, setCategoryName, scores, setScores } = context;
 
     const scoresChunckedArray = scores.slice(0,5);
 
