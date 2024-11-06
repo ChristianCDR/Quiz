@@ -33,7 +33,7 @@ class UserController extends AbstractController
                         properties: [
                             new OA\Property(property: 'id', type: 'integer', example: 1),
                             new OA\Property(property: 'email', type: 'string', example: 'mail@mail.com'),
-                            new OA\Property(property: 'userName', type: 'string', example: 'christian CDR'),
+                            new OA\Property(property: 'username', type: 'string', example: 'christian CDR'),
                             new OA\Property(property: 'password', type: 'string', example: 'hashedPassword')
                         ]
                     )
@@ -66,7 +66,7 @@ class UserController extends AbstractController
             $data[] = [
                 'userId' => $user->getId(),
                 'email' => $user->getEmail(), 
-                'userName' => $user->getUserName(), 
+                'username' => $user->getusername(), 
                 'password' => $user->getPassword()
             ];
         }
@@ -97,7 +97,7 @@ class UserController extends AbstractController
                     properties: [
                         new OA\Property(property: 'id', type: 'integer', example: 1),
                         new OA\Property(property: 'email', type: 'string', example: 'mail@mail.com'),
-                        new OA\Property(property: 'userName', type: 'string', example: 'christian CDR'),
+                        new OA\Property(property: 'username', type: 'string', example: 'christian CDR'),
                         new OA\Property(property: 'password', type: 'string', example: 'hashedPassword')
                     ]
                 )
@@ -127,7 +127,7 @@ class UserController extends AbstractController
         $data[] = [
             'userId' => $user->getId(),
             'email' => $user->getEmail(), 
-            'userName' => $user->getUserName(), 
+            'username' => $user->getusername(), 
             'password' => $user->getPassword()
         ];
 
@@ -152,10 +152,10 @@ class UserController extends AbstractController
             description: 'User data to update',
             content: new OA\JsonContent(
                 type: 'object',
-                required: ['email', 'userName', 'password'],
+                required: ['email', 'username', 'password'],
                 properties: [
                     new OA\Property(property: 'email', type: 'string', example: 'mail@mail.com'),
-                    new OA\Property(property: 'userName', type: 'string', example: 'christian CDR'),
+                    new OA\Property(property: 'username', type: 'string', example: 'christian CDR'),
                     new OA\Property(property: 'password', type: 'string', example: 'plainTextPassword')
                 ]
             )
@@ -169,7 +169,7 @@ class UserController extends AbstractController
                     properties: [
                         new OA\Property(property: 'id', type: 'integer', example: 1),
                         new OA\Property(property: 'email', type: 'string', example: 'mail@mail.com'),
-                        new OA\Property(property: 'userName', type: 'string', example: 'christian CDR'),
+                        new OA\Property(property: 'username', type: 'string', example: 'christian CDR'),
                         new OA\Property(property: 'password', type: 'string', example: 'hashedPassword')
                     ]
                 )
@@ -196,10 +196,10 @@ class UserController extends AbstractController
 
         $data= json_decode($request->getContent(), true);
 
-        if (isset($data['email']) && isset($data['userName']) && isset($data['password'])) {
+        if (isset($data['email']) && isset($data['username']) && isset($data['password'])) {
             $user 
             ->setEmail($data['email'])
-            ->setUserName($data['userName'])
+            ->setusername($data['username'])
             ->setPassword($data['password'])
             ;
         }
