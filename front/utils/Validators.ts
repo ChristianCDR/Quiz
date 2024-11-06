@@ -1,9 +1,6 @@
-export function emailValidator (email: string, confirmEmail: string) {
+export function emailValidator (email: string) {
     const reg = /^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,6}$/ 
-    if (email === confirmEmail) {
-        return reg.test(email)
-    }
-    else return ('mail_mismatch')
+    return reg.test(email)    
 }
 
 export function usernameValidator (userName: string) {

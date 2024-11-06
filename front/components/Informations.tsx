@@ -69,8 +69,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         width: '90%',
-        marginHorizontal: 'auto',
-        justifyContent: 'space-around'
+        marginHorizontal: 'auto'
     },
     title: {
         fontSize: 18,
