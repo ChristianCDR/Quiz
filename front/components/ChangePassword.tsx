@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import instance from '@/api/Interceptors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {View, StyleSheet, Text, TextInput, Pressable} from 'react-native';
 import { passwordValidator }  from '@/utils/Validators';
@@ -13,7 +14,9 @@ export default function ChangePassword () {
     const [oldPasswordSecureText, setOldPasswordSecureText] = useState<boolean>(true);
     const [newPasswordSecureText, setNewPasswordSecureText] = useState<boolean>(true);
     const [confirmPasswordecureText, setConfirmPasswordSecureText] = useState<boolean>(true);
+    const [message, setMessage] = useState<string>();
     const [error, setError] = useState<string>();
+    const [disabled, setDisabled] = useState<boolean>(true);
 
     const toggleSecureText = (value: number) => {
         switch (value) {
@@ -29,7 +32,13 @@ export default function ChangePassword () {
         }
     }
 
-    const handlePress = () => {
+    useEffect(() => {
+        if(oldPassword !== '' && newPassword !== '' && confirmPassword !== '') {
+            setDisabled(false);
+        }
+    }, [confirmPassword])
+
+    const handlePress = async () => {
         switch ('') {
             case oldPassword: 
                 setEmptyOldPassword(true);
@@ -43,8 +52,7 @@ export default function ChangePassword () {
             default:
                 break;
         }
-
-        // appel api pour verifier le mot de passe actuel
+        
         if (newPassword === confirmPassword) {
             if (!passwordValidator(newPassword)) {
                 setError("Le mot de passe doit contenir au minimum: " + '\n' 
@@ -55,9 +63,31 @@ export default function ChangePassword () {
                 + "1 caractère spécial: @ $ ! % * ? & ")
             }
             else {
-                //call api pour update le mdp
+                // call api pour update le mdp
+                const body = {
+                    'oldPassword': oldPassword,
+                    'newPassword': newPassword
+                }
+
+                try {
+                    const response = await instance.put('/api/user/change/password', body);
+                    if(response.data)  {
+                        setMessage(response.data.message);
+                        setOldPassword('');
+                        setNewPassword('');
+                        setConfirmPassword('');
+                        setDisabled(true);
+                    }
+                }
+                catch (error: any) {
+                    if (error.response) {
+                        console.log(error.response.data);
+                    }
+                }
+
             }
         }
+        else setError('Les mots de passe ne correspondent pas!');
     }    
 
     return (
@@ -66,6 +96,14 @@ export default function ChangePassword () {
                 Vous souhaitez changer votre mot de passe ? {"\n"}
                 Vous êtes au bon endroit 👍 ! 
             </Text>
+            {error? 
+              <View>
+                <Text style={styles.errorText}>{error}</Text>
+              </View> : message ?
+                <View>
+                    <Text style={[styles.errorText, {color: '#008000'}]}>{message}</Text>
+                </View> : ''
+            }
             <View>
                 <TextInput
                     style={[styles.input, emptyOldPassword && styles.errorBox]}
@@ -102,12 +140,8 @@ export default function ChangePassword () {
                     <FontAwesome name={confirmPasswordecureText? "eye" : "eye-slash"} size={24} color="black" />
                 </Pressable>
             </View>
-            {error? 
-              <View>
-                <Text style={styles.errorText}>{error}</Text>
-              </View>: ''
-            }
-            <Pressable style = {styles.button} onPress = {handlePress}>
+            
+            <Pressable style = {[styles.button, disabled && {backgroundColor: '#8e8989'}]} onPress = {handlePress} disabled={disabled}>
                 <Text style = {styles.buttonText}> Enregistrer </Text>
             </Pressable>
         </View>

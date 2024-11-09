@@ -31,7 +31,7 @@ export default function index () {
     return (  
         <ContextProvider>
             <>
-                <Stack.Navigator initialRouteName='Account'>
+                <Stack.Navigator initialRouteName='Login'>
                     <Stack.Screen 
                       name="Login" 
                       component={LoginScreen} 

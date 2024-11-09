@@ -52,7 +52,7 @@ export default function HomeScreen({route}: Props) {
         fetchCategories();
     },[]);
 
-    useEffect(()=>{
+    useEffect(() => {
         const fetchScores = async () => {
             try {
                 const response = await instance.get('/api/showScore/1');
@@ -88,11 +88,13 @@ export default function HomeScreen({route}: Props) {
                 barStyle="light-content"   
             />
             <ScrollView style={styles.verticalScroll}>
-                <View style={styles.user}>              
-                    <Image
-                        source={require('../assets/images/myAvatar.png')}
-                        style={styles.circularImgView}
-                    />
+                <View style={styles.user}>    
+                    <TouchableOpacity onPress={() => navigation.navigate('Account')}>          
+                        <Image
+                            source={require('../assets/images/myAvatar.png')}
+                            style={styles.circularImgView}
+                        />
+                    </TouchableOpacity>
                     <Text style={styles.username}>{username}</Text>
                 </View>
 
