@@ -55,10 +55,6 @@ export default function SettingsModal () {
         }
     }
 
-    useEffect(()=>{
-        console.log(isModalVisible)
-    },[isModalVisible])
-
     return (
         <Modal 
           visible={isModalVisible} 

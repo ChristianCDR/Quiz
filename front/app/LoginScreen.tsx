@@ -14,6 +14,7 @@ import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image } from 'reac
 // Permettre de quitter le quiz
 
 // Notifications
+// Mot de passe oublié
 // Aide  & contact => creer un mail gmail pour l'instant
 // mentionner  l'origine des pics de l'appli
 // info legales
