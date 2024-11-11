@@ -12,6 +12,7 @@ export function ContextProvider ({children}: Children) {
     const [quizzes, setQuizzes] = useState<Question[][]>([]);  
     const [categoryId, setCategoryId] = useState<number>(0);
     const [categoryName, setCategoryName] = useState<string>('');
+    const [email, setEmail] = useState<string>('');
 
     const showModal = () => setModalVisible(true);
     const hideModal = () => setModalVisible(false);
@@ -34,7 +35,9 @@ export function ContextProvider ({children}: Children) {
             categoryId,
             setCategoryId, 
             categoryName,
-            setCategoryName 
+            setCategoryName,
+            email, 
+            setEmail
         }}>
         
             {children}

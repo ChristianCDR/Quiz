@@ -56,6 +56,8 @@ export type ContextType = {
     setCategoryId: (value: number) => void
     categoryName: string;
     setCategoryName: (value: string) => void
+    email: string; 
+    setEmail: (value: string) => void
 }
 
 export type ErrorType = string | null

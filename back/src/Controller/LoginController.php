@@ -82,20 +82,20 @@ class LoginController extends AbstractController
         }
    
         $user = $this->userRepository->findOneBy(['email'=>$email]);
-        
-        if (!$user->isVerified()) {
-            return new JsonResponse(['error' => 'Veuillez confirmer votre adresse mail avant de vous connecter '], JsonResponse::HTTP_UNAUTHORIZED);
-        }
 
         if (!$user || !$passwordHasher->isPasswordValid($user, $password)) {
             return new JsonResponse(['error' => 'E-mail ou mot de passe invalide'], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+        
+        if (!$user->isVerified()) {
+            return new JsonResponse(['error' => 'Veuillez confirmer votre adresse mail avant de vous connecter '], JsonResponse::HTTP_UNAUTHORIZED);
         }
 
         $token = $this->JWTManager->create($user);
         $refreshToken = $this->refreshTokenManager->createRefreshToken($user->getEmail());
 
         return new JsonResponse ([
-            'message' => 'Login successful',
+            'email' => $user->getEmail(),
             'username' => $user->getUsername(),
             'userId' => $user->getId(),
             'accessToken' => $token,
