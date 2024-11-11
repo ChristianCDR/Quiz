@@ -31,53 +31,49 @@ export default function index () {
     return (  
         <ContextProvider>
             <>
-                <Stack.Navigator initialRouteName='Login'>
+                <Stack.Navigator initialRouteName='Login' screenOptions={{ headerShown: false }}>
                     <Stack.Screen 
                       name="Login" 
                       component={LoginScreen} 
-                      options={{headerShown: false}}   
                       initialParams={{ message: '' }}                                                                                                                        
                     />
                     <Stack.Screen 
                       name="Register" 
-                      component={RegisterScreen} 
-                      options={{headerShown: false}}                                                                                                                           
+                      component={RegisterScreen}
                     />
                     <Stack.Screen 
                       name="Home" 
-                      component={HomeScreen} 
-                      options={{headerShown: false}}                                                                                                                         
+                      component={HomeScreen}
                     />
                     <Stack.Screen
                       name="Score"
                       component={ScoreScreen}
-                      options={{headerShown: false}}
                     />
                     <Stack.Screen 
                       name="Quiz" 
                       component={QuizScreen} 
-                      options={{headerShown: false}}
+
                     />
                     <Stack.Screen 
                       name="Result" 
                       component={ResultScreen} 
-                      options={{headerShown: false}}
+
                       // initialParams={{ score: 9, quizLength: 10 }}
                     />
                     <Stack.Screen 
                       name="QuizzesByCategory"
                       component={QuizzesByCategoryScreen}
-                      options={{headerShown: false}}
+
                     />
                     <Stack.Screen 
                       name="Lessons"
                       component={LessonScreen}
-                      options={{headerShown: false}}
+
                     />
                     <Stack.Screen 
                       name="Account"
                       component={AccountScreen}
-                      options={{headerShown: false}}
+
                     />
                   </Stack.Navigator>
             </>

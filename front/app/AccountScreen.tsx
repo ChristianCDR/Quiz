@@ -48,7 +48,7 @@ export default function AccountScreen () {
             
             {passwordPressed ? <ChangePassword/> : <Informations/>}
 
-            <Footer/>
+            {/* <Footer/> */}
         </View>
     )
 }

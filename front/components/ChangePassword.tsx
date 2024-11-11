@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import instance from '@/api/Interceptors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import {View, StyleSheet, Text, TextInput, Pressable} from 'react-native';
+import {View, StyleSheet, Text, TextInput, Pressable, TouchableOpacity} from 'react-native';
 import { passwordValidator }  from '@/utils/Validators';
 
 export default function ChangePassword () {
@@ -81,7 +81,9 @@ export default function ChangePassword () {
                 }
                 catch (error: any) {
                     if (error.response) {
-                        console.log(error.response.data);
+                        setError(error.response.data);
+                    } else {
+                        setError('Une erreur est survenue. Veuillez réessayer.');
                     }
                 }
 
@@ -99,10 +101,10 @@ export default function ChangePassword () {
             {error? 
               <View>
                 <Text style={styles.errorText}>{error}</Text>
-              </View> : message ?
+              </View> : message &&
                 <View>
                     <Text style={[styles.errorText, {color: '#008000'}]}>{message}</Text>
-                </View> : ''
+                </View>
             }
             <View>
                 <TextInput
@@ -141,9 +143,9 @@ export default function ChangePassword () {
                 </Pressable>
             </View>
             
-            <Pressable style = {[styles.button, disabled && {backgroundColor: '#8e8989'}]} onPress = {handlePress} disabled={disabled}>
+            <TouchableOpacity style = {[styles.button, disabled && {backgroundColor: '#8e8989'}]} onPress = {handlePress} disabled={disabled}>
                 <Text style = {styles.buttonText}> Enregistrer </Text>
-            </Pressable>
+            </TouchableOpacity>
         </View>
     )
 }

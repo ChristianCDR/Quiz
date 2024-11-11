@@ -1,14 +1,12 @@
-import React, { useContext, useEffect } from 'react';
-import * as SecureStore from 'expo-secure-store';
-import { Modal, View, Text, StyleSheet, TouchableWithoutFeedback, Pressable, Alert } from 'react-native';
+import React, { useContext } from 'react';
+import { Modal, View, Text, StyleSheet, TouchableWithoutFeedback, Pressable, Alert, Linking } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Context } from '../utils/Context';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import instance from '@/api/Interceptors';
-import { getTokens } from '@/api/Auth';
+import handleLogout from '@/utils/HandleLogout';
 import { SettingsScreenNavigationProp } from '@/utils/Types';
 
 export default function SettingsModal () {
@@ -31,29 +29,38 @@ export default function SettingsModal () {
                 },
                 {
                     text: "Déconnexion",
-                    onPress: handleLogout,
+                    onPress: () => { 
+                        handleLogout()
+                        .then(() => {
+                            hideModal();
+                            navigation.navigate('Login', {message: ''});
+                        })
+                        .catch(error => console.error("Erreur lors de la déconnexion :", error));
+                    }
+                    ,
                     style: "destructive",
                 }
             ]
         )
     }
 
-    const handleLogout = async () => {
-        const {accessToken, refreshToken } = await getTokens() || { refreshToken: null }
+    const openEmailApps = () => {
+        const email = 'resq18@gmail.com';
+        const subject = 'Sujet du message';
+        const mailToUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
 
-        try {
-            // revoke refreshToken
-            await instance.post('/api/logout', { 'refreshToken': refreshToken })
-            //suppression du secureStore
-            await SecureStore.deleteItemAsync ('accessToken')
-            await SecureStore.deleteItemAsync ('refreshToken')
-
-            navigation.navigate('Login', {message: ''});     
-        }
-        catch (error) {
-            console.log(error)
-        }
+        Linking.openURL(mailToUrl)
+        .catch (
+           () => Alert.alert('Erreur', "Impossible d'ouvrir l'application e-mail.")
+        )
     }
+
+    const openNotificationSettings = () => {
+        Linking.openSettings()
+        .catch (
+            () => Alert.alert('Erreur', "Impossible d'ouvrir les paramètres.")
+        )
+      };
 
     return (
         <Modal 
@@ -69,13 +76,13 @@ export default function SettingsModal () {
                                 <FontAwesome6 name="circle-user" size={24} color="black" />
                                 <Text style={styles.modalText}>Mon compte</Text>
                             </Pressable>
-                            <Pressable style = {styles.pressable}>
-                                <Ionicons name="notifications-outline" size={28} color="black" />
+                            <Pressable style = {styles.pressable} onPress = {openNotificationSettings}>
+                                <Ionicons name="notifications-outline" size={25} color="black" />
                                 <Text style={styles.modalText}>Notifications</Text>
                             </Pressable>
-                            <Pressable style = {styles.pressable}>
-                                <Feather name="help-circle" size={24} color="black" />
-                                <Text style={styles.modalText}>Aide & contact</Text>
+                            <Pressable style = {styles.pressable} onPress={openEmailApps}>
+                                <Feather name="mail" size={24} color="black" />
+                                <Text style={styles.modalText}>Nous contacter</Text>
                             </Pressable>
                             <Pressable style = {styles.pressable}>
                                 <Feather name="list" size={24} color="black" />
