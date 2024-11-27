@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import instance from '@/api/Interceptors';
+import customAxiosInstance from '@/api/Interceptors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {View, StyleSheet, Text, TextInput, Pressable, TouchableOpacity} from 'react-native';
 import { passwordValidator }  from '@/utils/Validators';
@@ -70,7 +70,8 @@ export default function ChangePassword () {
                 }
 
                 try {
-                    const response = await instance.put('/api/user/change/password', body);
+                    const jsonAxiosInstance = customAxiosInstance('application/json');
+                    const response = await jsonAxiosInstance.put('/api/user/change/password', body);
                     if(response.data)  {
                         setMessage(response.data.message);
                         setOldPassword('');

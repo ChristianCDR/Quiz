@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { StatusBar } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '@/app/HomeScreen';
 import QuizScreen from '@/app/QuizScreen';
 import ResultScreen from '@/app/ResultScreen';
@@ -34,8 +34,8 @@ export default function index () {
                 <Stack.Navigator initialRouteName='Login' screenOptions={{ headerShown: false }}>
                     <Stack.Screen 
                       name="Login" 
-                      component={LoginScreen} 
-                      initialParams={{ message: '' }}                                                                                                                        
+                      component={LoginScreen}   
+                      initialParams={{ message: ''}}                                                                                                                   
                     />
                     <Stack.Screen 
                       name="Register" 
@@ -52,28 +52,23 @@ export default function index () {
                     <Stack.Screen 
                       name="Quiz" 
                       component={QuizScreen} 
-
                     />
                     <Stack.Screen 
                       name="Result" 
                       component={ResultScreen} 
-
                       // initialParams={{ score: 9, quizLength: 10 }}
                     />
                     <Stack.Screen 
                       name="QuizzesByCategory"
                       component={QuizzesByCategoryScreen}
-
                     />
                     <Stack.Screen 
                       name="Lessons"
                       component={LessonScreen}
-
                     />
                     <Stack.Screen 
                       name="Account"
                       component={AccountScreen}
-
                     />
                   </Stack.Navigator>
             </>

@@ -74,7 +74,7 @@ export default function SettingsModal () {
                         <View style={styles.modalView}>
                             <Pressable style = {styles.pressable} onPress={() => {navigation.navigate('Account')}}>
                                 <FontAwesome6 name="circle-user" size={24} color="black" />
-                                <Text style={styles.modalText}>Mon compte</Text>
+                                <Text style={styles.modalText}>Mon comptrt</Text>
                             </Pressable>
                             <Pressable style = {styles.pressable} onPress = {openNotificationSettings}>
                                 <Ionicons name="notifications-outline" size={25} color="black" />

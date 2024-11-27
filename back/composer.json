@@ -12,6 +12,7 @@
         "doctrine/orm": "^2.16",
         "lexik/jwt-authentication-bundle": "^2.21",
         "nelmio/api-doc-bundle": "^4.26",
+        "nelmio/cors-bundle": "^2.5",
         "symfony/asset": "6.3.*",
         "symfony/console": "6.3.*",
         "symfony/dotenv": "6.3.*",
