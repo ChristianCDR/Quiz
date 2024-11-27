@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Security\EmailVerifier;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,10 +15,36 @@ use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Attributes as OA;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 #[Route('/api/user')]
 class UserController extends AbstractController
 {
+    private $tokenStorageInterface;
+    private $jwtManager;
+    private $entityManager;
+    private $passwordHasher;
+    private $validator;
+    private $userRepository;
+    
+    public function __construct (
+        JWTTokenManagerInterface $jwtManager, 
+        TokenStorageInterface $tokenStorageInterface, 
+        EntityManagerInterface $entityManager,
+        UserPasswordHasherInterface $passwordHasher,
+        ValidatorInterface $validator,
+        UserRepository $userRepository
+    ) 
+    {
+        $this->entityManager = $entityManager;
+        $this->jwtManager = $jwtManager;
+        $this->passwordHasher = $passwordHasher;
+        $this->validator = $validator;
+        $this->userRepository = $userRepository;
+        $this->tokenStorageInterface = $tokenStorageInterface;
+    }
+
     #[Route('/', name: 'app_user_index', methods: ['GET'])]
     #[OA\Get(
         summary: 'Get users',
@@ -33,7 +60,7 @@ class UserController extends AbstractController
                         properties: [
                             new OA\Property(property: 'id', type: 'integer', example: 1),
                             new OA\Property(property: 'email', type: 'string', example: 'mail@mail.com'),
-                            new OA\Property(property: 'userName', type: 'string', example: 'christian CDR'),
+                            new OA\Property(property: 'username', type: 'string', example: 'christian CDR'),
                             new OA\Property(property: 'password', type: 'string', example: 'hashedPassword')
                         ]
                     )
@@ -51,9 +78,9 @@ class UserController extends AbstractController
             )
         ]
     )]
-    public function index(UserRepository $userRepository): JsonResponse
+    public function index(): JsonResponse
     {
-        $users = $userRepository->findAll();
+        $users = $this->userRepository->findAll();
         $data = [];
 
         if (!$users) {
@@ -66,7 +93,7 @@ class UserController extends AbstractController
             $data[] = [
                 'userId' => $user->getId(),
                 'email' => $user->getEmail(), 
-                'userName' => $user->getUserName(), 
+                'username' => $user->getusername(), 
                 'password' => $user->getPassword()
             ];
         }
@@ -97,7 +124,7 @@ class UserController extends AbstractController
                     properties: [
                         new OA\Property(property: 'id', type: 'integer', example: 1),
                         new OA\Property(property: 'email', type: 'string', example: 'mail@mail.com'),
-                        new OA\Property(property: 'userName', type: 'string', example: 'christian CDR'),
+                        new OA\Property(property: 'username', type: 'string', example: 'christian CDR'),
                         new OA\Property(property: 'password', type: 'string', example: 'hashedPassword')
                     ]
                 )
@@ -127,7 +154,7 @@ class UserController extends AbstractController
         $data[] = [
             'userId' => $user->getId(),
             'email' => $user->getEmail(), 
-            'userName' => $user->getUserName(), 
+            'username' => $user->getusername(), 
             'password' => $user->getPassword()
         ];
 
@@ -152,10 +179,10 @@ class UserController extends AbstractController
             description: 'User data to update',
             content: new OA\JsonContent(
                 type: 'object',
-                required: ['email', 'userName', 'password'],
+                required: ['email', 'username', 'password'],
                 properties: [
                     new OA\Property(property: 'email', type: 'string', example: 'mail@mail.com'),
-                    new OA\Property(property: 'userName', type: 'string', example: 'christian CDR'),
+                    new OA\Property(property: 'username', type: 'string', example: 'christian CDR'),
                     new OA\Property(property: 'password', type: 'string', example: 'plainTextPassword')
                 ]
             )
@@ -169,7 +196,7 @@ class UserController extends AbstractController
                     properties: [
                         new OA\Property(property: 'id', type: 'integer', example: 1),
                         new OA\Property(property: 'email', type: 'string', example: 'mail@mail.com'),
-                        new OA\Property(property: 'userName', type: 'string', example: 'christian CDR'),
+                        new OA\Property(property: 'username', type: 'string', example: 'christian CDR'),
                         new OA\Property(property: 'password', type: 'string', example: 'hashedPassword')
                     ]
                 )
@@ -186,7 +213,7 @@ class UserController extends AbstractController
             )
         ]
     )]
-    public function edit(Request $request, User $user, EntityManagerInterface $entityManager): JsonResponse
+    public function edit(Request $request, User $user): JsonResponse
     {
         if (!$user) {
             return new JsonResponse([
@@ -196,10 +223,10 @@ class UserController extends AbstractController
 
         $data= json_decode($request->getContent(), true);
 
-        if (isset($data['email']) && isset($data['userName']) && isset($data['password'])) {
+        if (isset($data['email']) && isset($data['username']) && isset($data['password'])) {
             $user 
             ->setEmail($data['email'])
-            ->setUserName($data['userName'])
+            ->setusername($data['username'])
             ->setPassword($data['password'])
             ;
         }
@@ -209,8 +236,8 @@ class UserController extends AbstractController
             ], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        $entityManager->persist($user);
-        $entityManager->flush();
+        // $this->entityManager->persist($user);
+        // $this->entityManager->flush();
 
         return new JsonResponse ($data, JsonResponse::HTTP_OK);
     }
@@ -246,7 +273,7 @@ class UserController extends AbstractController
             )
         ]
     )]
-    public function delete(Request $request, User $user, EntityManagerInterface $entityManager): JsonResponse
+    public function delete(Request $request, User $user): JsonResponse
     {
         if (!$user) {
             return new JsonResponse([
@@ -254,8 +281,8 @@ class UserController extends AbstractController
             ], JsonResponse::HTTP_NOT_FOUND);
         }
 
-        $entityManager->remove($user);
-        $entityManager->flush();
+        $this->entityManager->remove($user);
+        $this->entityManager->flush();
 
         return new JsonResponse([
             'message' => 'User deleted successfully'

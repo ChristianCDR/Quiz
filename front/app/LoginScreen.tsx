@@ -1,17 +1,21 @@
 import React, { useState, useContext } from 'react';
 import { storeTokens } from '@/api/Auth';
-import instance from '@/api/Interceptors';
+import customAxiosInstance from '@/api/Interceptors';
 import { Context } from '@/utils/Context';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import { LoginScreenNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native';
+import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 // Page Mon compte
 // permettre l'upload de photo de profil
+// Mot de passe oublié
+// boucles de loading 
+// audio
 
-// Notifications
+// Notifications 
 // Aide  & contact => creer un mail gmail pour l'instant
+
 // mentionner  l'origine des pics de l'appli
 // info legales
 // icone de l'appli
@@ -24,7 +28,6 @@ type Props = {
 }
 
 export default function LoginScreen ({route}: Props) {
-    const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string>();
     const [secureText, setSecureText] = useState<boolean>(true);
@@ -38,7 +41,9 @@ export default function LoginScreen ({route}: Props) {
 
     if (!context) throw new Error ('Context returned null');
       
-    const { setUserId }  = context;
+    const { setUserId, setUsername, email, setEmail}  = context;
+
+    const jsonAxiosInstance = customAxiosInstance('application/json');
 
     const handleLogin = async () => {
       if (email === '') setEmptyEmail(true);
@@ -50,7 +55,7 @@ export default function LoginScreen ({route}: Props) {
       }
 
       try {
-          const response = await instance.post('/api/login', body);
+          const response = await jsonAxiosInstance.post('/api/login', body);
           if (response.status === 200) {
             const accessToken = response.data.accessToken;
             const refreshToken = response.data.refreshToken;
@@ -58,7 +63,9 @@ export default function LoginScreen ({route}: Props) {
 
             await storeTokens(accessToken, refreshToken);
             setUserId(userId);
-            navigation.navigate('Home', {username: response.data.username});
+            setUsername(response.data.username);
+            setEmail(response.data.email);
+            navigation.navigate('Home');
           }
       }
       catch (error: any) {
@@ -66,6 +73,7 @@ export default function LoginScreen ({route}: Props) {
           setError(error.response.data.error);
         } else {
           setError('La connexion a échoué.. Veuillez réessayer..');
+          console.log(error)
         }
       }
     }
@@ -76,10 +84,6 @@ export default function LoginScreen ({route}: Props) {
 
     return (
       <View style={styles.container}>
-          <StatusBar
-              backgroundColor="#1E3C58"
-              barStyle="light-content"   
-          />
           <View>
             <Image style={styles.logo} source={require('../assets/images/resq18.png')}/>
           </View>
@@ -90,7 +94,7 @@ export default function LoginScreen ({route}: Props) {
           }
           
           <View>
-            <Text style={styles.linkText}>{message}</Text>
+            <Text style={[styles.linkText, {color: 'yellow'}]}>{message}</Text>
           </View>
   
           <Text style={styles.title}>Connexion</Text>
@@ -128,7 +132,7 @@ const styles = StyleSheet.create({
     container: {
       flex: 1,
       justifyContent: 'center',
-      padding: 20,
+      paddingHorizontal: 20,
       backgroundColor: '#1E3C58',
     },
     title: {

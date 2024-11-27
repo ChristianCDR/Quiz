@@ -37,10 +37,10 @@ class RegistrationController extends AbstractController
             required: true,
             content: new OA\JsonContent(
                 type: 'object',
-                required: ['email', 'userName', 'password'],
+                required: ['email', 'username', 'password'],
                 properties: [
                     new OA\Property(property: 'email', type: 'string', example: 'chris@mail.com'),
-                    new OA\Property(property: 'userName', type: 'string', example: 'christian CDR'),
+                    new OA\Property(property: 'username', type: 'string', example: 'christian CDR'),
                     new OA\Property(property: 'password', type: 'string', example: 'Azerty1@')
                 ]
             )
@@ -54,7 +54,7 @@ class RegistrationController extends AbstractController
                     properties: [
                         new OA\Property(property: 'id', type: 'integer', example: 1),
                         new OA\Property(property: 'email', type: 'string', example: 'mail@mail.com'),
-                        new OA\Property(property: 'userName', type: 'string', example: 'christian CDR'),
+                        new OA\Property(property: 'username', type: 'string', example: 'christian CDR'),
                         new OA\Property(property: 'password', type: 'string', example: 'hashedPassword')
                     ]
                 )
@@ -79,7 +79,7 @@ class RegistrationController extends AbstractController
 
         $user 
             ->setEmail($data['email'] ?? '')
-            ->setUserName($data['userName'] ?? '')
+            ->setusername($data['username'] ?? '')
             ->setPassword($data['password'] ?? '')
             ->setIsVerified(false)
         ;

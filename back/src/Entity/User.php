@@ -74,7 +74,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         match: true,
         message: "Votre nom d'utilisateur peut contenir des lettres, chiffres, underscores, tirets et espaces"
     )]
-    private ?string $userName = null;
+    private ?string $username = null;
 
     #[ORM\Column]
     private ?bool $isVerified = null;
@@ -157,14 +157,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    public function getUserName(): ?string
+    public function getUsername(): ?string
     {
-        return $this->userName;
+        return $this->username;
     }
 
-    public function setUserName(string $userName): static
+    public function setUsername(string $username): static
     {
-        $this->userName = $userName;
+        $this->username = $username;
 
         return $this;
     }

@@ -140,11 +140,10 @@ export default function QuizScreen({route} : Props) {
         </View>
       </View>
       
-      <View style={styles.quiz}>
-        
-          <View style={styles.questionContainer}>
-            <Text style={styles.questionText}> {quizData[currentQuestion]?.questionText} </Text>
-          </View> 
+      <View style={styles.quiz}> 
+        <View style={styles.questionContainer}>
+          <Text style={styles.questionText}> {quizData[currentQuestion]?.questionText} </Text>
+        </View> 
           
         <View style={styles.optionContainer}>
           {quizData[currentQuestion]?.options.map((item, index) => {
@@ -158,6 +157,12 @@ export default function QuizScreen({route} : Props) {
             </TouchableOpacity> 
           })}
         </View>
+      </View>
+
+      <View style= {styles.buttonView}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
+          <Text style={styles.buttonText}> Quitter</Text>
+         </TouchableOpacity>
       </View>
            
     </View>
@@ -245,5 +250,21 @@ const styles = StyleSheet.create({
     width: '90%',
     flexDirection: 'row',
     justifyContent: 'space-between'
+  },
+  buttonView: {
+    width: '90%',
+    alignItems: 'flex-end',
+    marginTop: 30
+  },
+  button: {
+    height: 50,
+    width: 100,
+    backgroundColor: "#1E3C58",
+    justifyContent: 'center',
+    borderRadius: 10
+  },
+  buttonText: {
+    textAlign: 'center',
+    color: '#fff',
   }
 })

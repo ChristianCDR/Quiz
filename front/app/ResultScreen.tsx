@@ -2,7 +2,7 @@ import { StyleSheet, View, Text, Image, TouchableOpacity, Share, Animated, Easin
 import { ResultScreenNavigationProp, ResultScreenRouteProp } from "../utils/Types";
 import { useEffect, useState, useRef, useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import instance from '@/api/Interceptors';
+import customAxiosInstance from '@/api/Interceptors';
 import { Context } from '@/utils/Context';
 import { captureRef } from 'react-native-view-shot';
 import BackButton from '@/components/BackButton';
@@ -53,15 +53,16 @@ export default function ResultScreen ({route}: Props) {
         }
 
         const storeScore = async () => {
-           try {
-                await instance.post('/api/newScore', body);
+            const jsonAxiosInstance = customAxiosInstance('application/json');
+
+            try {
+                await jsonAxiosInstance.post('/api/newScore', body);
            } 
            catch (error: any) {
                 if (error.response.status === 400 ) {
-                    await instance.put('/api/editScore', body);
+                    await jsonAxiosInstance.put('/api/editScore', body);
                 }
            }
-           
         }
 
         storeScore();

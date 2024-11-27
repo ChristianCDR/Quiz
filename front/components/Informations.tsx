@@ -1,12 +1,86 @@
-import { useState } from 'react';
-import {View, StyleSheet, Text, TextInput, Pressable, Image} from 'react-native';
+import { useState, useContext } from 'react';
+import { Context } from '@/utils/Context';
+import { Buffer } from 'buffer';
+import * as SecureStore from 'expo-secure-store';
+import customAxiosInstance from '@/api/Interceptors';
+import { useNavigation } from '@react-navigation/native';
+import { AccountScreenNavigationProp } from '@/utils/Types';
+import { emailValidator, usernameValidator }  from '@/utils/Validators';
+import pickImageFromGallery from '@/utils/HandleProfilePhoto';
+import {View, StyleSheet, Text, TextInput, Image, TouchableOpacity} from 'react-native';
+import handleLogout from '@/utils/HandleLogout';
 
 export default function Informations () {
-    const [email, setEmail] = useState<string>('');
-    const [username, setUsername] = useState<string>('');
     const [emptyEmail, setEmptyEmail] = useState<boolean>(false);
     const [emptyUsername, setEmptyUsername] = useState<boolean>(false);
     const [photoExists, setPhotoExists] = useState<boolean>(false);
+    const [message, setMessage] = useState<string>();
+    const [error, setError] = useState<string>();
+    const [disabled, setDisabled] = useState<boolean>(true);
+
+    const context = useContext(Context);
+
+    if (!context) throw new Error ('Context returned null');
+      
+    const { username, setUsername, email, setEmail }  = context;
+
+    const navigation = useNavigation<AccountScreenNavigationProp>();
+
+    const handleChange = (field: string, value: string) => {
+        if (field === 'email') setEmail(value);
+        else if (field === 'username') setUsername(value);
+        setDisabled(false);
+    }
+
+    const handlePress = async () => {
+        switch ('') {
+            case email: 
+                setEmptyEmail(true);
+                setError('Veuillez remplir ce champ.');
+                break;
+            case username: 
+                setEmptyUsername(true);
+                setError('Veuillez remplir ce champ.');
+                break;   
+            default:
+                break; 
+        }
+
+        if (emailValidator(email) && usernameValidator(username.trim())) {
+            const body = {
+              "email": email,
+              "username": username.trim()
+            }
+          
+            try {   
+                const jsonAxiosInstance = customAxiosInstance('application/json');
+                const response = await jsonAxiosInstance.put('/api/user/change/userInfos', body)       
+                if (response.data) {
+                    setMessage(response.data.message);
+                    setDisabled(true);
+
+                    const token = await SecureStore.getItemAsync ('accessToken');
+                    const parts = token?.split('.').map((part) => Buffer.from(part.replace(/-/g, '+').replace(/_/g, '/'),'base64').toString());
+
+                    if (parts) {
+                        const payload = JSON.parse(parts[1]);
+                        payload?.email !== response.data.email ? setTimeout(() => {
+                            handleLogout()
+                            .then(() => navigation.navigate('Login', {message: 'Veuillez confirmer votre nouvelle adresse mail'+ '\n' +'et vous reconnecter'}))
+                            .catch(error => console.error("Erreur lors de la déconnexion :", error));
+                        }, 3000) : ''
+                    }
+                }
+            }
+            catch(error: any) {
+                if (error.response) {
+                  setError(error.response.data.error);
+                } else {
+                  setError('Une erreur est survenue. Veuillez réessayer.');
+                }
+            }  
+        } 
+    }
 
     return (
         <View style = {styles.container}>
@@ -19,29 +93,37 @@ export default function Informations () {
                 <View>
                     { photoExists ? 
                         <View style= {styles.doubleButtons}>
-                            <Pressable style = {styles.button} onPress={() => {}}> 
+                            <TouchableOpacity style = {styles.button} onPress={() => {}}> 
                                 <Text style = {styles.buttonText}>Modifier</Text>
-                            </Pressable>
-                            <Pressable style = {styles.button} onPress={() => {}}> 
+                            </TouchableOpacity>
+                            <TouchableOpacity style = {styles.button} onPress={() => {}}> 
                                 <Text style = {styles.buttonText}>Supprimer</Text>
-                            </Pressable>
+                            </TouchableOpacity>
                         </View>
                     
                     :
-                        <Pressable style = {styles.button} onPress={() => {}}> 
+                        <TouchableOpacity style = {styles.button} onPress={() => {}}> 
                             <Text style = {styles.buttonText}>Ajouter</Text>
-                        </Pressable>
+                        </TouchableOpacity>
                     }  
                 </View>
             </View>
             
             <View style = {styles.infos}>
                 <Text style = {styles.title}> À propos de vous 🫵</Text>
+                {error? 
+                    <View>
+                        <Text style={styles.errorText}>{error}</Text>
+                    </View> : message &&
+                    <View>
+                        <Text style={[styles.errorText, {color: '#008000'}]}>{message}</Text>
+                    </View>
+                }
                 <TextInput
                     style={[styles.input, emptyEmail && styles.errorBox]}
                     placeholder="Email"
                     value={email}
-                    onChangeText={setEmail}
+                    onChangeText={(value) => handleChange('email', value)}
                     keyboardType="email-address"
                     autoCapitalize="none"
                 />
@@ -49,18 +131,18 @@ export default function Informations () {
                     style={[styles.input, emptyUsername && styles.errorBox]}
                     placeholder="Nom d'utilisateur"
                     value={username}
-                    onChangeText={setUsername}
+                    onChangeText={(value) => handleChange('username', value)}
                     keyboardType="default"
                     autoCapitalize="none"
                 />
             </View>
-            <Pressable style = {styles.button}>
+            <TouchableOpacity style = {[styles.button, disabled && {backgroundColor: '#8e8989'}]} onPress={handlePress} disabled={disabled}>
                 <Text style = {styles.buttonText}> Enregistrer </Text>
-            </Pressable>
+            </TouchableOpacity>
 
-            <Pressable style = {styles.deleteButton}>
+            <TouchableOpacity style = {styles.deleteButton}>
                 <Text style = {[styles.buttonText,  {color: '#000'}]}> Supprimer mon compte </Text>
-            </Pressable>
+            </TouchableOpacity>
         </View>
     )
 }
@@ -69,8 +151,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         width: '90%',
-        marginHorizontal: 'auto',
-        justifyContent: 'space-around'
+        marginHorizontal: 'auto'
     },
     title: {
         fontSize: 18,
@@ -100,6 +181,12 @@ const styles = StyleSheet.create({
       paddingHorizontal: 15,
       marginVertical: 20,
       backgroundColor: '#fff',
+    },
+    errorText: {
+        color: '#F15743',
+        marginVertical: 10,
+        textAlign: 'center',
+        fontSize: 16
     },
     errorBox: {
       borderColor: 'red'
