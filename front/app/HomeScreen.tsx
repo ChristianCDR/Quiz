@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import Footer from '@/components/Footer';
-import instance from '@/api/Interceptors';
+import customAxiosInstance from '@/api/Interceptors';
 import { Context } from "@/utils/Context";
 import DisplayScores from '@/components/DisplayScores';
 import { useNavigation } from '@react-navigation/native';
@@ -16,7 +16,6 @@ export default function HomeScreen({route}: Props) {
     const [data, setCategory] = useState<Category[]>([]);
     const [error, setError] = useState<ErrorType>();
     const [loading, setLoading] = useState<boolean>(true);
-    const {username} = route.params;
 
     let images: { [key: string]: any } = {
         'inc': require('../assets/images/fire_v2.png'),
@@ -31,14 +30,17 @@ export default function HomeScreen({route}: Props) {
 
     if(!context) throw new Error ('Context returned null');
 
-    const { setCategoryId, setCategoryName, scores, setScores } = context;
+    const { username, setCategoryId, setCategoryName, scores, setScores } = context;
 
     const scoresChunckedArray = scores.slice(0,5);
+
+
+    const jsonAxiosInstance = customAxiosInstance('application/json');
 
     useEffect(() => {
         const fetchCategories = async () => {
            try {
-                const response = await instance.get('/api/categories/');
+                const response = await jsonAxiosInstance.get('/api/categories/');
                 setCategory(response.data);
            }
            catch (error) {
@@ -53,10 +55,10 @@ export default function HomeScreen({route}: Props) {
         fetchCategories();
     },[]);
 
-    useEffect(()=>{
+    useEffect(() => {
         const fetchScores = async () => {
             try {
-                const response = await instance.get('/api/showScore/1');
+                const response = await jsonAxiosInstance.get('/api/showScore/1');
                 setScores(response.data.scores);
             }
             catch (error) {
@@ -89,11 +91,13 @@ export default function HomeScreen({route}: Props) {
                 barStyle="light-content"   
             />
             <ScrollView style={styles.verticalScroll}>
-                <View style={styles.user}>              
-                    <Image
-                        source={require('../assets/images/myAvatar.png')}
-                        style={styles.circularImgView}
-                    />
+                <View style={styles.user}>    
+                    <TouchableOpacity onPress={() => navigation.navigate('Account')}>          
+                        <Image
+                            source={require('../assets/images/myAvatar.png')}
+                            style={styles.circularImgView}
+                        />
+                    </TouchableOpacity>
                     <Text style={styles.username}>{username}</Text>
                 </View>
 
@@ -103,7 +107,7 @@ export default function HomeScreen({route}: Props) {
                     </View>
                     
                     <View style={styles.cardText}>
-                        <Text style={styles.cardText1}> Joue & {"\n"} Gagne !</Text>
+                        <Text style={styles.cardText1}> Jfoue & {"\n"} Gagne !</Text>
                         <Text style={styles.cardText2}>
                             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                         </Text>

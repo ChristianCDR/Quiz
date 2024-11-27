@@ -4,7 +4,7 @@ import { RegisterScreenNavigationProp } from '@/utils/Types';
 import { useNavigation } from '@react-navigation/native';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import instance from '@/api/Interceptors';
+import customAxiosInstance from '@/api/Interceptors';
 
 export default function RegisterScreen () {
 
@@ -12,7 +12,7 @@ export default function RegisterScreen () {
     const [confirmEmail, setConfirmEmail] = useState<string>('');
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [error, setError] = useState<string>();
+    const [error, setError] = useState<string>('');
     const [secureText, setSecureText] = useState<boolean>(true);
     const [emptyEmail, setEmptyEmail] = useState<boolean>(false);
     const [emptyUsername, setEmptyUsername] = useState<boolean>(false);
@@ -22,60 +22,64 @@ export default function RegisterScreen () {
   
     const handleRegister = async () => {
 
-        switch ('') {
-            case email: 
-                setEmptyEmail(true);
-                setError('Veuillez remplir tous les champs.');
-                break;
-            case confirmEmail: 
-                setEmptyConfirm(true);
-                break;
-            case username: 
-                setEmptyUsername(true);
-                setError('Veuillez remplir tous les champs.');
-                break;
-            case password: 
-                setEmptyPassword(true);
-                setError('Veuillez remplir tous les champs.');
-                break;            
-        }
+      switch ('') {
+        case email: 
+            setEmptyEmail(true);
+            break;
+        case confirmEmail: 
+            setEmptyConfirm(true);
+            break;
+        case username: 
+            setEmptyUsername(true);
+            break;
+        case password: 
+            setEmptyPassword(true);
+            break;         
+      }
 
-        if (password != '' && !passwordValidator(password)) {
-          setError("Le mot de passe doit contenir au minimum: " + '\n' 
-          + "1 chiffre" + '\n' 
-          + "8 caractères" + '\n' 
-          + "1 lettre miniscule" + '\n' 
-          + "1 lettre majuscule"  + '\n' 
-          + "1 caractère spécial: @ $ ! % * ? & ")
-        } 
-
-        if (emailValidator(email, confirmEmail) === 'mail_mismatch') {
+      switch (false) {
+        case email === confirmEmail: 
           setError("Les e-mails ne correspondent pas.");
+          break;
+        case emailValidator(email):
+          setError('Veuillez saisir un e-mail valide.');
+          break;
+        case usernameValidator(username.trim()):
+          setError('Veuillez saisir un nom d\'utilisateur valide');
+          break;
+        case password === '' && passwordValidator(password):
+          setError("Le mot de passe doit contenir au minimum: " + '\n' 
+            + "1 chiffre" + '\n' 
+            + "8 caractères" + '\n' 
+            + "1 lettre miniscule" + '\n' 
+            + "1 lettre majuscule"  + '\n' 
+            + "1 caractère spécial: @ $ ! % * ? & ");
+          break;
+      }
+ 
+      if (emailValidator(email) && usernameValidator(username.trim()) && passwordValidator(password)) {
+        const body = {
+          "email": email,
+          "username": username.trim(),
+          "password": password
         }
-
-        if (emailValidator(email, confirmEmail) && usernameValidator(username.trim()) && passwordValidator(password)) {
-          
-          const body = {
-              "email": email,
-              "username": username.trim(),
-              "password": password
+      
+        try {
+          const jsonAxiosInstance = customAxiosInstance('application/json');   
+          const response = await jsonAxiosInstance.post('/api/register', body)       
+          if (response.status === 201) {
+            navigation.navigate('Login', { message: 'Inscription réussie.' + '\n' + 'Confirmez votre adresse mail avant de vous connecter.' })
           }
-          
-          try {   
-              const response = await instance.post('/api/register', body)       
-              if (response.status === 201) {
-                navigation.navigate('Login', { message: 'Inscription réussie.' + '\n' + 'Confirmez votre adresse mail avant de vous connecter.' })
-              }
+        }
+        catch(error: any) {
+          if (error.response) {
+            setError(error.response.data);
+            console.log(error.response.data)
+          } else {
+            setError('Une erreur est survenue. Veuillez réessayer.');
           }
-          catch(error: any) {
-              if (error.response) {
-                setError(error.response.data.error);
-                console.log(error.response)
-              } else {
-                setError('Une erreur est survenue. Veuillez réessayer.');
-              }
-          }  
-        }    
+        }  
+      }   
     }
 
     const toggleSecureText = () => {

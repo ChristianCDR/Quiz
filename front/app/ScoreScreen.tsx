@@ -1,5 +1,4 @@
 import { useContext } from "react";
-import Footer from '@/components/Footer';
 import { Context } from "@/utils/Context";
 import BackButton from "@/components/BackButton";
 import { ScoreScreenRouteProp } from "@/utils/Types";
@@ -23,7 +22,6 @@ export default function ScoreScreen () {
                 <Text style={styles.title}>Scores</Text>
                 <DisplayScores scores = {scores}/>
             </ScrollView>
-            <Footer/>
         </View>
     )
 }

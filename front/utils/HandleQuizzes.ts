@@ -1,10 +1,11 @@
-import instance from "@/api/Interceptors";
+import customAxiosInstance from "@/api/Interceptors";
 import { Question } from "@/utils/Types";
 
 export const fetchQuizzesByCategoryId = async (categoryId: number) => {
     
    try {
-        const response = await instance.get(`/api/questions/category/${categoryId}`);
+        const jsonAxiosInstance = customAxiosInstance('application/json');
+        const response = await jsonAxiosInstance.get(`/api/questions/category/${categoryId}`);
 
         if (response.data) {
             const result = chunkData(response.data, 10);

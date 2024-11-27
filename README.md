@@ -12,7 +12,7 @@ sudo kill -9 PID
 
 --Back--
 
-cd back && symfony server:start
+cd back && symfony server:start --allow-http --no-tls --allow-all-ip
 
 --Front--
 
