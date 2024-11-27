@@ -92,4 +92,4 @@ export type ScoreScreenRouteProp = RouteProp<RootStackParamList, 'Score'>
 
 export type LessonScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Lessons'>
 
-export type AccountScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Account'>
+export type AccountScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Account'> 

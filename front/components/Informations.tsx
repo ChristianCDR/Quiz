@@ -2,11 +2,11 @@ import { useState, useContext } from 'react';
 import { Context } from '@/utils/Context';
 import { Buffer } from 'buffer';
 import * as SecureStore from 'expo-secure-store';
-import instance from '@/api/Interceptors';
+import customAxiosInstance from '@/api/Interceptors';
 import { useNavigation } from '@react-navigation/native';
 import { AccountScreenNavigationProp } from '@/utils/Types';
 import { emailValidator, usernameValidator }  from '@/utils/Validators';
-
+import pickImageFromGallery from '@/utils/HandleProfilePhoto';
 import {View, StyleSheet, Text, TextInput, Image, TouchableOpacity} from 'react-native';
 import handleLogout from '@/utils/HandleLogout';
 
@@ -53,12 +53,15 @@ export default function Informations () {
             }
           
             try {   
-                const response = await instance.put('/api/user/change/userInfos', body)       
+                const jsonAxiosInstance = customAxiosInstance('application/json');
+                const response = await jsonAxiosInstance.put('/api/user/change/userInfos', body)       
                 if (response.data) {
                     setMessage(response.data.message);
                     setDisabled(true);
+
                     const token = await SecureStore.getItemAsync ('accessToken');
                     const parts = token?.split('.').map((part) => Buffer.from(part.replace(/-/g, '+').replace(/_/g, '/'),'base64').toString());
+
                     if (parts) {
                         const payload = JSON.parse(parts[1]);
                         payload?.email !== response.data.email ? setTimeout(() => {

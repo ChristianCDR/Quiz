@@ -1,11 +1,11 @@
 import React, { useState, useContext } from 'react';
 import { storeTokens } from '@/api/Auth';
-import instance from '@/api/Interceptors';
+import customAxiosInstance from '@/api/Interceptors';
 import { Context } from '@/utils/Context';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import { LoginScreenNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image, StatusBar } from 'react-native';
+import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 // Page Mon compte
 // permettre l'upload de photo de profil
@@ -13,7 +13,7 @@ import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image, StatusBar }
 // boucles de loading 
 // audio
 
-// Notifications
+// Notifications 
 // Aide  & contact => creer un mail gmail pour l'instant
 
 // mentionner  l'origine des pics de l'appli
@@ -43,6 +43,8 @@ export default function LoginScreen ({route}: Props) {
       
     const { setUserId, setUsername, email, setEmail}  = context;
 
+    const jsonAxiosInstance = customAxiosInstance('application/json');
+
     const handleLogin = async () => {
       if (email === '') setEmptyEmail(true);
       if (password === '') setEmptyPassword(true);
@@ -53,7 +55,7 @@ export default function LoginScreen ({route}: Props) {
       }
 
       try {
-          const response = await instance.post('/api/login', body);
+          const response = await jsonAxiosInstance.post('/api/login', body);
           if (response.status === 200) {
             const accessToken = response.data.accessToken;
             const refreshToken = response.data.refreshToken;
@@ -71,6 +73,7 @@ export default function LoginScreen ({route}: Props) {
           setError(error.response.data.error);
         } else {
           setError('La connexion a échoué.. Veuillez réessayer..');
+          console.log(error)
         }
       }
     }

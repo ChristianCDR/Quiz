@@ -1,5 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
-import instance from '@/api/Interceptors';
+import customAxiosInstance from '@/api/Interceptors';
 import { getTokens } from '@/api/Auth';
 
 const handleLogout = async () => {
@@ -7,7 +7,8 @@ const handleLogout = async () => {
 
     try {
         // revoke refreshToken
-        await instance.post('/api/logout', { 'refreshToken': refreshToken });
+        const jsonAxiosInstance = customAxiosInstance('application/json');
+        await jsonAxiosInstance.post('/api/logout', { 'refreshToken': refreshToken });
         //suppression du secureStore
         await SecureStore.deleteItemAsync ('accessToken');
         await SecureStore.deleteItemAsync ('refreshToken');
