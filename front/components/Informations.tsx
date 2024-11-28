@@ -4,7 +4,7 @@ import { Buffer } from 'buffer';
 import * as SecureStore from 'expo-secure-store';
 import customAxiosInstance from '@/api/Interceptors';
 import { useNavigation } from '@react-navigation/native';
-import { AccountScreenNavigationProp } from '@/utils/Types';
+import { StackNavigationProp } from '@/utils/Types';
 import { emailValidator, usernameValidator }  from '@/utils/Validators';
 import pickImageFromGallery from '@/utils/HandleProfilePhoto';
 import {View, StyleSheet, Text, TextInput, Image, TouchableOpacity} from 'react-native';
@@ -24,7 +24,7 @@ export default function Informations () {
       
     const { username, setUsername, email, setEmail }  = context;
 
-    const navigation = useNavigation<AccountScreenNavigationProp>();
+    const navigation = useNavigation<StackNavigationProp>();
 
     const handleChange = (field: string, value: string) => {
         if (field === 'email') setEmail(value);

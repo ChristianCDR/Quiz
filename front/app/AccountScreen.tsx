@@ -1,17 +1,16 @@
 import { useState, useContext, useEffect } from 'react';
-import Footer from '@/components/Footer';
 import { Context } from '@/utils/Context';
 import Informations from '@/components/Informations';
 import ChangePassword from '@/components/ChangePassword';
 import { useNavigation } from '@react-navigation/native';
-import { AccountScreenNavigationProp } from '@/utils/Types';
+import { StackNavigationProp } from '@/utils/Types';
 import {View, StyleSheet, Text, Pressable} from 'react-native';
 
 export default function AccountScreen () {
     const [informationsPressed, setInformationsPressed] = useState<boolean>(true);
     const [passwordPressed, setPasswordPressed] = useState<boolean>(false);
 
-    const navigation = useNavigation<AccountScreenNavigationProp>();
+    const navigation = useNavigation<StackNavigationProp>();
 
     const context = useContext(Context);
 

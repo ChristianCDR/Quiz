@@ -7,10 +7,10 @@ import Feather from '@expo/vector-icons/Feather';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import handleLogout from '@/utils/HandleLogout';
-import { SettingsScreenNavigationProp } from '@/utils/Types';
+import { StackNavigationProp } from '@/utils/Types';
 
 export default function SettingsModal () {
-    const navigation = useNavigation<SettingsScreenNavigationProp>();
+    const navigation = useNavigation<StackNavigationProp>();
 
     const modalContext = useContext(Context);
 
@@ -60,7 +60,11 @@ export default function SettingsModal () {
         .catch (
             () => Alert.alert('Erreur', "Impossible d'ouvrir les paramètres.")
         )
-      };
+    };
+
+    const goToAccount = () => {
+        navigation.navigate('Account');
+    }
 
     return (
         <Modal 
@@ -72,9 +76,9 @@ export default function SettingsModal () {
                 <View style={styles.container}>
                     <TouchableWithoutFeedback>
                         <View style={styles.modalView}>
-                            <Pressable style = {styles.pressable} onPress={() => {navigation.navigate('Account')}}>
+                            <Pressable style = {styles.pressable} onPress={goToAccount}>
                                 <FontAwesome6 name="circle-user" size={24} color="black" />
-                                <Text style={styles.modalText}>Mon comptrt</Text>
+                                <Text style={styles.modalText}>Mon compte</Text>
                             </Pressable>
                             <Pressable style = {styles.pressable} onPress = {openNotificationSettings}>
                                 <Ionicons name="notifications-outline" size={25} color="black" />

@@ -1,5 +1,5 @@
 import { StyleSheet, View, Text, Image, TouchableOpacity, Share, Animated, Easing, StatusBar } from 'react-native';
-import { ResultScreenNavigationProp, ResultScreenRouteProp } from "../utils/Types";
+import { StackNavigationProp, ResultScreenRouteProp } from "../utils/Types";
 import { useEffect, useState, useRef, useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import customAxiosInstance from '@/api/Interceptors';
@@ -16,7 +16,7 @@ export default function ResultScreen ({route}: Props) {
     const [comment, setComment] = useState<string>()
     const [scoreColor, setScoreColor] = useState<string>()
     const [fruitImage, setFruitImage] = useState()
-    const navigation = useNavigation<ResultScreenNavigationProp>()
+    const navigation = useNavigation<StackNavigationProp>()
     const { score, quizLength} = route.params
     const formattedScore = (score) < 10 ? `0${score}` : score.toString()
     const viewRef = useRef<View>(null)

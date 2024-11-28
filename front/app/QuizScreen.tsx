@@ -3,7 +3,7 @@ import { Svg, Path } from 'react-native-svg';
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import CountdownTimer from "@/components/CountdownTimer";
-import { QuizScreenNavigationProp, QuizScreenRouteProp } from "../utils/Types";
+import { StackNavigationProp, QuizScreenRouteProp } from "../utils/Types";
 import Feather from '@expo/vector-icons/Feather';
 import Octicons from '@expo/vector-icons/Octicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -21,7 +21,7 @@ export default function QuizScreen({route} : Props) {
   const [score, setScore] = useState(0)
   const [reset, setReset] = useState(false)
   const [isLastQuestion, setIsLastQuestion] = useState(false)
-  const navigation = useNavigation<QuizScreenNavigationProp>()
+  const navigation = useNavigation<StackNavigationProp>()
   const [showCorrectAnswer, setShowCorrectAnswer] = useState<boolean>(false)
   const [userAnswers, setUserAnswers] = useState<(boolean | null)[]>(Array(quizData.length).fill(null)) // Tableau rempli de Null pour avoir la couleur grise
   const newAnswers = [...userAnswers] // Deuxieme tableau qui va progressivement se substituer au premier

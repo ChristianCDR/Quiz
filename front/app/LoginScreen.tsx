@@ -4,7 +4,7 @@ import customAxiosInstance from '@/api/Interceptors';
 import { Context } from '@/utils/Context';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
-import { LoginScreenNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
+import { StackNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 // Page Mon compte
@@ -34,7 +34,7 @@ export default function LoginScreen ({route}: Props) {
     const [emptyEmail, setEmptyEmail] = useState<boolean>(false);
     const [emptyPassword, setEmptyPassword] = useState<boolean>(false);
 
-    const navigation = useNavigation<LoginScreenNavigationProp>();
+    const navigation = useNavigation<StackNavigationProp>();
     const {message} = route.params;
     
     const context = useContext(Context);
@@ -65,7 +65,7 @@ export default function LoginScreen ({route}: Props) {
             setUserId(userId);
             setUsername(response.data.username);
             setEmail(response.data.email);
-            navigation.navigate('Home');
+            navigation.navigate('Tabs', { screen: 'Home'});
           }
       }
       catch (error: any) {
