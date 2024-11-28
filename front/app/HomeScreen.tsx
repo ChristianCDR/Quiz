@@ -4,7 +4,7 @@ import customAxiosInstance from '@/api/Interceptors';
 import { Context } from "@/utils/Context";
 import DisplayScores from '@/components/DisplayScores';
 import { useNavigation } from '@react-navigation/native';
-import { HomeScreenNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "@/utils/Types";
+import { StackNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "@/utils/Types";
 import { StyleSheet, View, SafeAreaView, Text, StatusBar, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 
 
@@ -24,13 +24,13 @@ export default function HomeScreen({route}: Props) {
         'sap': require('../assets/images/sap.png')
     }
 
-    const navigation = useNavigation<HomeScreenNavigationProp>();
+    const navigation = useNavigation<StackNavigationProp>();
 
     const context = useContext(Context);
 
     if(!context) throw new Error ('Context returned null');
 
-    const { username, setCategoryId, setCategoryName, scores, setScores } = context;
+    const { username, userId, setCategoryId, setCategoryName, scores, setScores } = context;
 
     const scoresChunckedArray = scores.slice(0,5);
 
@@ -45,7 +45,7 @@ export default function HomeScreen({route}: Props) {
            }
            catch (error) {
                 const errMessage = (error as Error).message;
-                setError(errMessage);
+                setError('Le chargement a échoué :(');
            }
            finally {
             setLoading(false);
@@ -58,12 +58,12 @@ export default function HomeScreen({route}: Props) {
     useEffect(() => {
         const fetchScores = async () => {
             try {
-                const response = await jsonAxiosInstance.get('/api/showScore/1');
+                const response = await jsonAxiosInstance.get(`/api/showScore/${userId}`);
                 setScores(response.data.scores);
             }
             catch (error) {
                 const errMessage = (error as Error).message;
-                setError(errMessage);
+                setError('Le chargement a échoué :(');
             }
         }
 
@@ -107,9 +107,9 @@ export default function HomeScreen({route}: Props) {
                     </View>
                     
                     <View style={styles.cardText}>
-                        <Text style={styles.cardText1}> Jfoue & {"\n"} Gagne !</Text>
+                        <Text style={styles.cardText1}> Joue & {"\n"} Gagne !</Text>
                         <Text style={styles.cardText2}>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                        Prêt à prouver que tu es le meilleur ? Chaque question est une nouvelle occasion de briller. N'attends plus, challenge-toi et montre tes compétences !
                         </Text>
                     </View>
                 </View>
@@ -137,8 +137,6 @@ export default function HomeScreen({route}: Props) {
                 <DisplayScores scores = {scoresChunckedArray}/>
   
             </ScrollView>  
-            
-            <Footer/> 
 
         </SafeAreaView>
     );

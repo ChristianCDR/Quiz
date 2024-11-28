@@ -1,13 +1,13 @@
 import { useContext } from "react";
 import { Context } from "@/utils/Context";
 import BackButton from "@/components/BackButton";
-import { ScoreScreenRouteProp } from "@/utils/Types";
+import { StackNavigationProp } from "@/utils/Types";
 import DisplayScores from '@/components/DisplayScores';
 import { useNavigation } from "@react-navigation/native";
 import { View, StyleSheet, Text, ScrollView } from "react-native";
 
 export default function ScoreScreen () {
-    const navigation = useNavigation<ScoreScreenRouteProp>();
+    const navigation = useNavigation<StackNavigationProp>();
     
     const context = useContext(Context);
 

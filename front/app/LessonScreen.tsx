@@ -1,12 +1,11 @@
 import { View, Text, StyleSheet } from "react-native";
 import BackButton from "@/components/BackButton";
 import { useNavigation } from "@react-navigation/native";
-import { LessonScreenNavigationProp } from "@/utils/Types";
-import Footer from '@/components/Footer';
+import { StackNavigationProp } from "@/utils/Types";
 
 
 export default function LessonScreen () {
-    const navigation = useNavigation<LessonScreenNavigationProp>();
+    const navigation = useNavigation<StackNavigationProp>();
 
     return(
         <View style = {styles.container}>

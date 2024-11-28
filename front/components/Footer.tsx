@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { ScoreScreenNavigationProp } from '@/utils/Types';
+import { StackNavigationProp } from '@/utils/Types';
 import { useNavigation, useNavigationState } from '@react-navigation/native';
 import { useContext, useEffect, useState } from 'react';
 import { Context } from '../utils/Context';
@@ -11,7 +11,7 @@ import Entypo from '@expo/vector-icons/Entypo';
 export default function Footer () {
 
     const [activeButton, setAtiveButton] = useState<number>();
-    const navigation = useNavigation<ScoreScreenNavigationProp>();
+    const navigation = useNavigation<StackNavigationProp>();
 
     const routeName = useNavigationState((state) => {
         const route = state.routes [state.index]
@@ -47,21 +47,21 @@ export default function Footer () {
     return (
         <View style={styles.footer}>
             <TouchableOpacity 
-                onPress={()=>{navigation.navigate('Home')}} 
+                onPress={()=>{navigation.navigate('Tabs', { screen: 'Home'})}} 
                 style={[styles.button, activeButton === 1 && styles.pressedButton]}
             >
                 <AntDesign name="home" size={24} color="black" />
                 <Text>Home</Text>
             </TouchableOpacity>
             <TouchableOpacity 
-                onPress={()=>{navigation.navigate('Score')}} 
+                onPress={()=>{navigation.navigate('Tabs', { screen: 'Score'})}} 
                 style={[styles.button, activeButton === 2 && styles.pressedButton]}
             >
                 <Ionicons name="stats-chart-outline" size={24} color="black" />
                 <Text>Scores</Text>
             </TouchableOpacity>
             <TouchableOpacity 
-                onPress={()=>{navigation.navigate('Lessons')}} 
+                onPress={()=>{navigation.navigate('Tabs', { screen: 'Lessons'})}} 
                 style={[styles.button, activeButton === 3 && styles.pressedButton]}
             >
                 <FontAwesome name="book" size={24} color="black" />
