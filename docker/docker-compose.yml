@@ -23,6 +23,17 @@ services:
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: 1 
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
+  back:
+    build: 
+      context: ../back
+      dockerfile: Dockerfile
+    container_name: backend_container
+    ports:
+      - 8000:8000
+    depends_on:
+      - database  
+    volumes:
+      -  ../back:/var/www/back
 volumes:
   ###> doctrine/doctrine-bundle ###
   postgres_data:
