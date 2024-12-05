@@ -137,6 +137,6 @@ class RegistrationController extends AbstractController
             return $this->render('email_confirmation.html.twig', ['message' => $exception->getReason()]);
         }
 
-        return $this->render('email_confirmation.html.twig', ['message' => 'Votre adresse e-mail a été confirmée.']);
+        return $this->render('email_confirmation.html.twig', ['message' => 'Votre adresse e-mail a été confirmée.']); 
     }
 }

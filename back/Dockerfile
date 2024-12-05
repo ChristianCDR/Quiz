@@ -1,34 +1,23 @@
 # Utilisons l'image PHP 8.2 avec FPM
-
 FROM php:8.2-fpm
 
-# Dépendances nécessaires pour PostgreSQL
-# Dépendance pour l'extension zip
-# Dépendance pour zip 
-
-RUN apt-get update && apt-get install -y \
-    libpq-dev \     
-    libzip-dev \   
-    zlib1g-dev \ 
-    git \
-    unzip \
-    && rm -rf /var/lib/apt/lists/*
+# Dépendances nécessaires
+RUN apt-get update && apt-get install -y libpq-dev && rm -rf /var/lib/apt/lists/*
 
 # Extensions de PHP
-RUN docker-php-ext-install pdo pdo_pgsql zip
+RUN docker-php-ext-install pdo pdo_pgsql
 
-# Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Crée le répertoire de travail
+WORKDIR /var/www/html
 
-WORKDIR /var/www/back
+# Copie les fichiers de l'application dans l'image Docker
+COPY . /var/www/html
 
-COPY . /var/www/back/
+# Change le propriétaire et le groupe des fichiers, puis applique les bonnes permissions
+RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
 
-# Installer les dépendances de l'application Symfony via Composer
-RUN composer install 
-#--no-dev --optimize-autoloader
+# Expose le port 9000 (pour PHP-FPM)
+EXPOSE 9000
 
-EXPOSE 8000
-
-# Commande pour lancer le serveur
-CMD php -S 0.0.0.0:8000 -t public
+# Démarre PHP-FPM
+CMD ["php-fpm"]

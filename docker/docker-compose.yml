@@ -13,6 +13,7 @@ services:
       - app-network
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: always
 
   ###> symfony/mailer ###
   mailer:
@@ -26,17 +27,22 @@ services:
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: 1 
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    restart: always
 
   ###> PHP ###
   php:
-    image: php:8.2-fpm
+    build:
+      context: ../back
+      dockerfile: Dockerfile
     container_name: php
     depends_on:
       - database
+      - mailer
     networks:
       - app-network
-    volumes:
-      -  ../back:/var/www/back
+    environment:
+      - DATABASE_URL=pgsql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      - MAILER_DSN=smtp://mailer:1025
 
   ###> Server Nginx ###
   nginx:
@@ -46,11 +52,12 @@ services:
       - "8000:80"
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ../back:/var/www/back
+      - ../back:/var/www/html
     depends_on:
       - php
     networks:
     - app-network
+    restart: always
 
 volumes:
   ###> doctrine/doctrine-bundle ###
