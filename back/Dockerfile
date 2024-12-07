@@ -2,10 +2,18 @@
 FROM php:8.2-fpm
 
 # Dépendances nécessaires
-RUN apt-get update && apt-get install -y libpq-dev && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    unzip \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # Extensions de PHP
 RUN docker-php-ext-install pdo pdo_pgsql
+
+# Installer Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Crée le répertoire de travail
 WORKDIR /var/www/html
@@ -15,6 +23,10 @@ COPY . /var/www/html
 
 # Change le propriétaire et le groupe des fichiers, puis applique les bonnes permissions
 RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
+
+#Installer toutes les dépendances du projet
+RUN composer install --optimize-autoloader
+# --no-dev
 
 # Expose le port 9000 (pour PHP-FPM)
 EXPOSE 9000

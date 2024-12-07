@@ -21,8 +21,8 @@ class Categories
     #[ORM\ManyToMany(targetEntity: Questions::class, mappedBy: 'Categories')]
     private Collection $questions;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $categoryImage = null;
+    // #[ORM\Column(length: 255, nullable: true)]
+    // private ?string $categoryImage = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: UserScore::class, orphanRemoval: true)]
     private Collection $userScores;
@@ -50,17 +50,17 @@ class Categories
         return $this;
     }
 
-    public function getCategoryImage(): ?string
-    {
-        return $this->categoryImage;
-    }
+    // public function getCategoryImage(): ?string
+    // {
+    //     return $this->categoryImage;
+    // }
 
-    public function setCategoryImage(?string $categoryImage): static
-    {
-        $this->categoryImage = $categoryImage;
+    // public function setCategoryImage(?string $categoryImage): static
+    // {
+    //     $this->categoryImage = $categoryImage;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     /**
      * @return Collection<int, Questions>

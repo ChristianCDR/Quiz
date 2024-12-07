@@ -35,6 +35,8 @@ services:
       context: ../back
       dockerfile: Dockerfile
     container_name: php
+    volumes:
+      - ../back:/var/www/html
     depends_on:
       - database
       - mailer
