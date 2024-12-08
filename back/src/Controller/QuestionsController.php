@@ -102,7 +102,7 @@ class QuestionsController extends AbstractController
             }
 
             $data[]= [
-                'questiontext' => $question->getQuestionText(), 
+                'questionText' => $question->getQuestionText(), 
                 'categories' => $cat,
                 'options' => $opt,
             ];
@@ -190,32 +190,7 @@ class QuestionsController extends AbstractController
     )]
     public function new (Request $request, CategoriesRepository $categoriesRepository, EntityManagerInterface $entityManager): JsonResponse 
     {
-        /*{
-            "questionText": "Quelle est la  capitale de la France?",
-            "categories": [
-              {
-                "category": 1
-              },
-            ],
-            "options": [
-              {
-                "text": "Bordeaux",
-                "isCorrect": false
-              },
-          {
-                "text": "Lyon",
-                "isCorrect": false
-              },
-          {
-                "text": "Paris",
-                "isCorrect": true
-              },
-          {
-                "text": "Toulouse",
-                "isCorrect": false
-              }
-            ]
-          }*/
+
         $data = json_decode($request->getContent(), true);
         
         $question = new Questions();
@@ -637,7 +612,7 @@ class QuestionsController extends AbstractController
             }
 
             $data[]= [
-                'questiontext' => $question->getQuestionText(), 
+                'questionText' => $question->getQuestionText(), 
                 // 'categories' => $cat,
                 'options' => $opt,
             ];

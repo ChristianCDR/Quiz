@@ -32,7 +32,7 @@ class CategoriesController extends AbstractController
                         properties: [
                             new OA\Property(property: 'id', type: 'integer', example: 1),
                             new OA\Property(property: 'categoryName', type: 'string', example: 'Incendie'),
-                            new OA\Property(property: 'categoryImage', type: 'string', example: 'fire.png')
+                            // new OA\Property(property: 'categoryImage', type: 'string', example: 'fire.png')
                         ]
                     )
                 )
@@ -65,7 +65,7 @@ class CategoriesController extends AbstractController
             $data[]= [
                 'id' => $category->getId(),
                 'categoryName' => $category->getCategoryName(),
-                'categoryImage' => $category->getCategoryImage()
+                // 'categoryImage' => $category->getCategoryImage()
             ];
         }
 
@@ -81,10 +81,9 @@ class CategoriesController extends AbstractController
             required: true,
             content: new OA\JsonContent(
                 type: 'object',
-                required: ['categoryName', 'categoryImage'],
+                required: ['categoryName'],
                 properties: [
-                    new OA\Property(property: 'categoryName', type: 'string', example: 'New Category'),
-                    new OA\Property(property: 'categoryImage', type: 'string', example: 'fire.png')
+                    new OA\Property(property: 'categoryName', type: 'string', example: 'New Category')
                 ]
             )
         ),
@@ -96,8 +95,7 @@ class CategoriesController extends AbstractController
                     type: 'object',
                     properties: [
                         new OA\Property(property: 'id', type: 'integer', example: 1),
-                        new OA\Property(property: 'categoryName', type: 'string', example: 'New Category'),
-                        new OA\Property(property: 'categoryImage', type: 'string', example: 'fire.png')
+                        new OA\Property(property: 'categoryName', type: 'string', example: 'New Category')
                     ]
                 )
             ),
@@ -119,11 +117,11 @@ class CategoriesController extends AbstractController
 
         $category = new Categories();
         $category->setCategoryName($data['categoryName'] ?? '');
-        $category->setCategoryImage($data['categoryImage'] ?? '');
+        // $category->setCategoryImage($data['categoryImage'] ?? '');
 
-        if (empty($category->getCategoryName()) || empty($category->getCategoryImage())) {
+        if (empty($category->getCategoryName())) {
             return new JsonResponse([
-                'error' => 'Invalid category name or image'
+                'error' => 'Invalid category name'
             ], JsonResponse::HTTP_BAD_REQUEST);
         }
 
@@ -132,8 +130,7 @@ class CategoriesController extends AbstractController
 
         return new JsonResponse([
             'id' => $category->getId(),
-            'categoryName' => $category->getCategoryName(),
-            'categoryImage' => $category->getCategoryImage()
+            'categoryName' => $category->getCategoryName()
         ], JsonResponse::HTTP_CREATED);
     }
 
@@ -186,8 +183,7 @@ class CategoriesController extends AbstractController
 
         return new JsonResponse([
             'id' => $category->getId(),
-            'categoryName' => $category->getCategoryName(),
-            'categoryImage' => $category->getCategoryImage()
+            'categoryName' => $category->getCategoryName()
         ], JsonResponse::HTTP_OK);
     }
 
@@ -210,10 +206,9 @@ class CategoriesController extends AbstractController
             description: 'Category data to update',
             content: new OA\JsonContent(
                 type: 'object',
-                required: ['categoryName', 'categoryImage'],
+                required: ['categoryName'],
                 properties: [
-                    new OA\Property(property: 'categoryName', type: 'string', example: 'Updated Category Name'),
-                    new OA\Property(property: 'categoryImage', type: 'string', example: 'new_fire.png')
+                    new OA\Property(property: 'categoryName', type: 'string', example: 'Updated Category Name')
                 ]
             )
         ),
@@ -225,8 +220,7 @@ class CategoriesController extends AbstractController
                     type: 'object',
                     properties: [
                         new OA\Property(property: 'id', type: 'integer', example: 1),
-                        new OA\Property(property: 'categoryName', type: 'string', example: 'Updated Category Name'),
-                        new OA\Property(property: 'categoryImage', type: 'string', example: 'new_fire.png')
+                        new OA\Property(property: 'categoryName', type: 'string', example: 'Updated Category Name')
                     ]
                 )
             ),
@@ -252,13 +246,12 @@ class CategoriesController extends AbstractController
 
         $data= json_decode($request->getContent(), true);
 
-        if (isset($data['categoryName']) && isset($data['categoryImage'])) {
+        if (isset($data['categoryName'])) {
             $category->setCategoryName($data['categoryName']);
-            $category->setCategoryImage($data['categoryImage']);
         }
         else {
             return new JsonResponse ([
-                'error' => 'Invalid category name or image'
+                'error' => 'Invalid category name'
             ], JsonResponse::HTTP_BAD_REQUEST);
         }
 
@@ -267,8 +260,7 @@ class CategoriesController extends AbstractController
 
         return new JsonResponse ([
             'id' => $category->getId(),
-            'categoryName' => $category->getCategoryName(),
-            'categoryImage' => $category->getCategoryImage()
+            'categoryName' => $category->getCategoryName()
         ], JsonResponse::HTTP_OK);
     }
 

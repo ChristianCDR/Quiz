@@ -4,7 +4,7 @@ import { Buffer } from 'buffer';
 import * as SecureStore from 'expo-secure-store';
 import customAxiosInstance from '@/api/Interceptors';
 import { useNavigation } from '@react-navigation/native';
-import { AccountScreenNavigationProp } from '@/utils/Types';
+import { RootStackNavigationProp } from '@/utils/Types';
 import { emailValidator, usernameValidator }  from '@/utils/Validators';
 import pickImageFromGallery from '@/utils/HandleProfilePhoto';
 import {View, StyleSheet, Text, TextInput, Image, TouchableOpacity} from 'react-native';
@@ -24,7 +24,7 @@ export default function Informations () {
       
     const { username, setUsername, email, setEmail }  = context;
 
-    const navigation = useNavigation<AccountScreenNavigationProp>();
+    const navigation = useNavigation<RootStackNavigationProp>();
 
     const handleChange = (field: string, value: string) => {
         if (field === 'email') setEmail(value);
@@ -46,7 +46,7 @@ export default function Informations () {
                 break; 
         }
 
-        if (emailValidator(email) && usernameValidator(username.trim())) {
+        if (email && username && emailValidator(email) && usernameValidator(username.trim())) {
             const body = {
               "email": email,
               "username": username.trim()
@@ -122,7 +122,7 @@ export default function Informations () {
                 <TextInput
                     style={[styles.input, emptyEmail && styles.errorBox]}
                     placeholder="Email"
-                    value={email}
+                    value={email ?? ''}
                     onChangeText={(value) => handleChange('email', value)}
                     keyboardType="email-address"
                     autoCapitalize="none"
@@ -130,7 +130,7 @@ export default function Informations () {
                 <TextInput
                     style={[styles.input, emptyUsername && styles.errorBox]}
                     placeholder="Nom d'utilisateur"
-                    value={username}
+                    value={username ?? ''}
                     onChangeText={(value) => handleChange('username', value)}
                     keyboardType="default"
                     autoCapitalize="none"

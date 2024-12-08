@@ -1,22 +1,19 @@
 import React, { useContext } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableWithoutFeedback, Pressable, Alert, Linking } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { Context } from '../utils/Context';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import handleLogout from '@/utils/HandleLogout';
-import { SettingsScreenNavigationProp } from '@/utils/Types';
 
 export default function SettingsModal () {
-    const navigation = useNavigation<SettingsScreenNavigationProp>();
 
     const modalContext = useContext(Context);
 
     if (!modalContext) throw new Error ('Modal Provider returned null');
 
-    const { isModalVisible, hideModal } = modalContext;
+    const { isModalVisible, hideModal, setScreenToReach } = modalContext;
 
     const handleAlert = () => {
         Alert.alert(
@@ -32,8 +29,7 @@ export default function SettingsModal () {
                     onPress: () => { 
                         handleLogout()
                         .then(() => {
-                            hideModal();
-                            navigation.navigate('Login', {message: ''});
+                            goToLogin();
                         })
                         .catch(error => console.error("Erreur lors de la déconnexion :", error));
                     }
@@ -60,7 +56,22 @@ export default function SettingsModal () {
         .catch (
             () => Alert.alert('Erreur', "Impossible d'ouvrir les paramètres.")
         )
-      };
+    };
+
+    const goToAccount = () => {
+        setScreenToReach('Account');
+        hideModal();
+    }
+
+    const goToInfos = () => {
+        setScreenToReach('Legal');
+        hideModal();
+    }
+
+    const goToLogin = () => {
+        setScreenToReach('Login');
+        hideModal();
+    }
 
     return (
         <Modal 
@@ -72,9 +83,9 @@ export default function SettingsModal () {
                 <View style={styles.container}>
                     <TouchableWithoutFeedback>
                         <View style={styles.modalView}>
-                            <Pressable style = {styles.pressable} onPress={() => {navigation.navigate('Account')}}>
+                            <Pressable style = {styles.pressable} onPress={goToAccount}>
                                 <FontAwesome6 name="circle-user" size={24} color="black" />
-                                <Text style={styles.modalText}>Mon comptrt</Text>
+                                <Text style={styles.modalText}>Mon compte</Text>
                             </Pressable>
                             <Pressable style = {styles.pressable} onPress = {openNotificationSettings}>
                                 <Ionicons name="notifications-outline" size={25} color="black" />
@@ -84,7 +95,7 @@ export default function SettingsModal () {
                                 <Feather name="mail" size={24} color="black" />
                                 <Text style={styles.modalText}>Nous contacter</Text>
                             </Pressable>
-                            <Pressable style = {styles.pressable}>
+                            <Pressable style = {styles.pressable} onPress={goToInfos}>
                                 <Feather name="list" size={24} color="black" />
                                 <Text style={styles.modalText}>Informations légales</Text>
                             </Pressable>

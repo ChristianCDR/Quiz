@@ -1,19 +1,36 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Context } from "@/utils/Context";
 import BackButton from "@/components/BackButton";
-import { ScoreScreenRouteProp } from "@/utils/Types";
+import { RootStackNavigationProp } from "@/utils/Types";
 import DisplayScores from '@/components/DisplayScores';
 import { useNavigation } from "@react-navigation/native";
 import { View, StyleSheet, Text, ScrollView } from "react-native";
 
 export default function ScoreScreen () {
-    const navigation = useNavigation<ScoreScreenRouteProp>();
+    const navigation = useNavigation<RootStackNavigationProp>();
     
     const context = useContext(Context);
 
     if(!context) throw new Error ('Context returned null');
 
-    const { scores } = context;
+    const { scores, screenToReach, setScreenToReach } = context;
+
+    useEffect(() => {
+        switch (screenToReach) {
+            case 'Account': navigation.navigate('Account');
+                break;
+            case 'Login': 
+                navigation.navigate('Login', {message: null});
+                setScreenToReach(null);
+                navigation.reset({
+                    index: 0, // On commence une nouvelle pile de navigation
+                    routes: [{ name: 'Login' }], // Remplacez 'Login' par le nom de votre écran de connexion
+                });
+                break;
+            case 'Legal': navigation.navigate('Legal');
+                break;
+        }
+    },[screenToReach])
 
     return (
         <View style = {styles.container}>

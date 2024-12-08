@@ -127,16 +127,22 @@ class RegistrationController extends AbstractController
 
     #[Route('/verify/email', name: 'app_verify_email')]
     public function verifyEmail (Request $request, UserRepository $userRepository): Response
-    {
+    {  
+        $id = $request->query->get('id'); 
+
+        if (null === $id) {
+            return $this->render('email_confirmation.html.twig', ['message' => 'Le lien ne contient pas votre identifiant.']);
+        }
+    
+        $user = $userRepository->find($id);
+
         try {
-            $id = $request->query->get('id'); 
-            if ($id) $user = $userRepository->find($id);
             $this->emailVerifier->handleEmailConfirmation($request, $user);
         }
         catch (VerifyEmailExceptionInterface $exception) {
             return $this->render('email_confirmation.html.twig', ['message' => $exception->getReason()]);
         }
 
-        return $this->render('email_confirmation.html.twig', ['message' => 'Votre adresse e-mail a été confirmée.']);
+        return $this->render('email_confirmation.html.twig', ['message' => 'Votre adresse email a été confirmée.']);
     }
 }

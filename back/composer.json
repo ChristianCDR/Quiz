@@ -13,25 +13,28 @@
         "lexik/jwt-authentication-bundle": "^2.21",
         "nelmio/api-doc-bundle": "^4.26",
         "nelmio/cors-bundle": "^2.5",
-        "symfony/asset": "6.3.*",
-        "symfony/console": "6.3.*",
-        "symfony/dotenv": "6.3.*",
+        "symfony/asset": "7.2.*",
+        "symfony/console": "7.2.*",
+        "symfony/dotenv": "7.2.*",
         "symfony/flex": "^2",
-        "symfony/form": "6.3.*",
-        "symfony/framework-bundle": "6.3.*",
-        "symfony/mailer": "6.3.*",
-        "symfony/runtime": "6.3.*",
-        "symfony/security-bundle": "6.3.*",
-        "symfony/security-csrf": "6.3.*",
-        "symfony/twig-bundle": "6.3.*",
-        "symfony/validator": "6.3.*",
+        "symfony/form": "7.2.*",
+        "symfony/framework-bundle": "7.2.*",
+        "symfony/mailer": "7.2.*",
+        "symfony/runtime": "7.2.*",
+        "symfony/security-bundle": "7.2.*",
+        "symfony/security-csrf": "7.2.*",
+        "symfony/twig-bundle": "7.2.*",
+        "symfony/validator": "7.2.*",
         "symfony/webpack-encore-bundle": "^2.1",
-        "symfony/yaml": "6.3.*",
+        "symfony/yaml": "7.2.*",
         "symfonycasts/verify-email-bundle": "^1.17",
         "zircote/swagger-php": "^4.10"
     },
     "require-dev": {
-        "symfony/maker-bundle": "^1.51"
+        "doctrine/doctrine-fixtures-bundle": "^4.0",
+        "symfony/debug-bundle": "7.2.*",
+        "symfony/maker-bundle": "^1.51",
+        "symfony/phpunit-bridge": "^7.2"
     },
     "config": {
         "allow-plugins": {
@@ -78,7 +81,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "6.3.*"
+            "require": "7.2.*"
         }
     }
 }

@@ -3,7 +3,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
 export interface Question  {
     "questionText": string,
-    "options": {'text': string, is_correct: boolean} []
+    "options": { 'text': string, is_correct: boolean } []
 }
 
 export interface Category {
@@ -22,16 +22,21 @@ export interface Score {
 }
 
 export type RootStackParamList = {
-    Register: undefined
-    Login: {message: string}
+    Register: undefined;
+    Login: { message: string | null};
+    Quiz: { quizData: Question[], categoryName: string };
+    Result: { score: number, quizLength: number };
+    QuizzesByCategory: undefined;
+    Account: undefined;
+    Legal: undefined;
+    Tabs: { screen: keyof TabParamList }; 
+}
+
+export type TabParamList = {
     Home: undefined
     Score: undefined
-    Quiz: {quizData: Question[], categoryName: string | undefined}
-    Result: {score: number, quizLength: number}
-    QuizzesByCategory: undefined
     Settings: undefined,
     Lessons: undefined,
-    Account: undefined
 }
 
 export type Children = {
@@ -46,7 +51,7 @@ export type ContextType = {
     setQuizNumber: (value: number) => void;
     userId:number; 
     setUserId: (value: number) => void;
-    username: string, 
+    username: string | null;
     setUsername: (value: string) => void;
     scores: Score[];
     setScores: (value: Score[]) => void;
@@ -54,42 +59,30 @@ export type ContextType = {
     setQuizzes: (value: Question[][]) => void;
     categoryId: number;
     setCategoryId: (value: number) => void
-    categoryName: string;
-    setCategoryName: (value: string) => void
-    email: string; 
-    setEmail: (value: string) => void
+    categoryName: string | null;
+    setCategoryName: (value: string) => void;
+    email: string | null;
+    setEmail: (value: string) => void;
+    fetchScores: boolean;
+    setFetchScores: (value: boolean) => void;
+    screenToReach: string | null;
+    setScreenToReach: (value: string | null ) => void;
 }
 
 export type ErrorType = string | null
 
-export type QuizzesByCategoryNavigationProp = NativeStackNavigationProp<RootStackParamList, 'QuizzesByCategory'>
+export type RootStackNavigationProp = NativeStackNavigationProp<RootStackParamList>
+
+// Route Props
 
 export type QuizzesByCategoryScreenRouteProp = RouteProp<RootStackParamList, 'QuizzesByCategory'>
 
-export type QuizScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Quiz'>
-
 export type QuizScreenRouteProp = RouteProp<RootStackParamList, 'Quiz'>
-
-export type ResultScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Result'>
 
 export type ResultScreenRouteProp = RouteProp<RootStackParamList, 'Result'>
 
-export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>
-
-export type HomeScreenRouteProp = RouteProp<RootStackParamList, 'Home'>
-
-export type RegisterScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Register'>
-
-export type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>
-
 export type LoginScreenRouteProp = RouteProp<RootStackParamList, 'Login'>
 
-export type SettingsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Settings'>
+export type HomeScreenRouteProp = RouteProp<TabParamList, 'Home'>
 
-export type ScoreScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Score'>
-
-export type ScoreScreenRouteProp = RouteProp<RootStackParamList, 'Score'>
-
-export type LessonScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Lessons'>
-
-export type AccountScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Account'> 
+export type ScoreScreenRouteProp = RouteProp<TabParamList, 'Score'>

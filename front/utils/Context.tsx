@@ -6,13 +6,15 @@ export const Context = createContext<ContextType | null>(null);
 export function ContextProvider ({children}: Children) {
     const [quizNumber, setQuizNumber] = useState<number>(0);
     const [userId, setUserId] = useState<number>(0);
-    const [username, setUsername] = useState<string>('');
+    const [username, setUsername] = useState<string|null>(null);
     const [isModalVisible, setModalVisible] = useState<boolean>(false);
     const [scores, setScores] = useState<Score[]>([]);
     const [quizzes, setQuizzes] = useState<Question[][]>([]);  
     const [categoryId, setCategoryId] = useState<number>(0);
-    const [categoryName, setCategoryName] = useState<string>('');
-    const [email, setEmail] = useState<string>('');
+    const [categoryName, setCategoryName] = useState<string|null>(null);
+    const [email, setEmail] = useState<string|null>(null);
+    const [fetchScores, setFetchScores] = useState<boolean>(false);
+    const [screenToReach, setScreenToReach] = useState<string|null>(null);
 
     const showModal = () => setModalVisible(true);
     const hideModal = () => setModalVisible(false);
@@ -37,7 +39,11 @@ export function ContextProvider ({children}: Children) {
             categoryName,
             setCategoryName,
             email, 
-            setEmail
+            setEmail,
+            fetchScores, 
+            setFetchScores,
+            screenToReach, 
+            setScreenToReach
         }}>
         
             {children}

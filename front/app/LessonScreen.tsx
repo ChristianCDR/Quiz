@@ -1,12 +1,36 @@
+import { useContext, useEffect } from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { Context } from "@/utils/Context";
 import BackButton from "@/components/BackButton";
 import { useNavigation } from "@react-navigation/native";
-import { LessonScreenNavigationProp } from "@/utils/Types";
-import Footer from '@/components/Footer';
+import { RootStackNavigationProp } from "@/utils/Types";
 
 
 export default function LessonScreen () {
-    const navigation = useNavigation<LessonScreenNavigationProp>();
+    const navigation = useNavigation<RootStackNavigationProp>();
+    
+    const context = useContext(Context);
+
+    if(!context) throw new Error ('Context returned null');
+
+    const { screenToReach, setScreenToReach } = context;
+
+    useEffect(() => {
+        switch (screenToReach) {
+            case 'Account': navigation.navigate('Account');
+                break;
+            case 'Login':     
+                navigation.navigate('Login', {message: null});
+                setScreenToReach(null);
+                navigation.reset({
+                    index: 0, // On commence une nouvelle pile de navigation
+                    routes: [{ name: 'Login' }], // Remplacez 'Login' par le nom de votre écran de connexion
+                });
+                break;
+            case 'Legal': navigation.navigate('Legal');
+                break;
+        }
+    },[screenToReach])
 
     return(
         <View style = {styles.container}>

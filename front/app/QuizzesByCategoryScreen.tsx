@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, StatusBar } from "react-native";
 import { useNavigation } from '@react-navigation/native';
-import { QuizzesByCategoryScreenRouteProp, QuizzesByCategoryNavigationProp, Question } from "@/utils/Types";
+import { QuizzesByCategoryScreenRouteProp, RootStackNavigationProp, Question } from "@/utils/Types";
 import BackButton from "@/components/BackButton";
 import { Context } from '@/utils/Context';
 import { fetchQuizzesByCategoryId } from '@/utils/HandleQuizzes';
@@ -12,7 +12,7 @@ type Props = {
 
 export default function QuizzesByCategoryScreen ({route} : Props) {
     const [quizzes, setQuizzes] = useState<Question[][]>();
-    const navigation = useNavigation<QuizzesByCategoryNavigationProp>();
+    const navigation = useNavigation<RootStackNavigationProp>();
 
     const context = useContext(Context);
 
@@ -31,7 +31,7 @@ export default function QuizzesByCategoryScreen ({route} : Props) {
     const handlePress = (index: number) => {
         
         setQuizNumber(index +1);     
-        if (quizzes) navigation.navigate('Quiz', {quizData: quizzes[index], 'categoryName': categoryName});
+        if (quizzes && categoryName) navigation.navigate('Quiz', {quizData: quizzes[index], 'categoryName': categoryName});
     }
     
     return (

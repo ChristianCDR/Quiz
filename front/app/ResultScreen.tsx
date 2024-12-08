@@ -1,5 +1,5 @@
 import { StyleSheet, View, Text, Image, TouchableOpacity, Share, Animated, Easing, StatusBar } from 'react-native';
-import { ResultScreenNavigationProp, ResultScreenRouteProp } from "../utils/Types";
+import { RootStackNavigationProp, ResultScreenRouteProp } from "../utils/Types";
 import { useEffect, useState, useRef, useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import customAxiosInstance from '@/api/Interceptors';
@@ -16,8 +16,8 @@ export default function ResultScreen ({route}: Props) {
     const [comment, setComment] = useState<string>()
     const [scoreColor, setScoreColor] = useState<string>()
     const [fruitImage, setFruitImage] = useState()
-    const navigation = useNavigation<ResultScreenNavigationProp>()
-    const { score, quizLength} = route.params
+    const navigation = useNavigation<RootStackNavigationProp>()
+    const { score, quizLength } = route.params
     const formattedScore = (score) < 10 ? `0${score}` : score.toString()
     const viewRef = useRef<View>(null)
     const scaleValue = useRef(new Animated.Value(0.1)).current 
@@ -42,7 +42,7 @@ export default function ResultScreen ({route}: Props) {
 
         if (!context) throw new Error ('Context returned null')
 
-        const { quizNumber, categoryId }  = context;
+        const { quizNumber, categoryId, setFetchScores }  = context;
 
         const scoreRate = (score*100) / quizLength;   
         
@@ -56,11 +56,13 @@ export default function ResultScreen ({route}: Props) {
             const jsonAxiosInstance = customAxiosInstance('application/json');
 
             try {
-                await jsonAxiosInstance.post('/api/newScore', body);
+                const response = await jsonAxiosInstance.post('/api/newScore', body);
+                if (response.status === 201) setFetchScores(true);
            } 
            catch (error: any) {
                 if (error.response.status === 400 ) {
-                    await jsonAxiosInstance.put('/api/editScore', body);
+                    const response = await jsonAxiosInstance.put('/api/editScore', body);
+                    if (response.status === 200) setFetchScores(true);
                 }
            }
         }
@@ -76,7 +78,7 @@ export default function ResultScreen ({route}: Props) {
             
         }  
         else if (score >= 5 && score < 9) {
-            setComment('Pas mal..');
+            setComment('Pas mal...');
             setFruitImage(fruitImages.thumb);
         }  
         else {
