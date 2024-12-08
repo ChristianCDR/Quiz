@@ -42,8 +42,11 @@ class EmailVerifier
      * @throws VerifyEmailExceptionInterface
      */
     public function handleEmailConfirmation(Request $request, UserInterface $user): void
-    {
-        $this->verifyEmailHelper->validateEmailConfirmation($request->getUri(), $user->getId(), $user->getEmail());
+    {   
+        $requestUri = $request->getUri();
+        $requestUri = str_replace('?%3F', '?', $requestUri);
+        
+        $this->verifyEmailHelper->validateEmailConfirmation($requestUri, $user->getId(), $user->getEmail());
 
         $user->setIsVerified(true);
 
