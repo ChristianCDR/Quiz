@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
-import Footer from '@/components/Footer';
 import customAxiosInstance from '@/api/Interceptors';
 import { Context } from "@/utils/Context";
 import DisplayScores from '@/components/DisplayScores';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "@/utils/Types";
+import { RootStackNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "@/utils/Types";
 import { StyleSheet, View, SafeAreaView, Text, StatusBar, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
-
 
 type Props = {
     route: HomeScreenRouteProp
@@ -18,22 +16,31 @@ export default function HomeScreen({route}: Props) {
     const [loading, setLoading] = useState<boolean>(true);
 
     let images: { [key: string]: any } = {
-        'inc': require('../assets/images/fire_v2.png'),
-        'vsr': require('../assets/images/car_accident.png'),
-        'opd': require('../assets/images/chainsaw.png'),
-        'sap': require('../assets/images/sap.png')
+        'Incendie': require('../assets/images/fire_v2.png'),
+        'Secours routier': require('../assets/images/car_accident.png'),
+        'Opérations diverses': require('../assets/images/chainsaw.png'),
+        'Secourisme': require('../assets/images/sap.png')
     }
 
-    const navigation = useNavigation<StackNavigationProp>();
+    const navigation = useNavigation<RootStackNavigationProp>();
 
     const context = useContext(Context);
 
     if(!context) throw new Error ('Context returned null');
 
-    const { username, userId, setCategoryId, setCategoryName, scores, setScores } = context;
+    const { 
+        username, 
+        userId, 
+        setCategoryName, 
+        setCategoryId,  
+        scores, 
+        setScores, 
+        fetchScores,
+        screenToReach,
+        setScreenToReach 
+    } = context;
 
     const scoresChunckedArray = scores.slice(0,5);
-
 
     const jsonAxiosInstance = customAxiosInstance('application/json');
 
@@ -52,7 +59,7 @@ export default function HomeScreen({route}: Props) {
            }   
         }
 
-        fetchCategories();
+        fetchCategories();     
     },[]);
 
     useEffect(() => {
@@ -68,7 +75,24 @@ export default function HomeScreen({route}: Props) {
         }
 
         fetchScores();
-    },[]);
+    },[fetchScores]);
+
+    useEffect(() => {
+            switch (screenToReach) {
+                case 'Account': navigation.navigate('Account');
+                    break;
+                case 'Login': 
+                    navigation.navigate('Login', {message: null});
+                    setScreenToReach(null);
+                    navigation.reset({
+                        index: 0, // On commence une nouvelle pile de navigation
+                        routes: [{ name: 'Login' }], // Remplacez 'Login' par le nom de votre écran de connexion
+                    });
+                    break;
+                case 'Legal': navigation.navigate('Legal');
+                    break;
+            }
+    },[screenToReach])
 
     const handleNavigation = (id: number, name: string) => {
         setCategoryId(id);
@@ -124,7 +148,7 @@ export default function HomeScreen({route}: Props) {
                     {data.length > 0 ? (
                         data.map((category) => ( 
                             <TouchableOpacity key={category.id} style={styles.category} onPress={()=> handleNavigation(category.id, category.categoryName)}>
-                                <Image style={styles.categoryImage} source ={images[category.categoryImage]}/>
+                                <Image style={styles.categoryImage} source ={images[category.categoryName]}/>
                                 <Text style={styles.categoryText}>{category.categoryName}</Text>
                             </TouchableOpacity>
                             ))
@@ -227,6 +251,7 @@ const styles = StyleSheet.create({
     category: {
         backgroundColor: '#1E3C58',
         height: '100%',
+        maxWidth: '30%',
         borderRadius: 20,
         paddingVertical: 10,
         marginRight: 10,

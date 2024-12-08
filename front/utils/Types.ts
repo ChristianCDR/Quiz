@@ -22,12 +22,13 @@ export interface Score {
 }
 
 export type RootStackParamList = {
-    Register: undefined
-    Login: { message: string }
-    Quiz: { quizData: Question[], categoryName: string | undefined }
-    Result: { score: number, quizLength: number }
-    QuizzesByCategory: undefined
-    Account: undefined,
+    Register: undefined;
+    Login: { message: string | null};
+    Quiz: { quizData: Question[], categoryName: string };
+    Result: { score: number, quizLength: number };
+    QuizzesByCategory: undefined;
+    Account: undefined;
+    Legal: undefined;
     Tabs: { screen: keyof TabParamList }; 
 }
 
@@ -50,7 +51,7 @@ export type ContextType = {
     setQuizNumber: (value: number) => void;
     userId:number; 
     setUserId: (value: number) => void;
-    username: string, 
+    username: string | null;
     setUsername: (value: string) => void;
     scores: Score[];
     setScores: (value: Score[]) => void;
@@ -58,15 +59,19 @@ export type ContextType = {
     setQuizzes: (value: Question[][]) => void;
     categoryId: number;
     setCategoryId: (value: number) => void
-    categoryName: string;
-    setCategoryName: (value: string) => void
-    email: string; 
-    setEmail: (value: string) => void
+    categoryName: string | null;
+    setCategoryName: (value: string) => void;
+    email: string | null;
+    setEmail: (value: string) => void;
+    fetchScores: boolean;
+    setFetchScores: (value: boolean) => void;
+    screenToReach: string | null;
+    setScreenToReach: (value: string | null ) => void;
 }
 
 export type ErrorType = string | null
 
-export type StackNavigationProp = NativeStackNavigationProp<RootStackParamList>
+export type RootStackNavigationProp = NativeStackNavigationProp<RootStackParamList>
 
 // Route Props
 

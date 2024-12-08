@@ -42,7 +42,7 @@ const TabNavigator = () => {
               return <FontAwesome name="book"  size={size} color={color} />;
               break;
             case 'Settings': 
-              return <Entypo name="dots-three-vertical"  size={size} color={color} />;
+              return <Entypo name="dots-three-vertical"  size={size} color={color} />
               break;
           }
         },
@@ -65,19 +65,30 @@ const TabNavigator = () => {
           }
         }
       })} 
-      screenListeners={{
-        tabPress: (e) => {
-          if (e.target?.includes('Settings')) {
-            e.preventDefault();
-            showModal();
-          }
-        }
-      }}
+      // screenListeners = {{
+      //   tabPress: (e) => {
+      //     if (e.target?.includes('Settings')) {
+      //       e.preventDefault();
+      //       showModal();
+      //     }
+      //   }
+      // }}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Score" component={ScoreScreen} />
       <Tab.Screen name="Lessons" component={LessonScreen} />
-      <Tab.Screen name="Settings" component={SettingsModal} />
+      <Tab.Screen 
+        name="Settings" 
+        component={SettingsModal} 
+        listeners={({ navigation }) => ({
+          // Navigation de la modal
+          tabPress: (e) => {
+            e.preventDefault();  // Empêcher l'activation du tab et ouvrir la modal
+            showModal();
+            // navigation.navigate('SettingsModal');
+          },
+        })}
+        />
     </Tab.Navigator>
   );
 }

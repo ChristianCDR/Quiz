@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { StatusBar } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
 import { NavigationContainer } from '@react-navigation/native';
-import { ContextProvider } from '@/utils/Context';
 import SettingsModal from '@/components/SettingsModal';
+import { ContextProvider } from '@/utils/Context';
 import AppStack from '@/navigation/Stack';
 
 export default function index () {

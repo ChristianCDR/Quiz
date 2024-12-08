@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { emailValidator, passwordValidator, usernameValidator }  from '@/utils/Validators';
-import { StackNavigationProp } from '@/utils/Types';
+import { RootStackNavigationProp } from '@/utils/Types';
 import { useNavigation } from '@react-navigation/native';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -18,7 +18,7 @@ export default function RegisterScreen () {
     const [emptyUsername, setEmptyUsername] = useState<boolean>(false);
     const [emptyConfirm, setEmptyConfirm] = useState<boolean>(false);
     const [emptyPassword, setEmptyPassword] = useState<boolean>(false);
-    const navigation = useNavigation<StackNavigationProp>();
+    const navigation = useNavigation<RootStackNavigationProp>();
   
     const handleRegister = async () => {
 
@@ -141,7 +141,7 @@ export default function RegisterScreen () {
                 <Text style={styles.buttonText}>S'inscrire</Text>
             </TouchableOpacity>
     
-            <TouchableOpacity onPress={() => navigation.navigate('Login', {message: ''})}>
+            <TouchableOpacity onPress={() => navigation.navigate('Login', {message: null})}>
                 <Text style={styles.linkText}>Déjà inscrit ? Connectez-vous</Text>
             </TouchableOpacity>   
         </View>

@@ -7,6 +7,7 @@ import RegisterScreen from '@/app/RegisterScreen';
 import LoginScreen from '@/app/LoginScreen';
 import QuizzesByCategoryScreen from '@/app/QuizzesByCategoryScreen';
 import TabNavigator from '@/navigation/Tabs';
+import AccountScreen from '@/app/AccountScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -34,6 +35,10 @@ const AppNavigator = () => {
             <Stack.Screen 
                 name="QuizzesByCategory"
                 component={QuizzesByCategoryScreen}
+            />
+            <Stack.Screen 
+                name="Account"
+                component={AccountScreen}
             />
             <Stack.Screen 
                 name="Tabs"

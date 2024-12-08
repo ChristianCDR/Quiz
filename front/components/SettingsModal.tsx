@@ -1,22 +1,19 @@
 import React, { useContext } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableWithoutFeedback, Pressable, Alert, Linking } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { Context } from '../utils/Context';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import handleLogout from '@/utils/HandleLogout';
-import { StackNavigationProp } from '@/utils/Types';
 
 export default function SettingsModal () {
-    const navigation = useNavigation<StackNavigationProp>();
 
     const modalContext = useContext(Context);
 
     if (!modalContext) throw new Error ('Modal Provider returned null');
 
-    const { isModalVisible, hideModal } = modalContext;
+    const { isModalVisible, hideModal, setScreenToReach } = modalContext;
 
     const handleAlert = () => {
         Alert.alert(
@@ -32,8 +29,7 @@ export default function SettingsModal () {
                     onPress: () => { 
                         handleLogout()
                         .then(() => {
-                            hideModal();
-                            navigation.navigate('Login', {message: ''});
+                            goToLogin();
                         })
                         .catch(error => console.error("Erreur lors de la déconnexion :", error));
                     }
@@ -63,7 +59,18 @@ export default function SettingsModal () {
     };
 
     const goToAccount = () => {
-        navigation.navigate('Account');
+        setScreenToReach('Account');
+        hideModal();
+    }
+
+    const goToInfos = () => {
+        setScreenToReach('Legal');
+        hideModal();
+    }
+
+    const goToLogin = () => {
+        setScreenToReach('Login');
+        hideModal();
     }
 
     return (
@@ -88,7 +95,7 @@ export default function SettingsModal () {
                                 <Feather name="mail" size={24} color="black" />
                                 <Text style={styles.modalText}>Nous contacter</Text>
                             </Pressable>
-                            <Pressable style = {styles.pressable}>
+                            <Pressable style = {styles.pressable} onPress={goToInfos}>
                                 <Feather name="list" size={24} color="black" />
                                 <Text style={styles.modalText}>Informations légales</Text>
                             </Pressable>

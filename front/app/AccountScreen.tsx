@@ -3,24 +3,20 @@ import { Context } from '@/utils/Context';
 import Informations from '@/components/Informations';
 import ChangePassword from '@/components/ChangePassword';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@/utils/Types';
+import { RootStackNavigationProp } from '@/utils/Types';
 import {View, StyleSheet, Text, Pressable} from 'react-native';
 
 export default function AccountScreen () {
     const [informationsPressed, setInformationsPressed] = useState<boolean>(true);
     const [passwordPressed, setPasswordPressed] = useState<boolean>(false);
 
-    const navigation = useNavigation<StackNavigationProp>();
+    const navigation = useNavigation<RootStackNavigationProp>();
 
     const context = useContext(Context);
 
     if (!context) throw new Error ('Context returned null');
 
     const { hideModal } = context;
-
-    useEffect (() => {
-        hideModal();
-    }, [])
 
     const handlePress = (screen : string) => {
 
