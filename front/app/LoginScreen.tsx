@@ -4,7 +4,7 @@ import customAxiosInstance from '@/api/Interceptors';
 import { Context } from '@/utils/Context';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
+import { RootStackNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 // Page Mon compte
@@ -12,6 +12,7 @@ import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image } from 'reac
 // Mot de passe oublié
 // boucles de loading 
 // audio
+// lien de confirmation expiré ou invalide
 
 // Notifications 
 // Aide  & contact => creer un mail gmail pour l'instant
@@ -28,13 +29,13 @@ type Props = {
 }
 
 export default function LoginScreen ({route}: Props) {
-    const [password, setPassword] = useState<string>('');
+    const [password, setPassword] = useState<string | null>(null);
     const [error, setError] = useState<string>();
     const [secureText, setSecureText] = useState<boolean>(true);
     const [emptyEmail, setEmptyEmail] = useState<boolean>(false);
     const [emptyPassword, setEmptyPassword] = useState<boolean>(false);
 
-    const navigation = useNavigation<StackNavigationProp>();
+    const navigation = useNavigation<RootStackNavigationProp>();
     const {message} = route.params;
     
     const context = useContext(Context);
@@ -46,8 +47,8 @@ export default function LoginScreen ({route}: Props) {
     const jsonAxiosInstance = customAxiosInstance('application/json');
 
     const handleLogin = async () => {
-      if (email === '') setEmptyEmail(true);
-      if (password === '') setEmptyPassword(true);
+      if (email == null) setEmptyEmail(true);
+      if (password == null) setEmptyPassword(true);
 
       const body = {
           "email": email,
@@ -99,9 +100,9 @@ export default function LoginScreen ({route}: Props) {
   
           <Text style={styles.title}>Connexion</Text>
           <TextInput
-              style={[styles.input, emptyEmail && styles.errorBox]}
+              style={[styles.input, emptyEmail && styles.errorBox]} 
               placeholder="Email"
-              value={email}
+              value={email ?? ''}
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
@@ -110,7 +111,7 @@ export default function LoginScreen ({route}: Props) {
             <TextInput
                 style={[styles.input, emptyPassword && styles.errorBox]}
                 placeholder="Mot de passe"
-                value={password}
+                value={password ?? ''}
                 onChangeText={setPassword}
                 secureTextEntry={secureText}
             />
