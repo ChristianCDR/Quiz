@@ -29,7 +29,7 @@ class LoginController extends AbstractController
         $this->JWTManager = $JWTManager;
     }
 
-    #[Route(path: '/api/login', name: 'app_login', methods: ['POST'])]
+    #[Route(path: '/api/v1/login', name: 'app_login', methods: ['POST'])]
     #[OA\Post(
         summary: 'Log user',
         tags: ['Auth'],
@@ -39,7 +39,7 @@ class LoginController extends AbstractController
                 type: 'object',
                 required: ['email', 'password'],
                 properties: [
-                    new OA\Property(property: 'email', type: 'string', example: 'chris@mail.com'),
+                    new OA\Property(property: 'email', type: 'string', example: 'chris1@mail.com'),
                     new OA\Property(property: 'password', type: 'string', example: 'Azerty1@')
                 ]
             )
@@ -104,7 +104,7 @@ class LoginController extends AbstractController
         
     }
 
-    #[Route(path: '/api/refreshToken', name: 'app_refresh_token', methods: ['POST'])]
+    #[Route(path: '/api/v1/refreshToken', name: 'app_refresh_token', methods: ['POST'])]
     #[OA\Post(
         summary: 'Refresh token',
         tags: ['Auth'],
@@ -168,7 +168,7 @@ class LoginController extends AbstractController
         ]);    
     }
 
-    #[Route(path: '/api/logout', name: 'app_logout', methods: ['POST'])]
+    #[Route(path: '/api/v1/logout', name: 'app_logout', methods: ['POST'])]
     #[OA\Post(
         summary: 'Logout user',
         tags: ['Auth'],
@@ -176,9 +176,9 @@ class LoginController extends AbstractController
             required: true,
             content: new OA\JsonContent(
                 type: 'object',
-                required: ['token'],
+                required: ['refreshToken'],
                 properties: [
-                    new OA\Property(property: 'token', type: 'string', example: '9fc8a9c7945daf1fa65a8956103809b2dd3560656fc2626aec508f8babd72117'),
+                    new OA\Property(property: 'refreshToken', type: 'string', example: '9fc8a9c7945daf1fa65a8956103809b2dd3560656fc2626aec508f8babd72117'),
                 ]
             )
         )

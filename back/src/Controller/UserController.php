@@ -18,7 +18,7 @@ use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-#[Route('/api/user')]
+#[Route('/api/v1/user')]
 class UserController extends AbstractController
 {
     private $tokenStorageInterface;
@@ -93,7 +93,7 @@ class UserController extends AbstractController
             $data[] = [
                 'userId' => $user->getId(),
                 'email' => $user->getEmail(), 
-                'username' => $user->getusername(), 
+                'username' => $user->getUsername(), 
                 'password' => $user->getPassword()
             ];
         }
@@ -154,7 +154,7 @@ class UserController extends AbstractController
         $data[] = [
             'userId' => $user->getId(),
             'email' => $user->getEmail(), 
-            'username' => $user->getusername(), 
+            'username' => $user->getUsername(), 
             'password' => $user->getPassword()
         ];
 
