@@ -18,7 +18,7 @@ use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 
-#[Route('/api/questions')]
+#[Route('/api/v1/questions')]
 class QuestionsController extends AbstractController
 {
     #[Route('/', name: 'api_question_index', methods: ['GET'])]

@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\ResetPasswordType;
 use App\Security\EmailVerifier;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Service\PasswordResetService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,6 +24,7 @@ use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+#[Route('/api/v1/reset')]
 class UserProfileController extends AbstractController
 {
     private $tokenStorageInterface;
@@ -30,6 +33,7 @@ class UserProfileController extends AbstractController
     private $passwordHasher;
     private $validator;
     private $userRepository;
+    private $passwordResetService;
     
     public function __construct (
         JWTTokenManagerInterface $jwtManager, 
@@ -38,7 +42,8 @@ class UserProfileController extends AbstractController
         UserPasswordHasherInterface $passwordHasher,
         ValidatorInterface $validator,
         UserRepository $userRepository,
-        EmailVerifier $emailVerifier
+        EmailVerifier $emailVerifier,
+        PasswordResetService $passwordResetService
     ) 
     {
         $this->entityManager = $entityManager;
@@ -48,11 +53,12 @@ class UserProfileController extends AbstractController
         $this->userRepository = $userRepository;
         $this->tokenStorageInterface = $tokenStorageInterface;
         $this->emailVerifier = $emailVerifier;
+        $this->passwordResetService = $passwordResetService;
     }
     
-    #[Route('/change/password', name: 'app_change_password', methods: ['PUT'])]
+    #[Route('/password', name: 'app_reset_password', methods: ['PUT'])]
     #[OA\Put(
-        summary: 'Change password',
+        summary: 'Reset password',
         tags: ['Profile'],
         requestBody: new OA\RequestBody(
             description: '',
@@ -89,7 +95,7 @@ class UserProfileController extends AbstractController
             )
         ]
     )]
-    public function change_password (Request $request): JsonResponse 
+    public function reset_password (Request $request): JsonResponse 
     {
         $data = json_decode($request->getContent(), true);
 
@@ -112,32 +118,16 @@ class UserProfileController extends AbstractController
             return new JsonResponse(['Error' => 'L\'ancien mot de passe est incorrect.'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        $errors = $this->validator->validate($user->setPassword($new_password));
-
-        if (count($errors) > 0) {
-            $errorMessages = [];
-            foreach ($errors as $error) {
-                $errorMessages[] = $error->getMessage();
-            }
-            return new JsonResponse(['Errors' => $errorMessages], JsonResponse::HTTP_BAD_REQUEST);
+        try {
+            $this->passwordResetService->resetPassword($new_password);
+            return new JsonResponse(['message' => 'Mot de passe modifié avec succès!'], JsonResponse::HTTP_OK);
         }
-
-        $hashedPassword = $this->passwordHasher->hashPassword(
-            $user,
-            $new_password
-        );
-
-        $user->setPassword($hashedPassword);  
-
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
-
-        return new JsonResponse([
-            'message' => 'Mot de passe changé avec succès!'
-        ], JsonResponse::HTTP_OK);
+        catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], JsonResponse::HTTP_BAD_REQUEST);
+        }      
     }
 
-    #[Route('/change/userInfos', name: 'app_change_user_infos', methods: ['PUT'])]
+    #[Route('/user_infos', name: 'app_reset_user_infos', methods: ['PUT'])]
     #[OA\Put(
         summary: 'Change email or username',
         tags: ['Profile'],
@@ -176,7 +166,7 @@ class UserProfileController extends AbstractController
             )
         ]
     )]
-    public function change_user_infos (Request $request): JsonResponse 
+    public function reset_user_infos (Request $request): JsonResponse 
     {
         $data = json_decode($request->getContent(), true);
 
@@ -241,6 +231,112 @@ class UserProfileController extends AbstractController
         catch (\Exception $e) {
             return new JsonResponse(['error' => 'Une erreur est survenue.'], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         } 
+    }
+
+    #[Route('/send_password_email', name: 'app_send_password_email', methods: ['POST'])]
+    #[OA\Post(
+        summary: 'Send password reset email',
+        tags: ['Profile'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                required: ['email'],
+                properties: [
+                    new OA\Property(property: 'email', type: 'string', example: 'chris1@mail.com')
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'User retrieved successfully',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'message', type: 'string', example: 'Un email vous a été envoyé.')
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'User not found',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'error', type: 'string', example: 'Utilisateur introuvable.')
+                    ]
+                )
+            )
+        ]
+    )]
+    #[Security(name: null)]
+    public function send_password_email(Request $request): JsonResponse
+    {
+        $data=json_decode($request->getContent(), true);
+        $email= $data['email'];
+
+        if (!$email) {
+            return new JsonResponse(
+                ['error' => "Merci d'indiquer l'adresse email associée à votre compte."], 
+                JsonResponse::HTTP_BAD_REQUEST
+            );
+        }
+   
+        $user = $this->userRepository->findOneBy(['email' => $email]);
+
+        if(!$user) {
+            return new JsonResponse([
+                'error' => 'Utilisateur introuvable!'
+            ], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        $this->emailVerifier->sendEmailConfirmation(
+            'app_reset_forgot_password', 
+            $user, 
+            (new TemplatedEmail())
+                ->from(new Address('no-reply@resq18.com', 'RESQ18'))
+                ->to($user->getEmail())
+                ->subject('Réinitialiser votre mot de passe')
+                ->htmlTemplate('/emails/forgot_password.html.twig')
+                ->context([
+                    'username' => $user->getUsername()
+                ])
+        );
+
+        return new JsonResponse (['message' => "Un email vous a été envoyé."], JsonResponse::HTTP_OK);
+    }
+
+    #[Route('/forgot_password', name:'app_reset_forgot_password')]
+    public function reset_forgot_password (Request $request): Response
+    {
+        $user_id = $request->query->get('id');
+        $user = $this->userRepository->find($user_id);
+
+        if (!$user) {
+            return $this->render('email_confirmation.html.twig', ['message' => 'Utilisateur non trouvé. Veuillez réessayer.']);
+            // $this->addFlash('error', 'Utilisateur non trouvé.');
+        }
+        else $user->setPassword('');
+
+        $form = $this->createForm(ResetPasswordType::class, $user);
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $new_password = $form->get('password')->getData();
+            
+            $this->passwordResetService->reset_password($new_password, $user);
+            return $this->render('email_confirmation.html.twig', ['message' => 'Votre mot de passe a été modifié avec succès.']);
+        }
+        // else {
+        //     foreach ($form->getErrors(true) as $error) {
+        //         echo $error->getMessage() . '<br>';
+        //     }
+        // }
+
+        return $this->render('/reset_password.html.twig', [
+            'form' => $form,
+        ]);
     }
 
     //ecrire la route des photos de profil ici
