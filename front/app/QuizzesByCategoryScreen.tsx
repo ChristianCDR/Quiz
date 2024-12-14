@@ -51,7 +51,7 @@ export default function QuizzesByCategoryScreen ({route} : Props) {
                         </View>
                     ))
                 ) : (
-                <Text style = {{textAlign: 'center'}} >No quizzes available</Text>
+                <Text style = {{textAlign: 'center'}} >Pas de quiz disponible pour l'instant.</Text>
                 )}
             </ScrollView>       
         </View>

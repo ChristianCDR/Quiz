@@ -5,8 +5,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import SettingsModal from '@/components/SettingsModal';
 import { ContextProvider } from '@/utils/Context';
 import AppStack from '@/navigation/Stack';
+import * as MediaLibrary from 'expo-media-library';
 
 export default function index () {
+  const [status, requestPermission] = MediaLibrary.usePermissions();
 
   useEffect(() => {
     NavigationBar.setBackgroundColorAsync('#FFF');
@@ -17,12 +19,16 @@ export default function index () {
     StatusBar.setBarStyle("light-content");
   }, []);
 
-    return (  
-        <ContextProvider>
-            <>
-                <AppStack/>
-            </>
-            <SettingsModal/>
-        </ContextProvider>  
-    );
+  // if (status === null) {
+  //   requestPermission();
+  // }
+
+  return (  
+      <ContextProvider>
+          <>
+              <AppStack/>
+          </>
+          <SettingsModal/>
+      </ContextProvider>  
+  );
 };

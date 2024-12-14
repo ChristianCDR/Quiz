@@ -30,6 +30,7 @@ export type RootStackParamList = {
     Account: undefined;
     Legal: undefined;
     Tabs: { screen: keyof TabParamList }; 
+    ForgotPassword: undefined;
 }
 
 export type TabParamList = {
@@ -63,8 +64,8 @@ export type ContextType = {
     setCategoryName: (value: string) => void;
     email: string | null;
     setEmail: (value: string) => void;
-    fetchScores: boolean;
-    setFetchScores: (value: boolean) => void;
+    updateScores: boolean;
+    setUpdateScores: (value: boolean) => void;
     screenToReach: string | null;
     setScreenToReach: (value: string | null ) => void;
 }
@@ -72,6 +73,8 @@ export type ContextType = {
 export type ErrorType = string | null
 
 export type RootStackNavigationProp = NativeStackNavigationProp<RootStackParamList>
+
+export type TabStackNavigationProp = NativeStackNavigationProp<TabParamList>
 
 // Route Props
 

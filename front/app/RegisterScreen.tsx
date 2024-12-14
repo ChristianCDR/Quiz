@@ -66,7 +66,7 @@ export default function RegisterScreen () {
       
         try {
           const jsonAxiosInstance = customAxiosInstance('application/json');   
-          const response = await jsonAxiosInstance.post('/api/register', body)       
+          const response = await jsonAxiosInstance.post('/api/v1/register', body)       
           if (response.status === 201) {
             navigation.navigate('Login', { message: 'Inscription réussie.' + '\n' + 'Confirmez votre adresse mail avant de vous connecter.' })
           }
