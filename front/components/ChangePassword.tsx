@@ -71,7 +71,7 @@ export default function ChangePassword () {
 
                 try {
                     const jsonAxiosInstance = customAxiosInstance('application/json');
-                    const response = await jsonAxiosInstance.put('/api/user/change/password', body);
+                    const response = await jsonAxiosInstance.put('/api/v1/user/reset/password', body);
                     if(response.data)  {
                         setMessage(response.data.message);
                         setOldPassword('');

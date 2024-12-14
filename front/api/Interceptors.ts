@@ -57,7 +57,7 @@ export const refreshAccessToken = async () => {
     const multipartAxiosInstance = customAxiosInstance('multipart/form-data');
 
     try {
-        const response = await multipartAxiosInstance.post('/api/refreshToken', { token: refreshToken });
+        const response = await multipartAxiosInstance.post('/api/v1/refreshToken', { token: refreshToken });
 
         if (response.data.token) {
             const { accessToken, refreshToken } = response.data;

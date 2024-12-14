@@ -4,6 +4,7 @@ import BackButton from "@/components/BackButton";
 import { RootStackNavigationProp } from "@/utils/Types";
 import DisplayScores from '@/components/DisplayScores';
 import { useNavigation } from "@react-navigation/native";
+import settingsNavigation from '@/utils/HandleSettingsNavigation';
 import { View, StyleSheet, Text, ScrollView } from "react-native";
 
 export default function ScoreScreen () {
@@ -13,23 +14,10 @@ export default function ScoreScreen () {
 
     if(!context) throw new Error ('Context returned null');
 
-    const { scores, screenToReach, setScreenToReach } = context;
+    const { scores, screenToReach } = context;
 
     useEffect(() => {
-        switch (screenToReach) {
-            case 'Account': navigation.navigate('Account');
-                break;
-            case 'Login': 
-                navigation.navigate('Login', {message: null});
-                setScreenToReach(null);
-                navigation.reset({
-                    index: 0, // On commence une nouvelle pile de navigation
-                    routes: [{ name: 'Login' }], // Remplacez 'Login' par le nom de votre écran de connexion
-                });
-                break;
-            case 'Legal': navigation.navigate('Legal');
-                break;
-        }
+        if (screenToReach) settingsNavigation(screenToReach, navigation);
     },[screenToReach])
 
     return (
@@ -46,7 +34,7 @@ export default function ScoreScreen () {
 const styles =  StyleSheet.create({
     container: {
         flex: 1,
-        // backgroundColor: "#ECE6D6"
+        backgroundColor: "#ECE6D6"
     },
     title: {
         color: '#000',

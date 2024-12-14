@@ -5,6 +5,7 @@ import DisplayScores from '@/components/DisplayScores';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "@/utils/Types";
 import { StyleSheet, View, SafeAreaView, Text, StatusBar, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import settingsNavigation from '@/utils/HandleSettingsNavigation';
 
 type Props = {
     route: HomeScreenRouteProp
@@ -35,19 +36,20 @@ export default function HomeScreen({route}: Props) {
         setCategoryId,  
         scores, 
         setScores, 
-        fetchScores,
+        updateScores,
+        setUpdateScores,
         screenToReach,
         setScreenToReach 
     } = context;
 
-    const scoresChunckedArray = scores.slice(0,5);
+    const scoresChunckedArray = scores.slice(0,3);
 
     const jsonAxiosInstance = customAxiosInstance('application/json');
 
     useEffect(() => {
         const fetchCategories = async () => {
            try {
-                const response = await jsonAxiosInstance.get('/api/categories/');
+                const response = await jsonAxiosInstance.get('/api/v1/categories/');
                 setCategory(response.data);
            }
            catch (error) {
@@ -65,8 +67,8 @@ export default function HomeScreen({route}: Props) {
     useEffect(() => {
         const fetchScores = async () => {
             try {
-                const response = await jsonAxiosInstance.get(`/api/showScore/${userId}`);
-                setScores(response.data.scores);
+                const response = await jsonAxiosInstance.get(`/api/v1/score/show/${userId}`);
+                setScores(response.data.scores); 
             }
             catch (error) {
                 const errMessage = (error as Error).message;
@@ -75,23 +77,11 @@ export default function HomeScreen({route}: Props) {
         }
 
         fetchScores();
-    },[fetchScores]);
+        setUpdateScores(false);
+    },[updateScores]);
 
     useEffect(() => {
-            switch (screenToReach) {
-                case 'Account': navigation.navigate('Account');
-                    break;
-                case 'Login': 
-                    navigation.navigate('Login', {message: null});
-                    setScreenToReach(null);
-                    navigation.reset({
-                        index: 0, // On commence une nouvelle pile de navigation
-                        routes: [{ name: 'Login' }], // Remplacez 'Login' par le nom de votre écran de connexion
-                    });
-                    break;
-                case 'Legal': navigation.navigate('Legal');
-                    break;
-            }
+        if (screenToReach) {settingsNavigation(screenToReach, navigation); setScreenToReach(null)};
     },[screenToReach])
 
     const handleNavigation = (id: number, name: string) => {

@@ -4,6 +4,7 @@ import { Context } from "@/utils/Context";
 import BackButton from "@/components/BackButton";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackNavigationProp } from "@/utils/Types";
+import settingsNavigation from '@/utils/HandleSettingsNavigation';
 
 
 export default function LessonScreen () {
@@ -13,23 +14,10 @@ export default function LessonScreen () {
 
     if(!context) throw new Error ('Context returned null');
 
-    const { screenToReach, setScreenToReach } = context;
+    const { screenToReach } = context;
 
     useEffect(() => {
-        switch (screenToReach) {
-            case 'Account': navigation.navigate('Account');
-                break;
-            case 'Login':     
-                navigation.navigate('Login', {message: null});
-                setScreenToReach(null);
-                navigation.reset({
-                    index: 0, // On commence une nouvelle pile de navigation
-                    routes: [{ name: 'Login' }], // Remplacez 'Login' par le nom de votre écran de connexion
-                });
-                break;
-            case 'Legal': navigation.navigate('Legal');
-                break;
-        }
+        if (screenToReach) settingsNavigation(screenToReach, navigation);
     },[screenToReach])
 
     return(
@@ -43,7 +31,8 @@ export default function LessonScreen () {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
+        backgroundColor: "#ECE6D6",
     },
     text: {
         fontSize: 18,
