@@ -143,9 +143,34 @@ class RegistrationController extends AbstractController
             $this->emailVerifier->handleEmailConfirmation($request, $user);
         }
         catch (VerifyEmailExceptionInterface $exception) {
-            return $this->render('email_confirmation.html.twig', ['message' => $exception->getReason()]);
+            return $this->render('invalid_link.html.twig', ['id' => $id]);
         }
 
         return $this->render('email_confirmation.html.twig', ['message' => 'Votre adresse email a été confirmée.']);
+    }
+
+    #[Route('/invalid_link/{id}', name: 'app_invalid_link', methods:['GET'])]
+
+    public function invalidConfirmationLink (User $user): Response
+    {
+
+        if (!$user) {
+            return $this->render('email_confirmation.html.twig', ['message' => 'Utilisateur inconnu.']);
+        }
+    
+        $this->emailVerifier->sendEmailConfirmation(
+            'app_verify_email', 
+            $user, 
+            (new TemplatedEmail())
+                ->from(new Address('no-reply@resq18.com', 'RESQ18'))
+                ->to($user->getEmail())
+                ->subject('Nouveau lien de confirmation')
+                ->htmlTemplate('/emails/invalid_link.html.twig')
+                ->context([
+                    'username' => $user->getUsername()
+                ])
+        );
+
+        return $this->render('email_confirmation.html.twig', ['message' => 'Un nouveau lien de confirmation vous a été envoyé.']);
     }
 }
