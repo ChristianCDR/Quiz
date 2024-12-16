@@ -54,7 +54,7 @@ export default function Informations () {
           
             try {   
                 const jsonAxiosInstance = customAxiosInstance('application/json');
-                const response = await jsonAxiosInstance.put('/api/user/change/userInfos', body)       
+                const response = await jsonAxiosInstance.put('/api/v1/user/reset/user_infos', body)       
                 if (response.data) {
                     setMessage(response.data.message);
                     setDisabled(true);

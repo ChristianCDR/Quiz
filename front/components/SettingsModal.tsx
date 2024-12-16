@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableWithoutFeedback, Pressable, Alert, Linking } from 'react-native';
-import { Context } from '../utils/Context';
+import { Context } from '@/utils/Context';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
@@ -70,7 +70,7 @@ export default function SettingsModal () {
 
     const goToLogin = () => {
         setScreenToReach('Login');
-        hideModal();
+        hideModal();       
     }
 
     return (
@@ -84,27 +84,27 @@ export default function SettingsModal () {
                     <TouchableWithoutFeedback>
                         <View style={styles.modalView}>
                             <Pressable style = {styles.pressable} onPress={goToAccount}>
-                                <FontAwesome6 name="circle-user" size={24} color="black" />
+                                <FontAwesome6 name="circle-user" size={24} color="white" />
                                 <Text style={styles.modalText}>Mon compte</Text>
                             </Pressable>
                             <Pressable style = {styles.pressable} onPress = {openNotificationSettings}>
-                                <Ionicons name="notifications-outline" size={25} color="black" />
+                                <Ionicons name="notifications-outline" size={25} color="white" />
                                 <Text style={styles.modalText}>Notifications</Text>
                             </Pressable>
                             <Pressable style = {styles.pressable} onPress={openEmailApps}>
-                                <Feather name="mail" size={24} color="black" />
+                                <Feather name="mail" size={24} color="white" />
                                 <Text style={styles.modalText}>Nous contacter</Text>
                             </Pressable>
                             <Pressable style = {styles.pressable} onPress={goToInfos}>
-                                <Feather name="list" size={24} color="black" />
+                                <Feather name="list" size={24} color="white" />
                                 <Text style={styles.modalText}>Informations légales</Text>
                             </Pressable>
                             <Pressable onPress={handleAlert} style = {styles.pressable}>
-                                <Feather name="log-out" size={22} color="black" />
+                                <Feather name="log-out" size={22} color="white" />
                                 <Text style={styles.modalText}>Se déconnecter</Text>
                             </Pressable>
                             <Pressable onPress={hideModal} style = {[styles.pressable, styles.closeModalButton]}>
-                                <AntDesign name="closecircleo" size={40} color="black" />
+                                <AntDesign name="closecircleo" size={40} color="white" />
                             </Pressable>
                         </View>
                     </TouchableWithoutFeedback>
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
         height: '44%',
         padding: 20, 
         paddingTop: 30,
-        backgroundColor: 'white', 
+        backgroundColor: '#1E3C58', 
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         position: 'absolute',
@@ -134,7 +134,8 @@ const styles = StyleSheet.create({
     },
     modalText: {
         fontSize: 18,
-        marginLeft: 15
+        marginLeft: 15,
+        color: 'white'
     },
     pressable: {
         height: 50,

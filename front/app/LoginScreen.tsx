@@ -7,19 +7,20 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
-// Page Mon compte
-// permettre l'upload de photo de profil
-// Mot de passe oublié
-// boucles de loading 
-// audio
-// lien de confirmation expiré ou invalide
+// Crud photo de profile
+// Lien de confirmation expiré ou invalide
 
-// Notifications 
-// Aide  & contact => creer un mail gmail pour l'instant
+// Boucles de loading 
+// Audio jeu
+
+// Notifications push
+// Publicités
 
 // mentionner  l'origine des pics de l'appli
 // info legales
 // icone de l'appli
+// Aide  & contact => creer un mail gmail pour l'instant
+// Captureref
 
 // Bruteforce
 // Oauth2
@@ -47,8 +48,8 @@ export default function LoginScreen ({route}: Props) {
     const jsonAxiosInstance = customAxiosInstance('application/json');
 
     const handleLogin = async () => {
-      if (email == null) setEmptyEmail(true);
-      if (password == null) setEmptyPassword(true);
+      if (email === null) setEmptyEmail(true);
+      if (password === null) setEmptyPassword(true);
 
       const body = {
           "email": email,
@@ -56,7 +57,7 @@ export default function LoginScreen ({route}: Props) {
       }
 
       try {
-          const response = await jsonAxiosInstance.post('/api/login', body);
+          const response = await jsonAxiosInstance.post('/api/v1/login', body);
           if (response.status === 200) {
             const accessToken = response.data.accessToken;
             const refreshToken = response.data.refreshToken;
@@ -81,6 +82,10 @@ export default function LoginScreen ({route}: Props) {
 
     const toggleSecureText = () => {
       setSecureText(!secureText);
+    }
+
+    const handleForgotPassword = () => {
+      navigation.navigate('ForgotPassword');
     }
 
     return (
@@ -117,6 +122,9 @@ export default function LoginScreen ({route}: Props) {
             />
             <TouchableOpacity  style={styles.eye} onPress={toggleSecureText}>
               <FontAwesome name={secureText? "eye" : "eye-slash"} size={24} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleForgotPassword}>
+              <Text style={[styles.linkText, styles.forgotPassword]}>Mot de passe oublié ?</Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
@@ -187,5 +195,10 @@ const styles = StyleSheet.create({
     },
     errorBox: {
       borderColor: 'red'
+    },
+    forgotPassword: {
+      textAlign: 'right', 
+      marginTop: -3,
+      marginBottom: 20 
     }
 })

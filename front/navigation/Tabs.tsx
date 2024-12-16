@@ -64,15 +64,7 @@ const TabNavigator = () => {
               break;
           }
         }
-      })} 
-      // screenListeners = {{
-      //   tabPress: (e) => {
-      //     if (e.target?.includes('Settings')) {
-      //       e.preventDefault();
-      //       showModal();
-      //     }
-      //   }
-      // }}
+      })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Score" component={ScoreScreen} />
@@ -85,7 +77,6 @@ const TabNavigator = () => {
           tabPress: (e) => {
             e.preventDefault();  // Empêcher l'activation du tab et ouvrir la modal
             showModal();
-            // navigation.navigate('SettingsModal');
           },
         })}
         />
