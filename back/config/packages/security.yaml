@@ -36,6 +36,7 @@ security:
         - { path: ^/api/v1/reset/password_web_page, roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/reset/forgot_password, roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1/invalid_link, roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/logout, roles: PUBLIC_ACCESS }
         - { path: ^/api/v1, roles: ROLE_USER }

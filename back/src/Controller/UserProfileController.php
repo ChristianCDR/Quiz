@@ -23,8 +23,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Mailer\MailerInterface;
 
-#[Route('/api/v1/reset')]
 class UserProfileController extends AbstractController
 {
     private $tokenStorageInterface;
@@ -34,6 +34,7 @@ class UserProfileController extends AbstractController
     private $validator;
     private $userRepository;
     private $passwordResetService;
+    private $mailer;
     
     public function __construct (
         JWTTokenManagerInterface $jwtManager, 
@@ -43,7 +44,8 @@ class UserProfileController extends AbstractController
         ValidatorInterface $validator,
         UserRepository $userRepository,
         EmailVerifier $emailVerifier,
-        PasswordResetService $passwordResetService
+        PasswordResetService $passwordResetService,
+        MailerInterface $mailer,
     ) 
     {
         $this->entityManager = $entityManager;
@@ -54,9 +56,10 @@ class UserProfileController extends AbstractController
         $this->tokenStorageInterface = $tokenStorageInterface;
         $this->emailVerifier = $emailVerifier;
         $this->passwordResetService = $passwordResetService;
+        $this->mailer = $mailer;
     }
     
-    #[Route('/password', name: 'app_reset_password', methods: ['PUT'])]
+    #[Route('/api/v1/reset/password', name: 'app_reset_password', methods: ['PUT'])]
     #[OA\Put(
         summary: 'Reset password',
         tags: ['Profile'],
@@ -127,7 +130,7 @@ class UserProfileController extends AbstractController
         }      
     }
 
-    #[Route('/user_infos', name: 'app_reset_user_infos', methods: ['PUT'])]
+    #[Route('/api/v1/reset/user_infos', name: 'app_reset_user_infos', methods: ['PUT'])]
     #[OA\Put(
         summary: 'Change email or username',
         tags: ['Profile'],
@@ -233,7 +236,7 @@ class UserProfileController extends AbstractController
         } 
     }
 
-    #[Route('/send_password_email', name: 'app_send_password_email', methods: ['POST'])]
+    #[Route('/api/v1/reset/send_password_email', name: 'app_send_password_email', methods: ['POST'])]
     #[OA\Post(
         summary: 'Send password reset email',
         tags: ['Profile'],
@@ -315,7 +318,6 @@ class UserProfileController extends AbstractController
 
         if (!$user) {
             return $this->render('email_confirmation.html.twig', ['message' => 'Utilisateur non trouvé. Veuillez réessayer.']);
-            // $this->addFlash('error', 'Utilisateur non trouvé.');
         }
         else $user->setPassword('');
 
@@ -326,6 +328,18 @@ class UserProfileController extends AbstractController
             $new_password = $form->get('password')->getData();
             
             $this->passwordResetService->reset_password($new_password, $user);
+
+            $email = (new TemplatedEmail())
+                ->from(new Address('no-reply@resq18.com', 'RESQ18'))
+                ->to($user->getEmail())
+                ->subject('Mot de passe modifié')
+                ->htmlTemplate('/emails/changed_password.html.twig')
+                ->context([
+                    'username' => $user->getUsername()
+                ]);
+            
+            $this->mailer->send($email);
+
             return $this->render('email_confirmation.html.twig', ['message' => 'Votre mot de passe a été modifié avec succès.']);
         }
         // else {
