@@ -19,7 +19,7 @@ export default function ResultScreen ({route}: Props) {
     const navigation = useNavigation<RootStackNavigationProp>()
     const { score, quizLength } = route.params
     const formattedScore = (score) < 10 ? `0${score}` : score.toString()
-    const viewRef = useRef<View>(null)
+    const viewRef = useRef(null)
     const scaleValue = useRef(new Animated.Value(0.1)).current 
     const context = useContext(Context);
 
@@ -31,7 +31,7 @@ export default function ResultScreen ({route}: Props) {
 
     const startAnimation: any = () => {
         Animated.timing (scaleValue, {
-            toValue: 2,
+            toValue: 1.5,
             duration: 600,
             easing: Easing.ease,
             useNativeDriver: true
@@ -42,7 +42,7 @@ export default function ResultScreen ({route}: Props) {
 
         if (!context) throw new Error ('Context returned null')
 
-        const { quizNumber, categoryId, setFetchScores }  = context;
+        const { quizNumber, categoryId, setUpdateScores }  = context;
 
         const scoreRate = (score*100) / quizLength;   
         
@@ -56,13 +56,13 @@ export default function ResultScreen ({route}: Props) {
             const jsonAxiosInstance = customAxiosInstance('application/json');
 
             try {
-                const response = await jsonAxiosInstance.post('/api/newScore', body);
-                if (response.status === 201) setFetchScores(true);
+                const response = await jsonAxiosInstance.post('/api/v1/score/new', body);
+                if (response.status === 201) setUpdateScores(true);
            } 
            catch (error: any) {
                 if (error.response.status === 400 ) {
-                    const response = await jsonAxiosInstance.put('/api/editScore', body);
-                    if (response.status === 200) setFetchScores(true);
+                    const response = await jsonAxiosInstance.put('/api/v1/score/edit', body);
+                    if (response.status === 200) setUpdateScores(true);
                 }
            }
         }
@@ -92,19 +92,23 @@ export default function ResultScreen ({route}: Props) {
     const handleShare = async () => {
         try {
             if(viewRef.current) {
+                
                 const uri = await captureRef(viewRef, {
                     format: 'png',
-                    quality: 0.8,
+                    quality: 1,
                 });
 
-            await Share.share({
-                url: uri,
-                title: 'Mon résultat de Quiz',
-                message: `J'ai obtenu un score de ${score} !`,
-            });
+                console.log(uri)
+
+                await Share.share({
+                    url: uri,
+                    title: 'Mon résultat de Quiz',
+                    message: `J'ai obtenu un score de ${score} sur RESQ18 !`,
+                });
             }     
         } catch (error) {
             console.error('Erreur lors du partage', error);
+            // alert("Une erreur s'est produite lors du partage de l'image.");
         }
     }
 
@@ -131,7 +135,7 @@ export default function ResultScreen ({route}: Props) {
                 <Text style={styles.yourScore}>Votre score</Text>
                 <Text style={styles.score}> <Text style={{color: scoreColor}}>{formattedScore}</Text> / {quizLength}</Text> 
                 <View style={styles.detailsButtons}>
-                    <TouchableOpacity onPress = {() => handleShare()} style={[styles.button, styles.detailsFirstButton]}>
+                    <TouchableOpacity onPress = {handleShare} style={[styles.button, styles.detailsFirstButton]}>
                         <Entypo name="share" size={24} color="black" /> 
                         <Text style={[styles.buttonText]}>Partager</Text>
                     </TouchableOpacity>

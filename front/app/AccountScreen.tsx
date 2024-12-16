@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext } from 'react';
 import { Context } from '@/utils/Context';
 import Informations from '@/components/Informations';
 import ChangePassword from '@/components/ChangePassword';
@@ -42,15 +42,14 @@ export default function AccountScreen () {
             </View>
             
             {passwordPressed ? <ChangePassword/> : <Informations/>}
-
-            {/* <Footer/> */}
         </View>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
+        backgroundColor: "#ECE6D6",
     },
     navBar: {
         borderColor: '#E2E2E2',

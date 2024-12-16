@@ -20,7 +20,7 @@ use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
  
     // mise en cache
-
+#[Route('/api/v1/score')]
 class UserScoreController extends AbstractController
 {
     private $entityManager;
@@ -46,7 +46,7 @@ class UserScoreController extends AbstractController
         $this->categoriesRepository = $categoriesRepository;
     }
 
-    #[Route('/api/users/scores', name: 'app_users_score', methods: ['GET'])]
+    #[Route('/all', name: 'app_users_score', methods: ['GET'])]
     #[OA\Get(
         summary: 'All users scores ',
         tags: ['User score'],
@@ -103,7 +103,7 @@ class UserScoreController extends AbstractController
         ], JsonResponse::HTTP_OK);
     }
 
-    #[Route('/api/newScore', name: 'app_new_score', methods: ['POST'])]
+    #[Route('/new', name: 'app_new_score', methods: ['POST'])]
     #[IsGranted('post')]
     #[OA\Post(
         summary: 'New user score ',
@@ -213,7 +213,7 @@ class UserScoreController extends AbstractController
         ], JsonResponse::HTTP_CREATED);
     }
 
-    #[Route('/api/editScore', name:'app_edit_score', methods:['PUT'])]
+    #[Route('/edit', name:'app_edit_score', methods:['PUT'])]
     #[OA\Put(
         summary: 'Update user score ',
         tags: ['User score'],
@@ -306,7 +306,7 @@ class UserScoreController extends AbstractController
         ], JsonResponse::HTTP_OK);
     }
 
-    #[Route('/api/showScore/{player_id}', name:'app_show_score', methods:['GET'])] 
+    #[Route('/show/{player_id}', name:'app_show_score', methods:['GET'])] 
     #[OA\Get(
         summary: 'Get scores by player ',
         tags: ['User score'],
@@ -381,7 +381,7 @@ class UserScoreController extends AbstractController
         ], JsonResponse::HTTP_OK);
     }
 
-    // #[Route('/api/deleteScore/', name:'app_delete_score', methods:['DELETE'])] 
+    // #[Route('/delete', name:'app_delete_score', methods:['DELETE'])] 
     #[OA\Delete(
         summary: 'Delete score',
         tags: ['User score'],

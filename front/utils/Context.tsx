@@ -13,7 +13,7 @@ export function ContextProvider ({children}: Children) {
     const [categoryId, setCategoryId] = useState<number>(0);
     const [categoryName, setCategoryName] = useState<string|null>(null);
     const [email, setEmail] = useState<string|null>(null);
-    const [fetchScores, setFetchScores] = useState<boolean>(false);
+    const [updateScores, setUpdateScores] = useState<boolean>(false);
     const [screenToReach, setScreenToReach] = useState<string|null>(null);
 
     const showModal = () => setModalVisible(true);
@@ -40,8 +40,8 @@ export function ContextProvider ({children}: Children) {
             setCategoryName,
             email, 
             setEmail,
-            fetchScores, 
-            setFetchScores,
+            updateScores, 
+            setUpdateScores,
             screenToReach, 
             setScreenToReach
         }}>

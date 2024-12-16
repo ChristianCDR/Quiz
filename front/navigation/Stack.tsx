@@ -8,16 +8,17 @@ import LoginScreen from '@/app/LoginScreen';
 import QuizzesByCategoryScreen from '@/app/QuizzesByCategoryScreen';
 import TabNavigator from '@/navigation/Tabs';
 import AccountScreen from '@/app/AccountScreen';
+import ForgotPasswordScreen from '@/app/ForgotPasswordScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
-
+ForgotPasswordScreen
 const AppNavigator = () => {
     return (
         <Stack.Navigator initialRouteName='Login' screenOptions={{ headerShown: false }}>
             <Stack.Screen 
                 name="Login" 
                 component={LoginScreen}   
-                initialParams={{ message: ''}}                                                                                                                   
+                initialParams={{ message: null}}                                                                                                                   
             />
             <Stack.Screen 
                 name="Register" 
@@ -30,7 +31,7 @@ const AppNavigator = () => {
             <Stack.Screen 
                 name="Result" 
                 component={ResultScreen} 
-                // initialParams={{ score: 9, quizLength: 10 }}
+                initialParams={{ score: 9, quizLength: 10 }}
             />
             <Stack.Screen 
                 name="QuizzesByCategory"
@@ -39,6 +40,10 @@ const AppNavigator = () => {
             <Stack.Screen 
                 name="Account"
                 component={AccountScreen}
+            />
+            <Stack.Screen 
+                name="ForgotPassword"
+                component={ForgotPasswordScreen}
             />
             <Stack.Screen 
                 name="Tabs"

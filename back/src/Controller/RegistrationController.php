@@ -29,7 +29,7 @@ class RegistrationController extends AbstractController
         $this->emailVerifier = $emailVerifier;
     }
 
-    #[Route('/api/register', name: 'app_register', methods: ['POST'])]
+    #[Route('/api/v1/register', name: 'app_register', methods: ['POST'])]
     #[OA\Post(
         summary: 'Create a new user',
         tags: ['Auth'],
@@ -79,7 +79,7 @@ class RegistrationController extends AbstractController
 
         $user 
             ->setEmail($data['email'] ?? '')
-            ->setusername($data['username'] ?? '')
+            ->setUsername($data['username'] ?? '')
             ->setPassword($data['password'] ?? '')
             ->setIsVerified(false)
         ;
@@ -109,10 +109,13 @@ class RegistrationController extends AbstractController
                 'app_verify_email', 
                 $user, 
                 (new TemplatedEmail())
-                    ->from(new Address('no-reply@resq18.com', 'ResQ 18'))
+                    ->from(new Address('no-reply@resq18.com', 'RESQ18'))
                     ->to($user->getEmail())
-                    ->subject('E-mail de confirmation')
-                    ->htmlTemplate('/registration/confirmation_email.html.twig')
+                    ->subject('Confirmation de votre inscription')
+                    ->htmlTemplate('/emails/confirmation_inscription.html.twig')
+                    ->context([
+                        'username' => $user->getUsername()
+                    ])
             );
 
             return new JsonResponse($user, JsonResponse::HTTP_CREATED);         
@@ -121,7 +124,7 @@ class RegistrationController extends AbstractController
             return new JsonResponse(['error' => 'Cette adresse e-mail est déjà utilisée.'], JsonResponse::HTTP_BAD_REQUEST);
         } 
         catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Une erreur est survenue.'], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(['error' => $e->getMessage()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }  
     }
 
@@ -140,9 +143,34 @@ class RegistrationController extends AbstractController
             $this->emailVerifier->handleEmailConfirmation($request, $user);
         }
         catch (VerifyEmailExceptionInterface $exception) {
-            return $this->render('email_confirmation.html.twig', ['message' => $exception->getReason()]);
+            return $this->render('invalid_link.html.twig', ['id' => $id]);
         }
 
         return $this->render('email_confirmation.html.twig', ['message' => 'Votre adresse email a été confirmée.']);
+    }
+
+    #[Route('/invalid_link/{id}', name: 'app_invalid_link', methods:['GET'])]
+
+    public function invalidConfirmationLink (User $user): Response
+    {
+
+        if (!$user) {
+            return $this->render('email_confirmation.html.twig', ['message' => 'Utilisateur inconnu.']);
+        }
+    
+        $this->emailVerifier->sendEmailConfirmation(
+            'app_verify_email', 
+            $user, 
+            (new TemplatedEmail())
+                ->from(new Address('no-reply@resq18.com', 'RESQ18'))
+                ->to($user->getEmail())
+                ->subject('Nouveau lien de confirmation')
+                ->htmlTemplate('/emails/invalid_link.html.twig')
+                ->context([
+                    'username' => $user->getUsername()
+                ])
+        );
+
+        return $this->render('email_confirmation.html.twig', ['message' => 'Un nouveau lien de confirmation vous a été envoyé.']);
     }
 }
