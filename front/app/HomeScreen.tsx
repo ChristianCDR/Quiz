@@ -39,12 +39,17 @@ export default function HomeScreen({route}: Props) {
         updateScores,
         setUpdateScores,
         screenToReach,
-        setScreenToReach 
+        setScreenToReach,
+        profilePhoto 
     } = context;
 
     const scoresChunckedArray = scores.slice(0,3);
 
     const jsonAxiosInstance = customAxiosInstance('application/json');
+
+    const baseUrl = 'http://192.168.1.161:8000/uploads/images/';
+
+    const [imageUri, setImageUri] = useState<string>(baseUrl + 'default.png');
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -82,7 +87,11 @@ export default function HomeScreen({route}: Props) {
 
     useEffect(() => {
         if (screenToReach) {settingsNavigation(screenToReach, navigation); setScreenToReach(null)};
-    },[screenToReach])
+    },[screenToReach, profilePhoto])
+
+    useEffect(() => {
+        setImageUri(baseUrl + profilePhoto);
+    }, [profilePhoto])
 
     const handleNavigation = (id: number, name: string) => {
         setCategoryId(id);
@@ -108,7 +117,7 @@ export default function HomeScreen({route}: Props) {
                 <View style={styles.user}>    
                     <TouchableOpacity onPress={() => navigation.navigate('Account')}>          
                         <Image
-                            source={require('../assets/images/myAvatar.png')}
+                            source={{uri: imageUri}}
                             style={styles.circularImgView}
                         />
                     </TouchableOpacity>

@@ -54,10 +54,10 @@ const customAxiosInstance = (value: string) => {
 
 export const refreshAccessToken = async () => {
     const { refreshToken }  = await getTokens () || { refreshToken: null };
-    const multipartAxiosInstance = customAxiosInstance('multipart/form-data');
+    const jsonAxiosInstance = customAxiosInstance('application/json');
 
     try {
-        const response = await multipartAxiosInstance.post('/api/v1/refreshToken', { token: refreshToken });
+        const response = await jsonAxiosInstance.post('/api/v1/refreshToken', { token: refreshToken });
 
         if (response.data.token) {
             const { accessToken, refreshToken } = response.data;

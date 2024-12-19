@@ -15,6 +15,7 @@ export function ContextProvider ({children}: Children) {
     const [email, setEmail] = useState<string|null>(null);
     const [updateScores, setUpdateScores] = useState<boolean>(false);
     const [screenToReach, setScreenToReach] = useState<string|null>(null);
+    const [profilePhoto, setProfilePhoto] = useState<string|null>('default.png');
 
     const showModal = () => setModalVisible(true);
     const hideModal = () => setModalVisible(false);
@@ -43,7 +44,9 @@ export function ContextProvider ({children}: Children) {
             updateScores, 
             setUpdateScores,
             screenToReach, 
-            setScreenToReach
+            setScreenToReach,
+            profilePhoto,
+            setProfilePhoto
         }}>
         
             {children}

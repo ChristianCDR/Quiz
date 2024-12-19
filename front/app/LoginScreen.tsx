@@ -8,8 +8,6 @@ import { RootStackNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 // Crud photo de profile
-// Lien de confirmation expiré ou invalide
-
 // Boucles de loading 
 // Audio jeu
 
@@ -43,7 +41,7 @@ export default function LoginScreen ({route}: Props) {
 
     if (!context) throw new Error ('Context returned null');
       
-    const { setUserId, setUsername, email, setEmail}  = context;
+    const { setUserId, setUsername, email, setEmail, setProfilePhoto }  = context;
 
     const jsonAxiosInstance = customAxiosInstance('application/json');
 
@@ -61,12 +59,13 @@ export default function LoginScreen ({route}: Props) {
           if (response.status === 200) {
             const accessToken = response.data.accessToken;
             const refreshToken = response.data.refreshToken;
-            const userId = response.data.userId;
 
             await storeTokens(accessToken, refreshToken);
-            setUserId(userId);
+            setUserId(response.data.userId);
             setUsername(response.data.username);
             setEmail(response.data.email);
+            setProfilePhoto(response.data.profilePhoto);
+
             navigation.navigate('Tabs', { screen: 'Home'});
           }
       }

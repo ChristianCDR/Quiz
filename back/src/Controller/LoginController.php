@@ -98,6 +98,7 @@ class LoginController extends AbstractController
             'email' => $user->getEmail(),
             'username' => $user->getUsername(),
             'userId' => $user->getId(),
+            'profilePhoto' => $user->getProfilePhoto(),
             'accessToken' => $token,
             'refreshToken' => $refreshToken->getToken()
         ], JsonResponse::HTTP_OK);

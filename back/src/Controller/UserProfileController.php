@@ -5,9 +5,10 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\ResetPasswordType;
 use App\Security\EmailVerifier;
+use App\Service\FileHandler;
+use App\Service\PasswordResetService;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Service\PasswordResetService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,6 +25,9 @@ use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class UserProfileController extends AbstractController
 {
@@ -35,6 +39,7 @@ class UserProfileController extends AbstractController
     private $userRepository;
     private $passwordResetService;
     private $mailer;
+    private $fileHandler;
     
     public function __construct (
         JWTTokenManagerInterface $jwtManager, 
@@ -46,6 +51,7 @@ class UserProfileController extends AbstractController
         EmailVerifier $emailVerifier,
         PasswordResetService $passwordResetService,
         MailerInterface $mailer,
+        FileHandler $fileHandler
     ) 
     {
         $this->entityManager = $entityManager;
@@ -57,6 +63,7 @@ class UserProfileController extends AbstractController
         $this->emailVerifier = $emailVerifier;
         $this->passwordResetService = $passwordResetService;
         $this->mailer = $mailer;
+        $this->fileHandler= $fileHandler;
     }
     
     #[Route('/api/v1/reset/password', name: 'app_reset_password', methods: ['PUT'])]
@@ -346,12 +353,144 @@ class UserProfileController extends AbstractController
         //     foreach ($form->getErrors(true) as $error) {
         //         echo $error->getMessage() . '<br>';
         //     }
-        // }
+        // }new OA\RequestBody
 
         return $this->render('/reset_password.html.twig', [
             'form' => $form,
         ]);
     }
 
-    //ecrire la route des photos de profil ici
+    #[Route('/api/v1/set_profile_photo', name:'app_set_profile_photo', methods:['POST'])]
+    #[OA\Post(
+        summary:"Upload profile photo",
+        tags: ['Profile'],
+        requestBody: new OA\RequestBody(
+            content: [
+                new OA\MediaType(
+                    mediaType: "multipart/form-data",
+                    schema: new OA\Schema(
+                        type: 'object',
+                        properties: [
+                            new OA\Property(property: 'profile_photo', type: 'string', format: 'binary')
+                        ]
+                    )
+                )
+            ]
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Image téléchargée et enregistrée.',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'message', type: 'string', example: 'Image téléchargée et enregistrée.')
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 400,
+                description: 'Aucun fichier reçu',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'error', type: 'string', example: 'Aucun fichier reçu.')
+                    ]
+                )
+            )
+        ]
+    )]
+    public function set_profile_photo (Request $request): JsonResponse
+    {
+        $file = $request->files->get('profile_photo');
+
+        $max_file_size = 10 * 1024 * 1024;
+
+        $mimeType = $file->getClientMimeType();
+
+        switch (true) {
+            case (!$file): 
+                return new JsonResponse(['error' => 'Fichier non reçu.'], JsonResponse::HTTP_BAD_REQUEST);
+                break;
+            case ($file->getSize() > $max_file_size): 
+                return new JsonResponse(['error' => 'Le fichier est trop volumineux.'], JsonResponse::HTTP_BAD_REQUEST);
+                break;
+            case (!in_array($mimeType, ['image/jpg', 'image/jpeg', 'image/png'])): 
+                return new JsonResponse('Type MIME non supporté : ' . $mimeType, JsonResponse::HTTP_BAD_REQUEST);
+                break;
+        }
+
+        $response = $this->fileHandler->upload($file);
+
+        if($response['status'] == 'success') {
+            $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
+
+            $user= $this->userRepository->findOneBy(['email' => $decodedJwtToken['email']]);
+
+            if (!$user) {
+                throw $this->createNotFoundException('Utilisateur non trouvé');
+            }
+
+            $oldPhotoName = $user->getProfilePhoto();
+
+            $this->fileHandler->delete($oldPhotoName);
+
+            $user->setProfilePhoto($response['filename']);
+
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+
+            return new JsonResponse(['message' => $response['message'], 'filename' => $response['filename']], JsonResponse::HTTP_OK);
+        }
+        else return new JsonResponse(['error' => $response['message']], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);   
+    }
+
+    #[Route('/api/v1/delete_profile_photo/{id}', name:'app_delete_profile_photo', methods:['DELETE'])]
+    #[OA\Delete(
+        summary:"Delete profile photo",
+        tags: ['Profile'],
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer'),
+                description: 'The ID of the user',
+                example: 5
+            )
+        ],
+        responses: [
+            new OA\Response(
+                response: 204,
+                description: 'Image supprimée.'
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Fichier introuvable.',
+                content: new OA\JsonContent(
+                    type: 'object',
+                    properties: [
+                        new OA\Property(property: 'error', type: 'string', example: 'Fichier introuvable.')
+                    ]
+                )
+            )
+        ]
+    )]
+    public function delete_profile_photo (User $user): JsonResponse
+    {
+        if(!$user) {
+            return new JsonResponse(['error' => 'Utilisateur introuvable.'], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        $filename = $user->getProfilePhoto();
+
+        $this->fileHandler->delete($filename);
+
+        $user->setProfilePhoto('default.png');
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return new JsonResponse([], JsonResponse::HTTP_NO_CONTENT);
+    }
 }
