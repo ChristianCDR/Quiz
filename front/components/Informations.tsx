@@ -1,30 +1,32 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { Context } from '@/utils/Context';
-import { Buffer } from 'buffer';
 import * as SecureStore from 'expo-secure-store';
 import customAxiosInstance from '@/api/Interceptors';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackNavigationProp } from '@/utils/Types';
 import { emailValidator, usernameValidator }  from '@/utils/Validators';
-import pickImageFromGallery from '@/utils/HandleProfilePhoto';
-import {View, StyleSheet, Text, TextInput, Image, TouchableOpacity} from 'react-native';
+import { pickImageFromGallery, deleteProfilePhoto } from '@/utils/HandleProfilePhoto';
+import { View, StyleSheet, Text, TextInput, Image, TouchableOpacity } from 'react-native';
 import handleLogout from '@/utils/HandleLogout';
 
 export default function Informations () {
     const [emptyEmail, setEmptyEmail] = useState<boolean>(false);
     const [emptyUsername, setEmptyUsername] = useState<boolean>(false);
-    const [photoExists, setPhotoExists] = useState<boolean>(false);
     const [message, setMessage] = useState<string>();
     const [error, setError] = useState<string>();
-    const [disabled, setDisabled] = useState<boolean>(true);
+    const [disabled, setDisabled] = useState<boolean>(true);   
 
     const context = useContext(Context);
 
     if (!context) throw new Error ('Context returned null');
       
-    const { username, setUsername, email, setEmail }  = context;
+    const { username, setUsername, email, setEmail, profilePhoto }  = context;
 
     const navigation = useNavigation<RootStackNavigationProp>();
+
+    const baseUrl = 'http://192.168.1.161:8000/uploads/images/';
+
+    const [imageUri, setImageUri] = useState<string>(baseUrl + 'default.png');
 
     const handleChange = (field: string, value: string) => {
         if (field === 'email') setEmail(value);
@@ -32,7 +34,7 @@ export default function Informations () {
         setDisabled(false);
     }
 
-    const handlePress = async () => {
+    const handleSave = async () => {
         switch ('') {
             case email: 
                 setEmptyEmail(true);
@@ -82,30 +84,28 @@ export default function Informations () {
         } 
     }
 
+    useEffect(() => {
+        setImageUri(baseUrl + profilePhoto);
+    }, [profilePhoto])
+
     return (
         <View style = {styles.container}>
             <Text style = {styles.title}> Dites Cheeeeeeese ! 😁🧀</Text>
             <View style = {styles.profilePhoto}>   
                 <Image
-                    source={require('../assets/images/myAvatar.png')}
+                    source={{uri: imageUri}}
                     style={styles.circularImgView}
                 />
-                <View>
-                    { photoExists ? 
-                        <View style= {styles.doubleButtons}>
-                            <TouchableOpacity style = {styles.button} onPress={() => {}}> 
-                                <Text style = {styles.buttonText}>Modifier</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style = {styles.button} onPress={() => {}}> 
-                                <Text style = {styles.buttonText}>Supprimer</Text>
-                            </TouchableOpacity>
-                        </View>
+                <View>      
+                    <TouchableOpacity style = {styles.button} onPress={() => pickImageFromGallery(context)}> 
+                        <Text style = {styles.buttonText}>Modifier</Text>
+                    </TouchableOpacity>
+                    { profilePhoto !== 'default.png' &&
                     
-                    :
-                        <TouchableOpacity style = {styles.button} onPress={() => {}}> 
-                            <Text style = {styles.buttonText}>Ajouter</Text>
-                        </TouchableOpacity>
-                    }  
+                        <TouchableOpacity style = {styles.button} onPress={() => deleteProfilePhoto(context)}> 
+                            <Text style = {styles.buttonText}>Supprimer</Text>
+                        </TouchableOpacity>                    
+                    }            
                 </View>
             </View>
             
@@ -136,7 +136,7 @@ export default function Informations () {
                     autoCapitalize="none"
                 />
             </View>
-            <TouchableOpacity style = {[styles.button, disabled && {backgroundColor: '#8e8989'}]} onPress={handlePress} disabled={disabled}>
+            <TouchableOpacity style = {[styles.button, disabled && {backgroundColor: '#8e8989'}]} onPress={handleSave} disabled={disabled}>
                 <Text style = {styles.buttonText}> Enregistrer </Text>
             </TouchableOpacity>
 
@@ -167,8 +167,8 @@ const styles = StyleSheet.create({
         width: 120,
         height: 120,
         borderRadius: 75,
-        borderColor: 'orange',
-        borderWidth: 1
+        borderColor: '#1E3C58',
+        borderWidth: 1.5
     },
     infos: {
         marginVertical: 20
@@ -195,7 +195,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: '#1E3C58',
         height: 40,
-        width: 150
+        width: 150,
+        marginBottom: 10
     },
     buttonText: {
         fontSize: 16,
@@ -205,14 +206,12 @@ const styles = StyleSheet.create({
     },
     deleteButton: {
         borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#1E3C58',
         height: 40,
         width: '90%',
         backgroundColor: '#e0e0e0',
         marginHorizontal: 'auto',
         marginVertical: 100
-    },
-    doubleButtons: {
-        height: 90,
-        justifyContent: 'space-between'
     }
 })

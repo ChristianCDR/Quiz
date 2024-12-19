@@ -37,6 +37,7 @@ services:
     container_name: php
     volumes:
       - ../back:/var/www/html
+      - ./docker-fpm.ini:/usr/local/etc/php/conf.d/docker-fpm.ini
     depends_on:
       - database
       - mailer

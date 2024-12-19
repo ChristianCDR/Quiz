@@ -68,6 +68,8 @@ export type ContextType = {
     setUpdateScores: (value: boolean) => void;
     screenToReach: string | null;
     setScreenToReach: (value: string | null ) => void;
+    profilePhoto: string | null;
+    setProfilePhoto: (value: string | null ) => void;
 }
 
 export type ErrorType = string | null
