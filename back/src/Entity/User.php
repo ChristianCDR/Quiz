@@ -82,6 +82,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'player', targetEntity: UserScore::class, orphanRemoval: true)]
     private Collection $userScores;
 
+    #[ORM\Column(length: 255)]
+    private ?string $profile_photo = null;
+
     public function __construct()
     {
         $this->userScores = new ArrayCollection();
@@ -207,6 +210,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $userScore->setPlayer(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getProfilePhoto(): ?string
+    {
+        return $this->profile_photo;
+    }
+
+    public function setProfilePhoto(string $profile_photo): static
+    {
+        $this->profile_photo = $profile_photo;
 
         return $this;
     }

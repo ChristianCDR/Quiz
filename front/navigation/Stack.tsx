@@ -11,7 +11,7 @@ import AccountScreen from '@/app/AccountScreen';
 import ForgotPasswordScreen from '@/app/ForgotPasswordScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
-ForgotPasswordScreen
+
 const AppNavigator = () => {
     return (
         <Stack.Navigator initialRouteName='Login' screenOptions={{ headerShown: false }}>
