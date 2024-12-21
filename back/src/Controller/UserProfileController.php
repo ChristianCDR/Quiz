@@ -113,7 +113,7 @@ class UserProfileController extends AbstractController
         $new_password = $data['newPassword']?? '';
 
         if ($old_password === '' || $new_password === '') {
-            return new JsonResponse(['Error' => 'Veuillez fournir l\'ancien et le nouveau mot de passe.'], JsonResponse::HTTP_BAD_REQUEST);
+            return new JsonResponse(['error' => 'Veuillez fournir l\'ancien et le nouveau mot de passe.'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
@@ -125,11 +125,11 @@ class UserProfileController extends AbstractController
         }
 
         if(!$this->passwordHasher->isPasswordValid($user, $old_password)) {
-            return new JsonResponse(['Error' => 'L\'ancien mot de passe est incorrect.'], JsonResponse::HTTP_BAD_REQUEST);
+            return new JsonResponse(['error' => 'L\'ancien mot de passe est incorrect.'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         try {
-            $this->passwordResetService->resetPassword($new_password);
+            $this->passwordResetService->resetPassword($new_password, $user);
             return new JsonResponse(['message' => 'Mot de passe modifié avec succès!'], JsonResponse::HTTP_OK);
         }
         catch (\Exception $e) {
@@ -184,7 +184,7 @@ class UserProfileController extends AbstractController
         $newUsername = $data['username']?? '';
 
         if ($newEmail === '' || $newUsername === '') {
-            return new JsonResponse(['Error' => 'Veuillez des informations valides'], JsonResponse::HTTP_BAD_REQUEST);
+            return new JsonResponse(['error' => 'Veuillez des informations valides'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
@@ -206,7 +206,7 @@ class UserProfileController extends AbstractController
             foreach ($errors as $error) {
                 $errorMessages[] = $error->getMessage();
             }
-            return new JsonResponse(['Errors' => $errorMessages], JsonResponse::HTTP_BAD_REQUEST);
+            return new JsonResponse(['errors' => $errorMessages], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         $userFromNewEmail = $this->userRepository->findOneBy(['email' => $newEmail]);
@@ -227,9 +227,9 @@ class UserProfileController extends AbstractController
                 'app_verify_email', 
                 $user, 
                 (new TemplatedEmail())
-                    ->from(new Address('no-reply@resq18.com', 'ResQ 18'))
+                    ->from(new Address('no-reply@resq18.com', 'RESQ18'))
                     ->to($user->getEmail())
-                    ->subject('Confirmez votre nouveau mail')
+                    ->subject('Confirmez votre nouvelle adresse email')
                     ->htmlTemplate('/registration/confirmation_email.html.twig')
             );
 
@@ -239,7 +239,7 @@ class UserProfileController extends AbstractController
             ], JsonResponse::HTTP_OK);        
         }
         catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Une erreur est survenue.'], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(['error' => $e->getMessage()], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         } 
     }
 
@@ -334,7 +334,7 @@ class UserProfileController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $new_password = $form->get('password')->getData();
             
-            $this->passwordResetService->reset_password($new_password, $user);
+            $this->passwordResetService->resetPassword($new_password, $user);
 
             $email = (new TemplatedEmail())
                 ->from(new Address('no-reply@resq18.com', 'RESQ18'))

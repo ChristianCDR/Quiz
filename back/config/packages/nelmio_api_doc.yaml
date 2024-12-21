@@ -5,18 +5,18 @@ nelmio_api_doc:
             description: An awesome app!
             version: 1.0.0
         tags:
+            - name: 'Auth'
+              description: 'Endpoints related to user authentication'
+            - name: 'Profile'
+              description: 'Endpoints related to user infos management'
             - name: 'Categories'
               description: 'Endpoints related to categories'
             - name: 'Questions'
               description: 'Endpoints related to questions'
+            - name: 'User score'
+              description: 'Endpoints related to user score'        
             - name: 'User'
               description: 'Endpoints related to user management'
-            - name: 'Auth'
-              description: 'Endpoints related to user Authentication'
-            - name: 'User score'
-              description: 'Endpoints related to user score'
-            - name: 'Profile'
-              description: 'Endpoints related to user infos management'
         components:
             securitySchemes:
                 Bearer:

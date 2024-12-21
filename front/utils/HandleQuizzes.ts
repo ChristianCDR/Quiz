@@ -5,7 +5,7 @@ export const fetchQuizzesByCategoryId = async (categoryId: number) => {
     
    try {
         const jsonAxiosInstance = customAxiosInstance('application/json');
-        const response = await jsonAxiosInstance.get(`/api/questions/category/${categoryId}`);
+        const response = await jsonAxiosInstance.get(`/api/v1/questions/category/${categoryId}`);
 
         if (response.data) {
             const result = chunkData(response.data, 10);
