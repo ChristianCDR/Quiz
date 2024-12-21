@@ -46,7 +46,7 @@ class FileHandler
     {
         $filePath = $this->getTargetDirectory().$filename;
         
-        if(file_exists($filePath)) {
+        if(file_exists($filePath) && $filename !== 'default.png') {
             unlink($filePath);
         } 
     }

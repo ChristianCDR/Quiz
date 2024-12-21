@@ -92,7 +92,7 @@ class LoginController extends AbstractController
         }
 
         $token = $this->JWTManager->create($user);
-        $refreshToken = $this->refreshTokenManager->createRefreshToken($user->getEmail());
+        $refreshToken = $this->refreshTokenManager->createRefreshToken($user);
 
         return new JsonResponse ([
             'email' => $user->getEmail(),
@@ -154,13 +154,12 @@ class LoginController extends AbstractController
             return new JsonResponse(['error' => 'Refresh token invalide ou expiré'], JsonResponse::HTTP_UNAUTHORIZED);  
         }
 
-        $refreshTokenUser = $this->refreshTokenManager->getUserIdentifierFromRefreshToken($refreshToken);
-
-        $userIdentifier = $refreshTokenUser->getUserIdentifier();
+        $userIdentifier = $this->refreshTokenManager->getUserIdentifierFromRefreshToken($refreshToken);
         
-        $user = $this->userRepository->findOneBy(['email'=>$userIdentifier]);
+        $user = $this->userRepository->findOneBy(['email'=>$userIdentifier->getEmail()]);
 
         $newJWTToken = $this->JWTManager->create($user);
+        
         $newRefreshToken = $this->refreshTokenManager->updateRefreshToken($refreshToken, $userIdentifier);
             
         return new JsonResponse([

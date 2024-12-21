@@ -29,7 +29,7 @@ class PasswordResetService
         $this->userRepository = $userRepository;
     }
 
-    public function reset_password (string $new_password, $user): void
+    public function resetPassword (string $new_password, $user): void
     {
         
         $errors = $this->validator->validate($user->setPassword($new_password));

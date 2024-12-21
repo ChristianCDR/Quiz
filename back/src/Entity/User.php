@@ -85,6 +85,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $profile_photo = null;
 
+    #[ORM\OneToOne(mappedBy: 'userIdentifier', cascade: ['persist', 'remove'])]
+    private ?RefreshToken $refreshToken = null;
+
     public function __construct()
     {
         $this->userScores = new ArrayCollection();
@@ -222,6 +225,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setProfilePhoto(string $profile_photo): static
     {
         $this->profile_photo = $profile_photo;
+
+        return $this;
+    }
+
+    public function getRefreshToken(): ?RefreshToken
+    {
+        return $this->refreshToken;
+    }
+
+    public function setRefreshToken(?RefreshToken $refreshToken): static
+    {
+        $this->refreshToken = $refreshToken;
 
         return $this;
     }

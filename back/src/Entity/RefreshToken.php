@@ -16,11 +16,12 @@ class RefreshToken
     #[ORM\Column(length: 255)]
     private ?string $token = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $userIdentifier = null;
-
     #[ORM\Column]
     private ?\DateTime $expiresAt = null;
+
+    #[ORM\OneToOne(inversedBy: 'refreshToken')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $userIdentifier = null;
 
     public function getId(): ?int
     {
@@ -39,12 +40,12 @@ class RefreshToken
         return $this;
     }
 
-    public function getUserIdentifier(): ?string
+    public function getUserIdentifier(): ?User
     {
         return $this->userIdentifier;
     }
 
-    public function setUserIdentifier(string $userIdentifier): static
+    public function setUserIdentifier(User $userIdentifier): static
     {
         $this->userIdentifier = $userIdentifier;
 
@@ -62,4 +63,5 @@ class RefreshToken
 
         return $this;
     }
+
 }

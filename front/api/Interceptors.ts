@@ -3,7 +3,7 @@ import { storeTokens, getTokens } from './Auth';
 
 const customAxiosInstance = (value: string) => {
     const instance = axios.create({
-        baseURL: 'http://192.168.1.161:8000',
+        baseURL: 'http://192.168.197.43:8000',
         headers: { 'Content-Type': value, Accept: value }
     });
 

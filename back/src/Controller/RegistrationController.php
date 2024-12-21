@@ -81,6 +81,7 @@ class RegistrationController extends AbstractController
             ->setEmail($data['email'] ?? '')
             ->setUsername($data['username'] ?? '')
             ->setPassword($data['password'] ?? '')
+            ->setProfilePhoto('default.png')
             ->setIsVerified(false)
         ;
 

@@ -8,7 +8,7 @@ const handleLogout = async () => {
     try {
         // revoke refreshToken
         const jsonAxiosInstance = customAxiosInstance('application/json');
-        await jsonAxiosInstance.post('/api/logout', { 'refreshToken': refreshToken });
+        await jsonAxiosInstance.post('/api/v1/logout', { 'refreshToken': refreshToken });
         //suppression du secureStore
         await SecureStore.deleteItemAsync ('accessToken');
         await SecureStore.deleteItemAsync ('refreshToken');
