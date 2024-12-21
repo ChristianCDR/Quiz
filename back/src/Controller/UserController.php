@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Security\EmailVerifier;
+use App\Service\FileHandler;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,6 +28,7 @@ class UserController extends AbstractController
     private $passwordHasher;
     private $validator;
     private $userRepository;
+    private $fileHandler;
     
     public function __construct (
         JWTTokenManagerInterface $jwtManager, 
@@ -34,7 +36,8 @@ class UserController extends AbstractController
         EntityManagerInterface $entityManager,
         UserPasswordHasherInterface $passwordHasher,
         ValidatorInterface $validator,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        FileHandler $fileHandler
     ) 
     {
         $this->entityManager = $entityManager;
@@ -43,6 +46,7 @@ class UserController extends AbstractController
         $this->validator = $validator;
         $this->userRepository = $userRepository;
         $this->tokenStorageInterface = $tokenStorageInterface;
+        $this->fileHandler = $fileHandler;
     }
 
     #[Route('/', name: 'app_user_index', methods: ['GET'])]
@@ -236,26 +240,16 @@ class UserController extends AbstractController
             ], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        // $this->entityManager->persist($user);
-        // $this->entityManager->flush();
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
 
         return new JsonResponse ($data, JsonResponse::HTTP_OK);
     }
 
-    #[Route('/{id}', name: 'app_user_delete', methods: ['DELETE'])]
+    #[Route('/delete', name: 'app_user_delete', methods: ['DELETE'])]
     #[OA\Delete(
         summary: 'Delete an user by ID',
         tags: ['User'],
-        parameters: [
-            new OA\Parameter(
-                name: 'id',
-                in: 'path',
-                required: true,
-                schema: new OA\Schema(type: 'integer'),
-                description: 'The ID of the user to delete',
-                example: 5
-            )
-        ],
         responses: [
             new OA\Response(
                 response: 204,
@@ -273,19 +267,23 @@ class UserController extends AbstractController
             )
         ]
     )]
-    public function delete(Request $request, User $user): JsonResponse
+    public function delete(): JsonResponse
     {
+        $decodedToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
+
+        $user = $this->userRepository->findOneBy(['email' => $decodedToken['email']]);
+
         if (!$user) {
-            return new JsonResponse([
-                'error' => 'User not found'
-            ], JsonResponse::HTTP_NOT_FOUND);
+            return new JsonResponse(['error' => 'Utilisateur introuvable.'], JsonResponse::HTTP_NOT_FOUND);
         }
+
+        $profilePhoto = $user->getProfilePhoto();
+
+        $this->fileHandler->delete($profilePhoto);
 
         $this->entityManager->remove($user);
         $this->entityManager->flush();
 
-        return new JsonResponse([
-            'message' => 'User deleted successfully'
-        ], JsonResponse::HTTP_NO_CONTENT);
+        return new JsonResponse([], JsonResponse::HTTP_NO_CONTENT);
     }
 }

@@ -47,7 +47,7 @@ export default function HomeScreen({route}: Props) {
 
     const jsonAxiosInstance = customAxiosInstance('application/json');
 
-    const baseUrl = 'http://192.168.1.161:8000/uploads/images/';
+    const baseUrl = 'http://192.168.197.43:8000/uploads/images/';
 
     const [imageUri, setImageUri] = useState<string>(baseUrl + 'default.png');
 
@@ -86,8 +86,11 @@ export default function HomeScreen({route}: Props) {
     },[updateScores]);
 
     useEffect(() => {
-        if (screenToReach) {settingsNavigation(screenToReach, navigation); setScreenToReach(null)};
-    },[screenToReach, profilePhoto])
+        if (screenToReach) {
+            settingsNavigation(screenToReach, navigation); 
+            setScreenToReach(null)
+        };
+    },[screenToReach])
 
     useEffect(() => {
         setImageUri(baseUrl + profilePhoto);

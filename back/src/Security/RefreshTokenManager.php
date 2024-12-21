@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use App\Entity\User;
 use App\Entity\RefreshToken;
 use App\Repository\RefreshTokenRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,10 +20,14 @@ class RefreshTokenManager
         $this->refreshTokenRepository = $refreshTokenRepository;
     }
 
-    public function createRefreshToken (string $userIdentifier): RefreshToken 
+    public function createRefreshToken (User $userIdentifier): RefreshToken 
     {
+        $refreshToken = $this->refreshTokenRepository->findOneBy(['userIdentifier' => $userIdentifier]);
+
+        if (!$refreshToken) $refreshToken = new RefreshToken ();
+        
         $token = bin2hex(random_bytes(32));
-        $refreshToken = new RefreshToken ();
+        
         $refreshToken
             ->setToken($token)
             ->setExpiresAt((new \DateTime())->modify('+30 days'))
@@ -64,16 +69,16 @@ class RefreshTokenManager
         return true;
     }
 
-    public function getUserIdentifierFromRefreshToken (string $token): ?RefreshToken
+    public function getUserIdentifierFromRefreshToken (string $token): ?User
     {
         $refreshToken = $this->refreshTokenRepository->findOneBy(['token' => $token]);
 
-        $refreshToken->getUserIdentifier();
+        $userIdentifier = $refreshToken->getUserIdentifier();
 
-        return $refreshToken;
+        return $userIdentifier;
     }
 
-    public function updateRefreshToken(string $token, string $userIdentifier): ?RefreshToken
+    public function updateRefreshToken(string $token, User $userIdentifier): ?RefreshToken
     {
         $refreshToken = $this->refreshTokenRepository->findOneBy(['token' => $token]);
 

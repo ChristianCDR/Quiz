@@ -18,7 +18,7 @@ export default function SettingsModal () {
     const handleAlert = () => {
         Alert.alert(
             'Confirmation',
-            'Êtes-vous sûr de vouloir vous déconnecter ?',
+            'Souhaitez-vous vraiment vous déconnecter ?',
             [
                 {
                     text: "Annuler",
@@ -63,7 +63,7 @@ export default function SettingsModal () {
         hideModal();
     }
 
-    const goToInfos = () => {
+    const goToLegal = () => {
         setScreenToReach('Legal');
         hideModal();
     }
@@ -95,7 +95,7 @@ export default function SettingsModal () {
                                 <Feather name="mail" size={24} color="white" />
                                 <Text style={styles.modalText}>Nous contacter</Text>
                             </Pressable>
-                            <Pressable style = {styles.pressable} onPress={goToInfos}>
+                            <Pressable style = {styles.pressable} onPress={goToLegal}>
                                 <Feather name="list" size={24} color="white" />
                                 <Text style={styles.modalText}>Informations légales</Text>
                             </Pressable>

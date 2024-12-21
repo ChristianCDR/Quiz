@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackNavigationProp } from '@/utils/Types';
 import { emailValidator, usernameValidator }  from '@/utils/Validators';
 import { pickImageFromGallery, deleteProfilePhoto } from '@/utils/HandleProfilePhoto';
-import { View, StyleSheet, Text, TextInput, Image, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, TextInput, Image, TouchableOpacity, Alert } from 'react-native';
 import handleLogout from '@/utils/HandleLogout';
 
 export default function Informations () {
@@ -24,9 +24,11 @@ export default function Informations () {
 
     const navigation = useNavigation<RootStackNavigationProp>();
 
-    const baseUrl = 'http://192.168.1.161:8000/uploads/images/';
+    const baseUrl = 'http://192.168.197.43:8000/uploads/images/';
 
     const [imageUri, setImageUri] = useState<string>(baseUrl + 'default.png');
+
+    const jsonAxiosInstance = customAxiosInstance('application/json');
 
     const handleChange = (field: string, value: string) => {
         if (field === 'email') setEmail(value);
@@ -55,8 +57,8 @@ export default function Informations () {
             }
           
             try {   
-                const jsonAxiosInstance = customAxiosInstance('application/json');
-                const response = await jsonAxiosInstance.put('/api/v1/user/reset/user_infos', body)       
+                const response = await jsonAxiosInstance.put('/api/v1/reset/user_infos', body)     
+
                 if (response.data) {
                     setMessage(response.data.message);
                     setDisabled(true);
@@ -84,13 +86,44 @@ export default function Informations () {
         } 
     }
 
+    const handleAccountRemoval = () => {
+        
+        Alert.alert(
+            'Confirmation',
+            'Souhaitez-vous vraiment supprimer votre compte ?',
+            [
+                {
+                    text: "Non",
+                    style: "cancel",
+                },
+                {
+                    text: "Oui",
+                    onPress: async () => { 
+                        handleLogout();
+                        await jsonAxiosInstance.delete('/api/v1/user/delete')
+                        .then(async() => {
+                            navigation.navigate('Register');
+                            navigation.reset({
+                                index: 0,
+                                routes: [{ name: 'Register' }]
+                            });
+                        })
+                        .catch(error => console.error("Erreur lors de la suppression du compte :", error));
+                    }
+                    ,
+                    style: "destructive",
+                }
+            ]
+        );   
+    }
+
     useEffect(() => {
         setImageUri(baseUrl + profilePhoto);
     }, [profilePhoto])
 
     return (
         <View style = {styles.container}>
-            <Text style = {styles.title}> Dites Cheeeeeeese ! 😁🧀</Text>
+            <Text style = {styles.title}> Cheeeeeeese ! 😁🧀</Text>
             <View style = {styles.profilePhoto}>   
                 <Image
                     source={{uri: imageUri}}
@@ -140,7 +173,7 @@ export default function Informations () {
                 <Text style = {styles.buttonText}> Enregistrer </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style = {styles.deleteButton}>
+            <TouchableOpacity style = {styles.deleteButton} onPress={handleAccountRemoval}>
                 <Text style = {[styles.buttonText,  {color: '#000'}]}> Supprimer mon compte </Text>
             </TouchableOpacity>
         </View>
