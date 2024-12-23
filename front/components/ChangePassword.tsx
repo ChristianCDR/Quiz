@@ -39,6 +39,8 @@ export default function ChangePassword () {
     }, [confirmPassword])
 
     const handlePress = async () => {
+        setError('');
+        
         switch ('') {
             case oldPassword: 
                 setEmptyOldPassword(true);
@@ -71,7 +73,7 @@ export default function ChangePassword () {
 
                 try {
                     const jsonAxiosInstance = customAxiosInstance('application/json');
-                    const response = await jsonAxiosInstance.put('/api/v1/user/reset/password', body);
+                    const response = await jsonAxiosInstance.put('/api/v1/reset/password', body);
                     if(response.data)  {
                         setMessage(response.data.message);
                         setOldPassword('');
@@ -82,7 +84,7 @@ export default function ChangePassword () {
                 }
                 catch (error: any) {
                     if (error.response) {
-                        setError(error.response.data);
+                        setError(error.response.data.error);
                     } else {
                         setError('Une erreur est survenue. Veuillez réessayer.');
                     }
@@ -99,7 +101,7 @@ export default function ChangePassword () {
                 Vous souhaitez changer votre mot de passe ? {"\n"}
                 Vous êtes au bon endroit 👍 ! 
             </Text>
-            {error? 
+            {error ? 
               <View>
                 <Text style={styles.errorText}>{error}</Text>
               </View> : message &&

@@ -23,10 +23,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class RegistrationController extends AbstractController 
 {   
     private EmailVerifier $emailVerifier;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(EmailVerifier $emailVerifier)
+    public function __construct(EmailVerifier $emailVerifier, EntityManagerInterface $entityManager)
     {
         $this->emailVerifier = $emailVerifier;
+        $this->entityManager = $entityManager;
     }
 
     #[Route('/api/v1/register', name: 'app_register', methods: ['POST'])]
@@ -81,6 +83,7 @@ class RegistrationController extends AbstractController
             ->setEmail($data['email'] ?? '')
             ->setUsername($data['username'] ?? '')
             ->setPassword($data['password'] ?? '')
+            ->setProfilePhoto('default.png')
             ->setIsVerified(false)
         ;
 
@@ -134,19 +137,24 @@ class RegistrationController extends AbstractController
         $id = $request->query->get('id'); 
 
         if (null === $id) {
-            return $this->render('email_confirmation.html.twig', ['message' => 'Le lien ne contient pas votre identifiant.']);
+            return $this->render('/pages/email_confirmation.html.twig', ['message' => 'Le lien ne contient pas votre identifiant.']);
         }
     
         $user = $userRepository->find($id);
 
         try {
             $this->emailVerifier->handleEmailConfirmation($request, $user);
+            
+            $user->setIsVerified(true);
+
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
         }
         catch (VerifyEmailExceptionInterface $exception) {
-            return $this->render('invalid_link.html.twig', ['id' => $id]);
+            return $this->render('/pages/invalid_link.html.twig', ['id' => $id]);
         }
 
-        return $this->render('email_confirmation.html.twig', ['message' => 'Votre adresse email a été confirmée.']);
+        return $this->render('/pages/email_confirmation.html.twig', ['message' => 'Votre adresse email a été confirmée.']);
     }
 
     #[Route('/invalid_link/{id}', name: 'app_invalid_link', methods:['GET'])]
@@ -155,7 +163,7 @@ class RegistrationController extends AbstractController
     {
 
         if (!$user) {
-            return $this->render('email_confirmation.html.twig', ['message' => 'Utilisateur inconnu.']);
+            return $this->render('/pages/email_confirmation.html.twig', ['message' => 'Utilisateur inconnu.']);
         }
     
         $this->emailVerifier->sendEmailConfirmation(
@@ -171,6 +179,6 @@ class RegistrationController extends AbstractController
                 ])
         );
 
-        return $this->render('email_confirmation.html.twig', ['message' => 'Un nouveau lien de confirmation vous a été envoyé.']);
+        return $this->render('/pages/email_confirmation.html.twig', ['message' => 'Un nouveau lien de confirmation vous a été envoyé.']);
     }
 }

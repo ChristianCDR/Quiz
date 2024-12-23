@@ -21,7 +21,8 @@ export default function RegisterScreen () {
     const navigation = useNavigation<RootStackNavigationProp>();
   
     const handleRegister = async () => {
-
+      setError('');
+      
       switch ('') {
         case email: 
             setEmptyEmail(true);
@@ -47,7 +48,7 @@ export default function RegisterScreen () {
         case usernameValidator(username.trim()):
           setError('Veuillez saisir un nom d\'utilisateur valide');
           break;
-        case password === '' && passwordValidator(password):
+        case passwordValidator(password):
           setError("Le mot de passe doit contenir au minimum: " + '\n' 
             + "1 chiffre" + '\n' 
             + "8 caractères" + '\n' 
@@ -73,8 +74,7 @@ export default function RegisterScreen () {
         }
         catch(error: any) {
           if (error.response) {
-            setError(error.response.data);
-            console.log(error.response.data)
+            setError(error.response.data.error);
           } else {
             setError('Une erreur est survenue. Veuillez réessayer.');
           }
