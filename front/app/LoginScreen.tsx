@@ -7,8 +7,12 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
-// Crud photo de profile
+// IMPORTANT: probleme sur la page Informations
+
+// probleme lorsque le user refait le quiz
+
 // Boucles de loading 
+
 // Audio jeu
 
 // Notifications push
@@ -18,6 +22,8 @@ import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image } from 'reac
 // info legales
 // icone de l'appli
 // Aide  & contact => creer un mail gmail pour l'instant
+
+// page Legal
 // Captureref
 
 // Bruteforce
@@ -46,6 +52,7 @@ export default function LoginScreen ({route}: Props) {
     const jsonAxiosInstance = customAxiosInstance('application/json');
 
     const handleLogin = async () => {
+      setError('');
       if (email === null) setEmptyEmail(true);
       if (password === null) setEmptyPassword(true);
 
@@ -66,7 +73,7 @@ export default function LoginScreen ({route}: Props) {
             setEmail(response.data.email);
             setProfilePhoto(response.data.profilePhoto);
 
-            navigation.navigate('Tabs', { screen: 'Home'});
+            navigation.replace('Tabs', { screen: 'Home'});
           }
       }
       catch (error: any) {

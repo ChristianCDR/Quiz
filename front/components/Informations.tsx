@@ -6,8 +6,9 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackNavigationProp } from '@/utils/Types';
 import { emailValidator, usernameValidator }  from '@/utils/Validators';
 import { pickImageFromGallery, deleteProfilePhoto } from '@/utils/HandleProfilePhoto';
-import { View, StyleSheet, Text, TextInput, Image, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, TextInput, Image, TouchableOpacity, Alert } from 'react-native';
 import handleLogout from '@/utils/HandleLogout';
+import { Buffer } from 'buffer';
 
 export default function Informations () {
     const [emptyEmail, setEmptyEmail] = useState<boolean>(false);
@@ -24,9 +25,11 @@ export default function Informations () {
 
     const navigation = useNavigation<RootStackNavigationProp>();
 
-    const baseUrl = 'http://192.168.1.161:8000/uploads/images/';
+    const baseUrl = 'http://192.168.197.43:8000/uploads/images/';
 
     const [imageUri, setImageUri] = useState<string>(baseUrl + 'default.png');
+
+    const jsonAxiosInstance = customAxiosInstance('application/json');
 
     const handleChange = (field: string, value: string) => {
         if (field === 'email') setEmail(value);
@@ -35,6 +38,8 @@ export default function Informations () {
     }
 
     const handleSave = async () => {
+        setError('');
+
         switch ('') {
             case email: 
                 setEmptyEmail(true);
@@ -55,20 +60,29 @@ export default function Informations () {
             }
           
             try {   
-                const jsonAxiosInstance = customAxiosInstance('application/json');
-                const response = await jsonAxiosInstance.put('/api/v1/user/reset/user_infos', body)       
+                
+                const response = await jsonAxiosInstance.put('/api/v1/reset/user_infos', body)     
+
                 if (response.data) {
+                    console.log(response)
                     setMessage(response.data.message);
                     setDisabled(true);
 
                     const token = await SecureStore.getItemAsync ('accessToken');
+                    // on decode le jwt accessToken
                     const parts = token?.split('.').map((part) => Buffer.from(part.replace(/-/g, '+').replace(/_/g, '/'),'base64').toString());
 
                     if (parts) {
                         const payload = JSON.parse(parts[1]);
                         payload?.email !== response.data.email ? setTimeout(() => {
                             handleLogout()
-                            .then(() => navigation.navigate('Login', {message: 'Veuillez confirmer votre nouvelle adresse mail'+ '\n' +'et vous reconnecter'}))
+                            .then(() => {
+                                navigation.navigate('Login', {message: 'Veuillez confirmer votre nouvelle adresse mail'+ '\n' +'et vous reconnecter'})
+                                navigation.reset({
+                                    index: 0,
+                                    routes: [{ name : 'Login' }]
+                                });
+                            })          
                             .catch(error => console.error("Erreur lors de la déconnexion :", error));
                         }, 3000) : ''
                     }
@@ -78,10 +92,42 @@ export default function Informations () {
                 if (error.response) {
                   setError(error.response.data.error);
                 } else {
+                console.log(error);
                   setError('Une erreur est survenue. Veuillez réessayer.');
                 }
             }  
         } 
+    }
+
+    const handleAccountRemoval = () => {
+        
+        Alert.alert(
+            'Confirmation',
+            'Souhaitez-vous vraiment supprimer votre compte ?',
+            [
+                {
+                    text: "Non",
+                    style: "cancel",
+                },
+                {
+                    text: "Oui",
+                    onPress: async () => { 
+                        handleLogout();
+                        await jsonAxiosInstance.delete('/api/v1/user/delete')
+                        .then(async() => {
+                            navigation.navigate('Register');
+                            navigation.reset({
+                                index: 0,
+                                routes: [{ name: 'Register' }]
+                            });
+                        })
+                        .catch(error => console.error("Erreur lors de la suppression du compte :", error));
+                    }
+                    ,
+                    style: "destructive",
+                }
+            ]
+        );   
     }
 
     useEffect(() => {
@@ -90,7 +136,7 @@ export default function Informations () {
 
     return (
         <View style = {styles.container}>
-            <Text style = {styles.title}> Dites Cheeeeeeese ! 😁🧀</Text>
+            <Text style = {styles.title}> Cheeeeeeese ! 😁🧀</Text>
             <View style = {styles.profilePhoto}>   
                 <Image
                     source={{uri: imageUri}}
@@ -140,7 +186,7 @@ export default function Informations () {
                 <Text style = {styles.buttonText}> Enregistrer </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style = {styles.deleteButton}>
+            <TouchableOpacity style = {styles.deleteButton} onPress={handleAccountRemoval}>
                 <Text style = {[styles.buttonText,  {color: '#000'}]}> Supprimer mon compte </Text>
             </TouchableOpacity>
         </View>

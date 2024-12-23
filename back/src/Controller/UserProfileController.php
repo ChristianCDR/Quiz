@@ -51,7 +51,7 @@ class UserProfileController extends AbstractController
         EmailVerifier $emailVerifier,
         PasswordResetService $passwordResetService,
         MailerInterface $mailer,
-        FileHandler $fileHandler
+        FileHandler $fileHandler,
     ) 
     {
         $this->entityManager = $entityManager;
@@ -63,7 +63,7 @@ class UserProfileController extends AbstractController
         $this->emailVerifier = $emailVerifier;
         $this->passwordResetService = $passwordResetService;
         $this->mailer = $mailer;
-        $this->fileHandler= $fileHandler;
+        $this->fileHandler = $fileHandler;
     }
     
     #[Route('/api/v1/reset/password', name: 'app_reset_password', methods: ['PUT'])]
@@ -113,7 +113,7 @@ class UserProfileController extends AbstractController
         $new_password = $data['newPassword']?? '';
 
         if ($old_password === '' || $new_password === '') {
-            return new JsonResponse(['Error' => 'Veuillez fournir l\'ancien et le nouveau mot de passe.'], JsonResponse::HTTP_BAD_REQUEST);
+            return new JsonResponse(['error' => 'Veuillez fournir l\'ancien et le nouveau mot de passe.'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
@@ -125,11 +125,11 @@ class UserProfileController extends AbstractController
         }
 
         if(!$this->passwordHasher->isPasswordValid($user, $old_password)) {
-            return new JsonResponse(['Error' => 'L\'ancien mot de passe est incorrect.'], JsonResponse::HTTP_BAD_REQUEST);
+            return new JsonResponse(['error' => 'L\'ancien mot de passe est incorrect.'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         try {
-            $this->passwordResetService->resetPassword($new_password);
+            $this->passwordResetService->resetPassword($new_password, $user);
             return new JsonResponse(['message' => 'Mot de passe modifié avec succès!'], JsonResponse::HTTP_OK);
         }
         catch (\Exception $e) {
@@ -182,9 +182,9 @@ class UserProfileController extends AbstractController
 
         $newEmail = $data['email']?? '';
         $newUsername = $data['username']?? '';
-
+        
         if ($newEmail === '' || $newUsername === '') {
-            return new JsonResponse(['Error' => 'Veuillez des informations valides'], JsonResponse::HTTP_BAD_REQUEST);
+            return new JsonResponse(['error' => 'Veuillez saisir des informations valides'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
@@ -194,6 +194,9 @@ class UserProfileController extends AbstractController
         if (!$user) {
             throw $this->createNotFoundException('Utilisateur non trouvé');
         }
+
+        $oldEmail = $user->getEmail();
+        $oldUsername = $user->getUsername();
 
         $errors = $this->validator->validate(
             $user
@@ -206,41 +209,41 @@ class UserProfileController extends AbstractController
             foreach ($errors as $error) {
                 $errorMessages[] = $error->getMessage();
             }
-            return new JsonResponse(['Errors' => $errorMessages], JsonResponse::HTTP_BAD_REQUEST);
+            return new JsonResponse(['errors' => $errorMessages], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        $userFromNewEmail = $this->userRepository->findOneBy(['email' => $newEmail]);
+        $userExists = $this->userRepository->findOneBy(['email' => $newEmail]);
 
-        if ($userFromNewEmail) return new JsonResponse(['error' => 'Cette adresse e-mail est déjà utilisée.'], JsonResponse::HTTP_BAD_REQUEST);
+        if ($newEmail !== $oldEmail && $userExists) return new JsonResponse(['error' => 'Cette adresse e-mail est déjà utilisée.'], JsonResponse::HTTP_BAD_REQUEST);
 
         $user
             ->setEmail($newEmail)
             ->setUsername($newUsername)
             ->setIsVerified(false)
+            ->setOldEmail($oldEmail)
         ;
-        
-        try {
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
 
+        if ($newEmail !== $oldEmail) {
             $this->emailVerifier->sendEmailConfirmation(
-                'app_verify_email', 
-                $user, 
+                'app_confirm_email_reset', 
+                $user,
                 (new TemplatedEmail())
-                    ->from(new Address('no-reply@resq18.com', 'ResQ 18'))
-                    ->to($user->getEmail())
-                    ->subject('Confirmez votre nouveau mail')
-                    ->htmlTemplate('/registration/confirmation_email.html.twig')
+                    ->from(new Address('no-reply@resq18.com', 'RESQ18'))
+                    ->to($user->getOldEmail())
+                    ->subject('Modification de votre adresse email')
+                    ->htmlTemplate('/emails/reset_credentials.html.twig')
+                    ->context(['username' => $oldUsername])
             );
+        }   
 
-            return new JsonResponse([
-                'message' => 'Vos informations ont été mis à jour.',
-                'email' => $user->getEmail()
-            ], JsonResponse::HTTP_OK);        
-        }
-        catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Une erreur est survenue.'], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
-        } 
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return new JsonResponse([
+            'message' => 'Vos informations ont été mis à jour.',
+            'email' => $user->getEmail()
+        ], JsonResponse::HTTP_OK);        
+        
     }
 
     #[Route('/api/v1/reset/send_password_email', name: 'app_send_password_email', methods: ['POST'])]
@@ -324,7 +327,7 @@ class UserProfileController extends AbstractController
         $user = $this->userRepository->find($user_id);
 
         if (!$user) {
-            return $this->render('email_confirmation.html.twig', ['message' => 'Utilisateur non trouvé. Veuillez réessayer.']);
+            return $this->render('/pages/email_confirmation.html.twig', ['message' => 'Utilisateur non trouvé. Veuillez réessayer.']);
         }
         else $user->setPassword('');
 
@@ -334,7 +337,7 @@ class UserProfileController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $new_password = $form->get('password')->getData();
             
-            $this->passwordResetService->reset_password($new_password, $user);
+            $this->passwordResetService->resetPassword($new_password, $user);
 
             $email = (new TemplatedEmail())
                 ->from(new Address('no-reply@resq18.com', 'RESQ18'))
@@ -347,7 +350,7 @@ class UserProfileController extends AbstractController
             
             $this->mailer->send($email);
 
-            return $this->render('email_confirmation.html.twig', ['message' => 'Votre mot de passe a été modifié avec succès.']);
+            return $this->render('/pages/email_confirmation.html.twig', ['message' => 'Votre mot de passe a été modifié avec succès.']);
         }
         // else {
         //     foreach ($form->getErrors(true) as $error) {
@@ -492,5 +495,66 @@ class UserProfileController extends AbstractController
         $this->entityManager->flush();
 
         return new JsonResponse([], JsonResponse::HTTP_NO_CONTENT);
+    }
+
+    #[Route('/confirm_email_reset', name: 'app_confirm_email_reset')]
+    public function confirm_email_reset (Request $request)
+    {
+        $id = $request->query->get('id'); 
+
+        if (null === $id) {
+            return $this->render('/pages/email_confirmation.html.twig', ['message' => 'Le lien ne contient pas votre identifiant.']);
+        }
+    
+        $user = $this->userRepository->find($id);
+
+        try {
+
+            $this->emailVerifier->handleEmailConfirmation($request, $user);   
+        }
+        catch (VerifyEmailExceptionInterface $exception) {
+            return $this->render('/pages/invalid_link.html.twig', ['id' => $id]);
+        }
+
+        $this->emailVerifier->sendEmailConfirmation(
+            'app_verify_email', 
+            $user, 
+            (new TemplatedEmail())
+                ->from(new Address('no-reply@resq18.com', 'RESQ18'))
+                ->to($user->getEmail())
+                ->subject('Confirmation de votre inscription')
+                ->htmlTemplate('/emails/confirmation_inscription.html.twig')
+                ->context([
+                    'username' => $user->getUsername()
+                ])
+        );
+
+        return $this->render('/pages/email_confirmation.html.twig', ['message' => 'Merci d\'avoir confirmé. Vous allez bientôt recevoir un email sur votre nouvelle adresse.']);
+    }
+
+    #[Route('/reset_credentials', name: 'app_reset_credentials', methods: ['GET'])]
+    public function reset_credentials (Request $request): Response
+    {
+
+        // $email = (new TemplatedEmail())
+            //     ->from(new Address('no-reply@resq18.com', 'RESQ18'))
+            //     ->to($user->getOldEmail())
+            //     ->subject('Modification de votre adresse email')
+            //     ->htmlTemplate('/emails/reset_credentials.html.twig')
+            //     ->context(['username' => $oldUsername])
+            // ;
+
+            // $this->mailer->send($email);
+
+        $form = $this->createForm(ResetCredentialsType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+        }
+
+        return $this->render('/pages/reset_credentials.html.twig', [
+            'form' => $form
+        ]);
     }
 }
