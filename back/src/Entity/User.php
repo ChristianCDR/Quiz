@@ -34,7 +34,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Assert\NotBlank(message: "Le mot de passe ne peut pas être vide.", groups: ['reset_password'])]
+    #[Assert\NotBlank(message: "Le mot de passe ne peut pas être vide.", groups: ['/pages/reset_password'])]
     #[Assert\Length(
         min: 8,
         minMessage: "Votre mot de passe doit comporter au moins {{ limit }} caractères."
@@ -87,6 +87,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToOne(mappedBy: 'userIdentifier', cascade: ['persist', 'remove'])]
     private ?RefreshToken $refreshToken = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $oldEmail = null;
 
     public function __construct()
     {
@@ -237,6 +240,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRefreshToken(?RefreshToken $refreshToken): static
     {
         $this->refreshToken = $refreshToken;
+
+        return $this;
+    }
+
+    public function getOldEmail(): ?string
+    {
+        return $this->oldEmail;
+    }
+
+    public function setOldEmail(?string $oldEmail): static
+    {
+        $this->oldEmail = $oldEmail;
 
         return $this;
     }
