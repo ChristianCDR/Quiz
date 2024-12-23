@@ -56,7 +56,7 @@ class ResetPasswordType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
-            'validation_groups' => ['/pages/reset_password']
+            'validation_groups' => ['reset_password']
         ]);
     }
 }

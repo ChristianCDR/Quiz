@@ -34,7 +34,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Assert\NotBlank(message: "Le mot de passe ne peut pas être vide.", groups: ['/pages/reset_password'])]
+    #[Assert\NotBlank(message: "Le mot de passe ne peut pas être vide.", groups: ['reset_password'])]
     #[Assert\Length(
         min: 8,
         minMessage: "Votre mot de passe doit comporter au moins {{ limit }} caractères."
