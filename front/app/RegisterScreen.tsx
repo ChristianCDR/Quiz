@@ -21,7 +21,8 @@ export default function RegisterScreen () {
     const navigation = useNavigation<RootStackNavigationProp>();
   
     const handleRegister = async () => {
-
+      setError('');
+      
       switch ('') {
         case email: 
             setEmptyEmail(true);
