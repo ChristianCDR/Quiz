@@ -7,8 +7,6 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
-// IMPORTANT: probleme sur la page Informations
-
 // probleme lorsque le user refait le quiz
 
 // Boucles de loading 
@@ -16,6 +14,7 @@ import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image } from 'reac
 // Audio jeu
 
 // Notifications push
+
 // Publicités
 
 // mentionner  l'origine des pics de l'appli
