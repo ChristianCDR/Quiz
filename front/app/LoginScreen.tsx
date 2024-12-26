@@ -7,8 +7,6 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
-// envoyer un mail pour mot de passe modifié
-
 // probleme lorsque le user refait le quiz
 
 // Boucles de loading 
