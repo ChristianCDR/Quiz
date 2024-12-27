@@ -2,10 +2,14 @@ import React from 'react';
 import * as Progress from 'react-native-progress';
 import { useNavigation } from '@react-navigation/native';
 import { Score, RootStackNavigationProp } from "@/utils/Types";
-import {View, StyleSheet, TouchableOpacity, Dimensions, Text} from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Dimensions, Text } from 'react-native';
 import { fetchQuizzesByCategoryId } from '@/utils/HandleQuizzes';
 
-export default function DisplayScores ({scores}: {scores: Score[]}) {
+type Props = {
+    scores: Score[]
+}
+
+export default function DisplayScores ({scores}: Props) {
     const screenWidth = Dimensions.get('window').width;
     const navigation = useNavigation<RootStackNavigationProp>();
 

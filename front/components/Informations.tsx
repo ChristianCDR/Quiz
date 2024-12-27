@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackNavigationProp } from '@/utils/Types';
 import { emailValidator, usernameValidator }  from '@/utils/Validators';
 import { pickImageFromGallery, deleteProfilePhoto } from '@/utils/HandleProfilePhoto';
-import { View, StyleSheet, Text, TextInput, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, StyleSheet, Text, TextInput, Image, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import handleLogout from '@/utils/HandleLogout';
 import { Buffer } from 'buffer';
 
@@ -16,6 +16,7 @@ export default function Informations () {
     const [message, setMessage] = useState<string>();
     const [error, setError] = useState<string>();
     const [disabled, setDisabled] = useState<boolean>(true);   
+    const [loading, setLoading] = useState<boolean>();
 
     const context = useContext(Context);
 
@@ -25,7 +26,7 @@ export default function Informations () {
 
     const navigation = useNavigation<RootStackNavigationProp>();
 
-    const baseUrl = 'http://192.168.197.43:8000/uploads/images/';
+    const baseUrl = 'http://192.168.1.161:8000/uploads/images/';
 
     const [imageUri, setImageUri] = useState<string>(baseUrl + 'default.png');
 
@@ -54,13 +55,15 @@ export default function Informations () {
         }
 
         if (email && username && emailValidator(email) && usernameValidator(username.trim())) {
+            setLoading(true);
+
             const body = {
               "email": email,
               "username": username.trim()
             }
           
             try {   
-                
+
                 const response = await jsonAxiosInstance.put('/api/v1/reset/user_infos', body)     
 
                 if (response.data) {
@@ -96,6 +99,9 @@ export default function Informations () {
                   setError('Une erreur est survenue. Veuillez réessayer.');
                 }
             }  
+            finally{
+                setLoading(false);
+            }
         } 
     }
 
@@ -165,6 +171,9 @@ export default function Informations () {
                         <Text style={[styles.errorText, {color: '#008000'}]}>{message}</Text>
                     </View>
                 }
+
+                { loading && <ActivityIndicator size="large" color="white" />}
+                
                 <TextInput
                     style={[styles.input, emptyEmail && styles.errorBox]}
                     placeholder="Email"

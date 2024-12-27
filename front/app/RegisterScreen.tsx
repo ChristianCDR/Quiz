@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { emailValidator, passwordValidator, usernameValidator }  from '@/utils/Validators';
 import { RootStackNavigationProp } from '@/utils/Types';
 import { useNavigation } from '@react-navigation/native';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image } from 'react-native';
+import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image, ActivityIndicator } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import customAxiosInstance from '@/api/Interceptors';
 
@@ -18,11 +18,12 @@ export default function RegisterScreen () {
     const [emptyUsername, setEmptyUsername] = useState<boolean>(false);
     const [emptyConfirm, setEmptyConfirm] = useState<boolean>(false);
     const [emptyPassword, setEmptyPassword] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>();
     const navigation = useNavigation<RootStackNavigationProp>();
   
     const handleRegister = async () => {
       setError('');
-      
+
       switch ('') {
         case email: 
             setEmptyEmail(true);
@@ -46,19 +47,22 @@ export default function RegisterScreen () {
           setError('Veuillez saisir un e-mail valide.');
           break;
         case usernameValidator(username.trim()):
-          setError('Veuillez saisir un nom d\'utilisateur valide');
+          setError('Veuillez saisir un nom d\'utilisateur valide.');
           break;
         case passwordValidator(password):
           setError("Le mot de passe doit contenir au minimum: " + '\n' 
-            + "1 chiffre" + '\n' 
+            + "1 chiffre  " 
             + "8 caractères" + '\n' 
-            + "1 lettre miniscule" + '\n' 
-            + "1 lettre majuscule"  + '\n' 
-            + "1 caractère spécial: @ $ ! % * ? & ");
+            + "1 lettre miniscule  "   
+            + "1 lettre majuscule"  + '\n'  
+            + "1 caractère spécial: @ $ ! % * ? & "
+          );
           break;
       }
  
       if (emailValidator(email) && usernameValidator(username.trim()) && passwordValidator(password)) {
+        setLoading(true);
+
         const body = {
           "email": email,
           "username": username.trim(),
@@ -74,11 +78,15 @@ export default function RegisterScreen () {
         }
         catch(error: any) {
           if (error.response) {
+            // console.log(error.response)
             setError(error.response.data.error);
           } else {
             setError('Une erreur est survenue. Veuillez réessayer.');
           }
         }  
+        finally {
+        setLoading(false);
+        }
       }   
     }
 
@@ -95,11 +103,14 @@ export default function RegisterScreen () {
             <View style={styles.logoView}>
               <Image style={styles.logo} source={require('../assets/images/resq18.png')}/>
             </View>
-            {error? 
+            {error &&
               <View>
                 <Text style={styles.errorText}>{error}</Text>
-              </View>: ''
+              </View>
             }
+
+            { loading && <ActivityIndicator size="large" color="white" /> }
+
             <Text style={styles.title}>Inscription</Text>
             <TextInput
                 style={[styles.input, emptyEmail && styles.errorBox]}
@@ -142,7 +153,7 @@ export default function RegisterScreen () {
             </TouchableOpacity>
     
             <TouchableOpacity onPress={() => navigation.navigate('Login', {message: null})}>
-                <Text style={styles.linkText}>Déjà inscrit ? Connectez-vous</Text>
+                <Text style={styles.linkText}>Déjà inscrit(e)? Connectez-vous</Text>
             </TouchableOpacity>   
         </View>
     )
