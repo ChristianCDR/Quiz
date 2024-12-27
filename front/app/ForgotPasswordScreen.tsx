@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useState, useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import BackButton from '@/components/BackButton';
@@ -10,6 +10,7 @@ export default function ForgotPassword () {
     const [emptyEmail, setEmptyEmail] = useState<boolean>(false);
     const [error, setError] = useState<string>();
     const [info, setInfo] = useState<string>();
+    const [loading, setLoading] = useState<boolean>();
 
     const navigation = useNavigation<RootStackNavigationProp>();
 
@@ -22,6 +23,10 @@ export default function ForgotPassword () {
     const jsonAxiosInstance = customAxiosInstance('application/json');
 
     const handleForgotPassword = async () => {
+        setError('');
+
+        setLoading(true);
+
         if (email === null) setEmptyEmail(true);
         
         const body = {
@@ -31,10 +36,10 @@ export default function ForgotPassword () {
         try {
             const response = await jsonAxiosInstance.post('/api/v1/reset/send_password_email', body);
             if (response.status === 200) {
-                setInfo('Un e-mail vous a été envoyé.')
+                setInfo('Un e-mail vous a été envoyé.');
                 
                 setTimeout(() => {
-                    navigation.navigate('Login', { message: null});
+                    navigation.navigate('Login', { message: null });
                 }, 3000);
             }
         }
@@ -45,6 +50,9 @@ export default function ForgotPassword () {
               setError("L'opération a échoué. Veuillez réessayer...");
               console.log(error);
             }
+        }
+        finally {
+            setLoading(false);
         }
     }
 
@@ -58,6 +66,7 @@ export default function ForgotPassword () {
                 associée à votre compte. Un lien vous sera envoyé pour vous permettre de 
                 <Text style={{ fontWeight: 'bold' }}> réinitialiser votre mot de passe. </Text> 
             </Text>
+            { loading && <ActivityIndicator size="large" color="white" /> }
             <TextInput
                 style={[styles.input, emptyEmail && styles.errorBox]} 
                 placeholder="Email"
@@ -72,10 +81,10 @@ export default function ForgotPassword () {
           <View>
             <Text>{info}</Text>
           </View>
-          { error? 
+          { error &&
             <View>
               <Text style={styles.errorText}>{error}</Text>
-            </View>: ''
+            </View>
           }
         </View>
     )

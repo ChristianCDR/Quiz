@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, StatusBar } from "react-native";
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, StatusBar, ActivityIndicator } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { QuizzesByCategoryScreenRouteProp, RootStackNavigationProp, Question } from "@/utils/Types";
 import BackButton from "@/components/BackButton";
@@ -12,6 +12,8 @@ type Props = {
 
 export default function QuizzesByCategoryScreen ({route} : Props) {
     const [quizzes, setQuizzes] = useState<Question[][]>();
+    const [loading, setLoading] = useState<boolean>(true);
+
     const navigation = useNavigation<RootStackNavigationProp>();
 
     const context = useContext(Context);
@@ -23,6 +25,7 @@ export default function QuizzesByCategoryScreen ({route} : Props) {
     useEffect(()=> {
         const setQuizzesArray = async () => {
             const quizzes = await fetchQuizzesByCategoryId(categoryId); 
+            if (quizzes) setLoading (false);
             setQuizzes(quizzes);
         }
         setQuizzesArray();
@@ -53,6 +56,8 @@ export default function QuizzesByCategoryScreen ({route} : Props) {
                 ) : (
                 <Text style = {{textAlign: 'center'}} >Pas de quiz disponible pour l'instant.</Text>
                 )}
+
+            { loading && <ActivityIndicator size="large" color="white" /> }
             </ScrollView>       
         </View>
     );

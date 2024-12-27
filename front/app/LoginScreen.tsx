@@ -5,11 +5,9 @@ import { Context } from '@/utils/Context';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 
-// probleme lorsque le user refait le quiz
-
-// Boucles de loading 
+// page Legal
 
 // Audio jeu
 
@@ -22,7 +20,7 @@ import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image } from 'reac
 // icone de l'appli
 // Aide  & contact => creer un mail gmail pour l'instant
 
-// page Legal
+
 // Captureref
 
 // Bruteforce
@@ -38,6 +36,7 @@ export default function LoginScreen ({route}: Props) {
     const [secureText, setSecureText] = useState<boolean>(true);
     const [emptyEmail, setEmptyEmail] = useState<boolean>(false);
     const [emptyPassword, setEmptyPassword] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>();
 
     const navigation = useNavigation<RootStackNavigationProp>();
     const {message} = route.params;
@@ -52,6 +51,8 @@ export default function LoginScreen ({route}: Props) {
 
     const handleLogin = async () => {
       setError('');
+      setLoading(true);
+
       if (email === null) setEmptyEmail(true);
       if (password === null) setEmptyPassword(true);
 
@@ -79,10 +80,13 @@ export default function LoginScreen ({route}: Props) {
         if (error.response) {
           setError(error.response.data.error);
         } else {
-          setError('La connexion a échoué.. Veuillez réessayer..');
+          setError('La connexion a échoué. Veuillez réessayer.');
           console.log(error)
         }
       }
+      finally {
+        setLoading(false);
+      } 
     }
 
     const toggleSecureText = () => {
@@ -103,6 +107,8 @@ export default function LoginScreen ({route}: Props) {
               <Text style={styles.errorText}>{error}</Text>
             </View>: ''
           }
+          
+          { loading && <ActivityIndicator size="large" color="white" /> }
           
           <View>
             <Text style={[styles.linkText, {color: 'yellow'}]}>{message}</Text>
