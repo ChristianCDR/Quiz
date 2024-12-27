@@ -25,9 +25,8 @@ export default function ScoreScreen () {
             <ScrollView>
                 <BackButton navigation={navigation} />
                 <Text style={styles.title}>Scores</Text>
-                
+                <DisplayScores scores = {scores} />
             </ScrollView>
-            <DisplayScores scores = {scores} />
         </View>
     )
 }
