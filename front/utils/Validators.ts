@@ -3,9 +3,9 @@ export function emailValidator (email: string) {
     return reg.test(email)    
 }
 
-export function usernameValidator (userName: string) {
+export function usernameValidator (username: string) {
     const reg = /^[\w\s\-]{1,30}$/ 
-    return reg.test(userName)
+    return reg.test(username)
 }
 
 export function passwordValidator (password: string) {
