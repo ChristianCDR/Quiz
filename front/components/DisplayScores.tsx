@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import * as Progress from 'react-native-progress';
 import { useNavigation } from '@react-navigation/native';
 import { Score, RootStackNavigationProp } from "@/utils/Types";
 import { View, StyleSheet, TouchableOpacity, Dimensions, Text } from 'react-native';
 import { fetchQuizzesByCategoryId } from '@/utils/HandleQuizzes';
+import { Context } from '@/utils/Context';
 
 type Props = {
     scores: Score[]
@@ -12,6 +13,7 @@ type Props = {
 export default function DisplayScores ({scores}: Props) {
     const screenWidth = Dimensions.get('window').width;
     const navigation = useNavigation<RootStackNavigationProp>();
+    const context = useContext(Context);
 
     const handlePress = async (index: number, categoryName: string, categoryId: number) => {
         
@@ -19,6 +21,12 @@ export default function DisplayScores ({scores}: Props) {
             throw new Error ('CategoryId est null');
         } 
 
+        if (!context) throw new Error ('Context returned null');
+
+        const { setQuizNumber } = context;
+        
+        setQuizNumber(index);
+        
         const quizzes =  await fetchQuizzesByCategoryId(categoryId);
 
         if (quizzes) navigation.navigate('Quiz', {quizData: quizzes[index-1], 'categoryName': categoryName });

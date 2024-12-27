@@ -11,8 +11,6 @@ import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image, ActivityInd
 
 // page Legal
 
-// Boucles de loading 
-
 // Audio jeu
 
 // Notifications push

@@ -172,7 +172,7 @@ export default function Informations () {
                     </View>
                 }
 
-                { loading && <ActivityIndicator size="large" color="white" />}
+                { loading && <ActivityIndicator size="large" color="white" /> }
                 
                 <TextInput
                     style={[styles.input, emptyEmail && styles.errorBox]}
