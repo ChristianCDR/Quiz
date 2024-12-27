@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import customAxiosInstance from '@/api/Interceptors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import {View, StyleSheet, Text, TextInput, Pressable, TouchableOpacity} from 'react-native';
+import {View, StyleSheet, Text, TextInput, Pressable, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { passwordValidator }  from '@/utils/Validators';
 
 export default function ChangePassword () {
@@ -17,6 +17,7 @@ export default function ChangePassword () {
     const [message, setMessage] = useState<string>();
     const [error, setError] = useState<string>();
     const [disabled, setDisabled] = useState<boolean>(true);
+    const [loading, setLoading] = useState<boolean>();
 
     const toggleSecureText = (value: number) => {
         switch (value) {
@@ -58,13 +59,15 @@ export default function ChangePassword () {
         if (newPassword === confirmPassword) {
             if (!passwordValidator(newPassword)) {
                 setError("Le mot de passe doit contenir au minimum: " + '\n' 
-                + "1 chiffre" + '\n' 
-                + "8 caractères" + '\n' 
-                + "1 lettre miniscule" + '\n' 
-                + "1 lettre majuscule"  + '\n' 
-                + "1 caractère spécial: @ $ ! % * ? & ")
+                    + "1 chiffre  " 
+                    + "8 caractères" + '\n' 
+                    + "1 lettre miniscule  "   
+                    + "1 lettre majuscule"  + '\n'  
+                    + "1 caractère spécial: @ $ ! % * ? & "
+                )
             }
             else {
+                setLoading(true);
                 // call api pour update le mdp
                 const body = {
                     'oldPassword': oldPassword,
@@ -89,6 +92,9 @@ export default function ChangePassword () {
                         setError('Une erreur est survenue. Veuillez réessayer.');
                     }
                 }
+                finally {
+                    setLoading(false);
+                }
 
             }
         }
@@ -109,6 +115,9 @@ export default function ChangePassword () {
                     <Text style={[styles.errorText, {color: '#008000'}]}>{message}</Text>
                 </View>
             }
+
+            { loading && <ActivityIndicator size="large" color="white" />}
+
             <View>
                 <TextInput
                     style={[styles.input, emptyOldPassword && styles.errorBox]}

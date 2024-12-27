@@ -47,7 +47,7 @@ export default function HomeScreen({route}: Props) {
 
     const jsonAxiosInstance = customAxiosInstance('application/json');
 
-    const baseUrl = 'http://192.168.197.43:8000/uploads/images/';
+    const baseUrl = 'http://192.168.1.161:8000/uploads/images/';
 
     const [imageUri, setImageUri] = useState<string>(baseUrl + 'default.png');
 
@@ -58,7 +58,7 @@ export default function HomeScreen({route}: Props) {
                 setCategory(response.data);
            }
            catch (error) {
-                const errMessage = (error as Error).message;
+                // const errMessage = (error as Error).message;
                 setError('Le chargement a échoué :(');
            }
            finally {
@@ -76,8 +76,11 @@ export default function HomeScreen({route}: Props) {
                 setScores(response.data.scores); 
             }
             catch (error) {
-                const errMessage = (error as Error).message;
+                // const errMessage = (error as Error).message;
                 setError('Le chargement a échoué :(');
+            }
+            finally {
+                setLoading(false);
             }
         }
 
@@ -100,14 +103,6 @@ export default function HomeScreen({route}: Props) {
         setCategoryId(id);
         setCategoryName(name);
         navigation.navigate('QuizzesByCategory');
-    }
-
-    if (loading) {
-        return (
-          <View style={styles.container}>
-            <ActivityIndicator size="large" color="#0000ff" />
-          </View>
-        );
     }
 
     return (
@@ -147,6 +142,7 @@ export default function HomeScreen({route}: Props) {
                     showsHorizontalScrollIndicator={false} 
                     contentContainerStyle={styles.categoryScrollContainer}
                 >
+                    { loading && <ActivityIndicator size="large" color="white" /> }
                     {data.length > 0 ? (
                         data.map((category) => ( 
                             <TouchableOpacity key={category.id} style={styles.category} onPress={()=> handleNavigation(category.id, category.categoryName)}>
@@ -159,8 +155,8 @@ export default function HomeScreen({route}: Props) {
                 </ScrollView>
 
                 <Text style={[styles.title, styles.recentTitle]}>Récents</Text>
-
-                <DisplayScores scores = {scoresChunckedArray}/>
+                { loading && <ActivityIndicator size="large" color="white" /> }
+                <DisplayScores scores = {scoresChunckedArray} />
   
             </ScrollView>  
 
