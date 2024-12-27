@@ -18,8 +18,7 @@ use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Attributes as OA;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
- 
-    // mise en cache
+
 #[Route('/api/v1/score')]
 class UserScoreController extends AbstractController
 {
@@ -158,15 +157,15 @@ class UserScoreController extends AbstractController
 
         foreach ($values as $value) {
             if(empty($value)) {
-                return new JsonResponse(['Error' => 'Empty request payload !'], JsonResponse::HTTP_BAD_REQUEST);
+                return new JsonResponse(['error' => 'Empty request payload !'], JsonResponse::HTTP_BAD_REQUEST);
             }
             else if(!is_int($value)) {
-                return new JsonResponse(['Error' => 'Request must contain integers !'], JsonResponse::HTTP_BAD_REQUEST);
+                return new JsonResponse(['error' => 'Request must contain integers !'], JsonResponse::HTTP_BAD_REQUEST);
             }
         }
 
         if ($score_rate > 100) {
-            return new JsonResponse(['Error' => 'Le taux de réussite ne peut pas dépasser 100%!'], JsonResponse::HTTP_BAD_REQUEST);
+            return new JsonResponse(['error' => 'Le taux de réussite ne peut pas dépasser 100%!'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
@@ -187,7 +186,7 @@ class UserScoreController extends AbstractController
        
         if ($existingScore) {
             return new JsonResponse([
-                'Error' => 'Un score existe déjà sur ce quiz!'
+                'error' => 'Un score existe déjà sur ce quiz!'
             ], JsonResponse::HTTP_BAD_REQUEST);
         }
 
@@ -263,7 +262,7 @@ class UserScoreController extends AbstractController
         $user= $this->userRepository->findOneBy(['email' => $decodedJwtToken['email']]);
 
         if (!$user) {
-            throw $this->createNotFoundException('Utilisateur non trouvé');
+            throw $this->createNotFoundException('Utilisateur introuvable.');
         }
 
         $quiz_id = $data['quiz_id'] ?? ''; 
@@ -273,20 +272,21 @@ class UserScoreController extends AbstractController
 
         foreach ($values as $value) {
             if(empty($value)) {
-                return new JsonResponse(['Error' => 'Empty request payload !'], JsonResponse::HTTP_BAD_REQUEST);
+                return new JsonResponse(['error' => 'Requête vide !'], JsonResponse::HTTP_BAD_REQUEST);
             }
             else if(!is_int($value)) {
-                return new JsonResponse(['Error' => 'Request must contain integers !'], JsonResponse::HTTP_BAD_REQUEST);
+                return new JsonResponse(['error' => 'La requête doit contenir des entiers (int)!'], JsonResponse::HTTP_BAD_REQUEST);
             }
         }
 
         if ($score_rate > 100) {
-            return new JsonResponse(['Error' => 'Le taux de réussite ne peut pas dépasser 100%!'], JsonResponse::HTTP_BAD_REQUEST);
+            return new JsonResponse(['error' => 'Le taux de réussite ne peut pas dépasser 100%!'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
         $userScore = $this->userScoreRepository->findOneBy(['player' => $user->getId(), 'quiz_id' => $quiz_id]);
 
-        if (!$userScore) {ootFoundException("Score utilisateur non trouvé");
+        if (!$userScore) {
+            throw $this->createNotFoundException("Score utilisateur introuvable");
         }
         
         $userScore

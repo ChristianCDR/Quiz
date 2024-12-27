@@ -116,7 +116,7 @@ export default function ChangePassword () {
                 </View>
             }
 
-            { loading && <ActivityIndicator size="large" color="white" />}
+            { loading && <ActivityIndicator size="large" color="white" /> }
 
             <View>
                 <TextInput
