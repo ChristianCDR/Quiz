@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\ResetPasswordType;
+use App\Form\ResetCredentialsType;
+use App\DTO\ResetCredentialsDTO;
 use App\Security\EmailVerifier;
 use App\Service\FileHandler;
 use App\Service\PasswordResetService;
@@ -358,7 +360,7 @@ class UserProfileController extends AbstractController
         //     }
         // }new OA\RequestBody
 
-        return $this->render('/reset_password.html.twig', [
+        return $this->render('/pages/reset_password.html.twig', [
             'form' => $form,
         ]);
     }
@@ -532,7 +534,7 @@ class UserProfileController extends AbstractController
         return $this->render('/pages/email_confirmation.html.twig', ['message' => 'Merci d\'avoir confirmé. Vous allez bientôt recevoir un email sur votre nouvelle adresse.']);
     }
 
-    #[Route('/reset_credentials', name: 'app_reset_credentials', methods: ['GET'])]
+    #[Route('/reset_credentials', name: 'app_reset_credentials', methods: ['GET', 'POST'])]
     public function reset_credentials (Request $request): Response
     {
 
@@ -546,11 +548,59 @@ class UserProfileController extends AbstractController
 
             // $this->mailer->send($email);
 
-        $form = $this->createForm(ResetCredentialsType::class, $user);
+        $resetCredentialsDTO = new ResetCredentialsDTO();
+
+        $form = $this->createForm(ResetCredentialsType::class, $resetCredentialsDTO);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            $email = $resetCredentialsDTO->email;
+            $password = $resetCredentialsDTO->password;
+
+            $user = $this->userRepository->findOneBy(['oldEmail' => $email]);
+            
+            if(!$user) {    
+                $this->addFlash('error', 'Utilisateur introuvable.');
+                return $this->redirectToRoute('app_reset_credentials');
+            }
+
+            $errors = $this->validator->validate(
+                $user
+                    ->setEmail($email)
+                    ->setPassword($password)
+            );
+    
+            if (count($errors) > 0) {
+                $errorMessages = [];
+                foreach ($errors as $error) {
+                    $errorMessages[] = $error->getMessage();
+                }
+                $this->addFlash('errors', $errorMessages);
+                return $this->redirectToRoute('app_reset_credentials');
+            }
+
+            if ($this->passwordHasher->isPasswordValid($user, $user->getPassword())) {
+                $this->addFlash('error', 'Veuillez fournir un mot de passe différent.');
+                return $this->redirectToRoute('app_reset_credentials');
+            }
+
+            $hashedPassword = $this->passwordHasher->hashPassword(
+                $user,
+                $password
+            );
+
+            $user
+                ->setEmail($email)
+                ->setPassword($hashedPassword)
+                ->setIsVerified(true)
+                ->setOldEmail(null)
+            ;
+
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+
+            return $this->render('/pages/email_confirmation.html.twig', ['message' => 'Vos identifiants ont été modifié avec succès.']);
         }
 
         return $this->render('/pages/reset_credentials.html.twig', [
