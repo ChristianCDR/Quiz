@@ -2,15 +2,17 @@ import { useState, useContext } from 'react';
 import { Context } from '@/utils/Context';
 import Informations from '@/components/Informations';
 import ChangePassword from '@/components/ChangePassword';
-import { useNavigation } from '@react-navigation/native';
+import BackButton from '@/components/BackButton';
 import { RootStackNavigationProp } from '@/utils/Types';
 import {View, StyleSheet, Text, Pressable} from 'react-native';
 
-export default function AccountScreen () {
+type Props = {
+    navigation: RootStackNavigationProp
+}
+
+export default function AccountScreen ({navigation}: Props) {
     const [informationsPressed, setInformationsPressed] = useState<boolean>(true);
     const [passwordPressed, setPasswordPressed] = useState<boolean>(false);
-
-    const navigation = useNavigation<RootStackNavigationProp>();
 
     const context = useContext(Context);
 
@@ -32,6 +34,7 @@ export default function AccountScreen () {
 
     return (
         <View style = {styles.container}>
+            <BackButton navigation={navigation} />
             <View style = {styles.navBar}>
                 <Pressable onPress={() => handlePress('informations')}> 
                     <Text style = {[styles.text, informationsPressed && styles.pressed]}> Informations </Text>    
@@ -57,7 +60,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'flex-end',
-        height: 70
+        height: 50
     },
     text: {
         fontSize: 16,
