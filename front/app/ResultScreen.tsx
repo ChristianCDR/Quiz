@@ -49,12 +49,12 @@ export default function ResultScreen ({route}: Props) {
         const body = {        
             "quiz_id": quizNumber,
             "score_rate": scoreRate,
-            'category_id': categoryId
+            "category_id": categoryId
         }
 
         const storeScore = async () => {
             const jsonAxiosInstance = customAxiosInstance('application/json');
-
+            
             try {
                 const response = await jsonAxiosInstance.post('/api/v1/score/new', body);
                 if (response.status === 201) setUpdateScores(true);
