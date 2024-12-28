@@ -7,8 +7,6 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 
-// page Legal
-
 // Audio jeu
 
 // Notifications push

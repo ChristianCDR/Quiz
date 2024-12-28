@@ -17,7 +17,7 @@ export default function LessonScreen () {
     const { screenToReach } = context;
 
     useEffect(() => {
-        if (screenToReach) settingsNavigation(screenToReach, navigation);
+        if (screenToReach) settingsNavigation(screenToReach, navigation);   
     },[screenToReach])
 
     return(
@@ -48,5 +48,4 @@ const styles = StyleSheet.create({
         marginHorizontal: 'auto',
         marginBottom: 20
     }
-
 })
