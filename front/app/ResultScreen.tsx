@@ -24,9 +24,9 @@ export default function ResultScreen ({route}: Props) {
     const context = useContext(Context);
 
     const fruitImages = {
-        strawberry : require('../assets/images/strawberry.png'),
-        thumb: require('../assets/images/thumb.png'),
-        medal: require('../assets/images/medal.png')
+        strawberry : require('@/assets/images/strawberry.png'),
+        thumb: require('@/assets/images/thumb.png'),
+        medal: require('@/assets/images/medal.png')
     }
 
     const startAnimation: any = () => {
@@ -128,7 +128,7 @@ export default function ResultScreen ({route}: Props) {
             {/* <Text style={styles.comment}>conseil</Text>  */}
             <View style={styles.details}>
                 <Image
-                    source={require('../assets/images/myAvatar.png')}
+                    source={require('@/assets/images/myAvatar.png')}
                     style={styles.circularImgView}
                 />
                 <Text style={styles.username}> Christian CDR </Text>

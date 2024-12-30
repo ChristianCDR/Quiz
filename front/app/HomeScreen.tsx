@@ -17,10 +17,10 @@ export default function HomeScreen({route}: Props) {
     const [loading, setLoading] = useState<boolean>(true);
 
     let images: { [key: string]: any } = {
-        'Incendie': require('../assets/images/fire_v2.png'),
-        'Secours routier': require('../assets/images/car_accident.png'),
-        'Opérations diverses': require('../assets/images/chainsaw.png'),
-        'Secourisme': require('../assets/images/sap.png')
+        'Incendie': require('@/assets/images/fire_v2.png'),
+        'Secours routier': require('@/assets/images/car_accident.png'),
+        'Opérations diverses': require('@/assets/images/chainsaw.png'),
+        'Secourisme': require('@/assets/images/sap.png')
     }
 
     const navigation = useNavigation<RootStackNavigationProp>();
@@ -124,7 +124,7 @@ export default function HomeScreen({route}: Props) {
 
                 <View style={styles.card}>
                     <View style={styles.cardImageView}>
-                        <Image  style={styles.cardImage} source ={require('../assets/images/brain_v3.png')}/>
+                        <Image  style={styles.cardImage} source ={require('@/assets/images/brain_v3.png')}/>
                     </View>
                     
                     <View style={styles.cardText}>
@@ -143,7 +143,7 @@ export default function HomeScreen({route}: Props) {
                     contentContainerStyle={styles.categoryScrollContainer}
                 >
                     { loading && <ActivityIndicator size="large" color="white" /> }
-                    {data.length > 0 ? (
+                    { data.length > 0 ? (
                         data.map((category) => ( 
                             <TouchableOpacity key={category.id} style={styles.category} onPress={()=> handleNavigation(category.id, category.categoryName)}>
                                 <Image style={styles.categoryImage} source ={images[category.categoryName]}/>
