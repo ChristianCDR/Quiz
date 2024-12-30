@@ -101,7 +101,7 @@ export default function RegisterScreen () {
                 barStyle="light-content"   
             />
             <View style={styles.logoView}>
-              <Image style={styles.logo} source={require('../assets/images/resq18.png')}/>
+              <Image style={styles.logo} source={require('@/assets/images/resq18.png')}/>
             </View>
             {error &&
               <View>

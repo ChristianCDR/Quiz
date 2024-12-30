@@ -3,112 +3,137 @@ import { Svg, Path } from 'react-native-svg';
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import CountdownTimer from "@/components/CountdownTimer";
-import { RootStackNavigationProp, QuizScreenRouteProp } from "../utils/Types";
+import { RootStackNavigationProp, QuizScreenRouteProp, Option } from "../utils/Types";
 import Feather from '@expo/vector-icons/Feather';
 import Octicons from '@expo/vector-icons/Octicons';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import Entypo from '@expo/vector-icons/Entypo';
+import { Audio } from 'expo-av';
 
 type Props = {
   route: QuizScreenRouteProp
 }
 
 export default function QuizScreen({route} : Props) {
-  const {quizData, categoryName} = route.params
+  const {quizData, categoryName} = route.params;
   // console.log(JSON.stringify(quizData, null, "\t"))
-  const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [nextQuestion, setNextQuestion] = useState(2)
-  const [score, setScore] = useState(0)
-  const [reset, setReset] = useState(false)
-  const [isLastQuestion, setIsLastQuestion] = useState(false)
-  const navigation = useNavigation<RootStackNavigationProp>()
-  const [showCorrectAnswer, setShowCorrectAnswer] = useState<boolean>(false)
-  const [userAnswers, setUserAnswers] = useState<(boolean | null)[]>(Array(quizData.length).fill(null)) // Tableau rempli de Null pour avoir la couleur grise
-  const newAnswers = [...userAnswers] // Deuxieme tableau qui va progressivement se substituer au premier
-  const [selectedOption, setSelectedOption] = useState()
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [nextQuestion, setNextQuestion] = useState(2);
+  const [score, setScore] = useState(0);
+  const [reset, setReset] = useState(false);
+  const [isLastQuestion, setIsLastQuestion] = useState(false);
+  const navigation = useNavigation<RootStackNavigationProp>();
+  const [showCorrectAnswer, setShowCorrectAnswer] = useState<boolean>(false);
+  const [userAnswers, setUserAnswers] = useState<(boolean | null)[]>(Array(quizData.length).fill(null)); // Tableau rempli de Null pour avoir la couleur grise
+  const newAnswers = [...userAnswers]; // Deuxieme tableau qui va progressivement se substituer au premier
+  const [selectedOption, setSelectedOption] = useState<Option>();
+  const [pressed, setPressed] = useState<boolean>(false);
 
 
-  const getOptionStyle = (item: any) => { 
-    if (selectedOption != item) return styles.itemButton
-    
-    if (item.is_correct) {
-      return [styles.itemButton, styles.correctAnswer]
-    }   
-    else {
-      return [styles.itemButton, styles.wrongAnswer]
-    }
-    
+  const getOptionStyle = (item: Option) => { 
+    if (item.is_correct) return [styles.itemButton, styles.correctAnswer];
+    else if (selectedOption !== item) return styles.itemButton;
+    else return [styles.itemButton, styles.wrongAnswer];    
   }
 
-  const getIcon = (item: any) => {
-    if (selectedOption != item) return <Feather name="circle" size={24} color="#1E3C58" />
-
-    if (item.is_correct) {
-      return <AntDesign name="checkcircle" size={24} color="#5ce65c" />
-    } 
-    else {
-      return <Entypo name="circle-with-cross" size={24} color="#ff0000" />
-    }
+  const getIcon = (item: Option) => {
+    switch (true) {
+      case (item.is_correct): 
+        return <Feather name="check-circle" size={24} color="#5ce65c" />
+        break;
+      case (selectedOption != item):
+        return <Feather name="circle" size={24} color="#1E3C58" />
+        break;
+      default:
+        return <Feather name="x-circle" size={24} color="#ff0000" />
+        break;
+    }  
   }
 
   const goToNextQuestion = () => {
-    setShowCorrectAnswer(false)
-    setReset(true)
-    setCurrentQuestion(currentQuestion +1)
-    setTimeout(() => setReset(false), 100)
+    setPressed(false);
+    setShowCorrectAnswer(false);
+    setReset(true);
+    setCurrentQuestion(currentQuestion +1);
+    setTimeout(() => setReset(false), 100);
   }
   
-  const handleAnswer = (item: any) => { 
-    setSelectedOption(item) 
-    setShowCorrectAnswer(true) 
+  const handleAnswer = (item: Option) => { 
+    setPressed(true);
+    setSelectedOption(item);
+    setShowCorrectAnswer(true);
+    playSound(item);
+
     setNextQuestion((prevQuestion) => {
       const nextQuestion = prevQuestion + 1;
       
       if (nextQuestion < quizData.length +1) {
-        setIsLastQuestion(false)
+        setIsLastQuestion(false);
       } else {
-        setIsLastQuestion(true)
+        setIsLastQuestion(true);
       }
 
       switch (true) {
         case (item.is_correct && !isLastQuestion):
-          setScore((prevScore) => prevScore + 1)
-          newAnswers[currentQuestion] = true
-          setTimeout(()=> goToNextQuestion(), 400) //Pour laisser le temps au user de voir le changement de couleur des options
-        break
+          setScore((prevScore) => prevScore + 1);
+          newAnswers[currentQuestion] = true;
+          setTimeout(()=> goToNextQuestion(), 1000) //Pour laisser le temps au user de voir le changement de couleur des options
+        break;
         case (item.is_correct && isLastQuestion):
           setScore((prevScore) => {
-            const updatedScore = prevScore + 1
+            const updatedScore = prevScore + 1;
             setTimeout(() => {
-              navigation.replace('Result', { score: updatedScore, quizLength: quizData.length })
+              navigation.replace('Result', { score: updatedScore, quizLength: quizData.length });
             }, 100)
-            return updatedScore
+            return updatedScore;
           })
-        break
+        break;
         case (!item.is_correct && isLastQuestion): 
           setTimeout(() => {
             navigation.replace('Result', { score: score, quizLength: quizData.length  });
           }, 100)
-        break
+        break;
         case (!item.is_correct && !isLastQuestion):
-          newAnswers[currentQuestion] = false
-          setTimeout(()=> goToNextQuestion(), 400) //Pour laisser le temps au user de voir le changement de couleur des options
-        break
+          newAnswers[currentQuestion] = false;
+          setTimeout(()=> goToNextQuestion(), 1000); //Pour laisser le temps au user de voir le changement de couleur des options
+        break;
       }
 
-      setUserAnswers(newAnswers)
-      return nextQuestion
+      setUserAnswers(newAnswers);
+      return nextQuestion;
     });
      
   }
 
   const handleTimerEnd = () => {
-    handleAnswer ({"is_correct": false})
-    if(newAnswers[currentQuestion] == null) newAnswers[currentQuestion] = false
+    handleAnswer ({text: '', is_correct: false});
+    if(newAnswers[currentQuestion] == null) newAnswers[currentQuestion] = false;
   }
   
-  const number = currentQuestion +1
-  const formattedNumber = (number) < 10 ? `0${number}` : number.toString()
+  const number = currentQuestion +1;
+  const formattedNumber = (number) < 10 ? `0${number}` : number.toString();
+
+  const playSound = async (item: Option) => {
+
+    try {
+      const soundFile = item.is_correct 
+      ? require('@/assets/sounds/correct_answer.wav') 
+      : require('@/assets/sounds/wrong_answer.wav');
+
+      const { sound } = await Audio.Sound.createAsync(
+        soundFile,
+        // { shouldPlay: true }
+      );
+
+      // Libérer les ressources après la lecture
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (status.isLoaded && status.didJustFinish) {
+          sound.unloadAsync();
+        }
+      });
+    }
+    catch (error) {
+      console.log('Erreur lors de la lecture du son :', error);
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -149,11 +174,13 @@ export default function QuizScreen({route} : Props) {
           {quizData[currentQuestion]?.options.map((item, index) => {
             return <TouchableOpacity key={index} 
               onPress={()=>{handleAnswer(item)}} 
-              style={getOptionStyle(item)}
+              style={[ pressed ? getOptionStyle(item) : styles.itemButton]}
               disabled={showCorrectAnswer}
             > 
               <Text style={styles.optionText}> {item.text} </Text>
-              { getIcon(item) }
+              { pressed ? 
+                getIcon(item) : <Feather name="circle" size={24} color="#1E3C58" />  
+              } 
             </TouchableOpacity> 
           })}
         </View>

@@ -98,7 +98,7 @@ export default function LoginScreen ({route}: Props) {
     return (
       <View style={styles.container}>
           <View>
-            <Image style={styles.logo} source={require('../assets/images/resq18.png')}/>
+            <Image style={styles.logo} source={require('@/assets/images/resq18.png')}/>
           </View>
           { error? 
             <View>
