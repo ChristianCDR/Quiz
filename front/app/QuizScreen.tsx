@@ -115,12 +115,12 @@ export default function QuizScreen({route} : Props) {
 
     try {
       const soundFile = item.is_correct 
-      ? require('@/assets/sounds/correct_answer.wav') 
-      : require('@/assets/sounds/wrong_answer.wav');
+      ? require('@/assets/sounds/correct_answer.mp3') 
+      : require('@/assets/sounds/wrong_answer.mp3');
 
       const { sound } = await Audio.Sound.createAsync(
         soundFile,
-        // { shouldPlay: true }
+        { shouldPlay: true }
       );
 
       // Libérer les ressources après la lecture
