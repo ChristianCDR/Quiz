@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "front",
+    "name": "RESQ18",
     "slug": "front",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -14,7 +14,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/sap.png",
+        "foregroundImage": "./assets/images/brain_v3.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": [
@@ -25,7 +25,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/brain_v3.png"
     },
     "plugins": [
       "expo-router",
@@ -35,7 +35,7 @@
           "image": "./assets/images/brain_v3.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "transparent"
         }
       ]
     ],
