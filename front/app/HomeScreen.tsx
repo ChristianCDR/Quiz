@@ -47,7 +47,7 @@ export default function HomeScreen({route}: Props) {
 
     const jsonAxiosInstance = customAxiosInstance('application/json');
 
-    const baseUrl = 'http://192.168.1.161:8000/uploads/images/';
+    const baseUrl = 'http://resq18.fr/uploads/images/';
 
     const [imageUri, setImageUri] = useState<string>(baseUrl + 'default.png');
 
@@ -128,9 +128,9 @@ export default function HomeScreen({route}: Props) {
                     </View>
                     
                     <View style={styles.cardText}>
-                        <Text style={styles.cardText1}> Joue & {"\n"} Gagne !</Text>
+                        <Text style={styles.cardText1}> Joue & {"\n"} Révise !</Text>
                         <Text style={styles.cardText2}>
-                        Prêt à prouver que tu es le meilleur ? Chaque question est une nouvelle occasion de briller. N'attends plus, challenge-toi et montre tes compétences !
+                        Chaque question est une nouvelle occasion de briller. N'attends plus, challenge-toi et montre tes compétences !
                         </Text>
                     </View>
                 </View>

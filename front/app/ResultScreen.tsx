@@ -92,13 +92,12 @@ export default function ResultScreen ({route}: Props) {
     const handleShare = async () => {
         try {
             if(viewRef.current) {
-                
                 const uri = await captureRef(viewRef, {
                     format: 'png',
                     quality: 1,
                 });
 
-                console.log(uri)
+                console.log('Image capturée : ', uri)
 
                 await Share.share({
                     url: uri,
@@ -113,7 +112,7 @@ export default function ResultScreen ({route}: Props) {
     }
 
     return (
-        <View style={styles.container} ref={viewRef}>
+        <View style={styles.container} ref={viewRef} collapsable={false}>
             <StatusBar
                 backgroundColor="#1E3C58"
                 barStyle="light-content"   
