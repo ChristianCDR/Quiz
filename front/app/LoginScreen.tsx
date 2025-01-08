@@ -7,19 +7,16 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 
-// Audio jeu
-
 // Notifications push
 
 // Publicités
+
+// Captureref
 
 // mentionner  l'origine des pics de l'appli
 // info legales
 // icone de l'appli
 // Aide  & contact => creer un mail gmail pour l'instant
-
-
-// Captureref
 
 // Bruteforce
 // Oauth2
@@ -98,7 +95,7 @@ export default function LoginScreen ({route}: Props) {
     return (
       <View style={styles.container}>
           <View>
-            <Image style={styles.logo} source={require('../assets/images/resq18.png')}/>
+            <Image style={styles.logo} source={require('@/assets/images/resq18.png')}/>
           </View>
           { error? 
             <View>

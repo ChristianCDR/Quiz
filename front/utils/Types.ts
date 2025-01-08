@@ -1,24 +1,29 @@
-import { RouteProp } from '@react-navigation/native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-export interface Question  {
-    "questionText": string,
-    "options": { 'text': string, is_correct: boolean } []
+export interface Option {
+    text: string;
+    is_correct: boolean; 
+}
+
+export interface Question {
+    questionText: string;
+    options: Option[];
 }
 
 export interface Category {
-    id: number,
-    categoryName: string,
-    categoryImage: string
+    id: number;
+    categoryName: string;
+    categoryImage: string;
 }
 
 export interface Score {
-    id: number, 
-    player_id: number, 
-    quiz_id: number, 
-    category_id: number,
-    category_name: string,
-    score_rate: number
+    id: number;
+    player_id: number; 
+    quiz_id: number;
+    category_id: number;
+    category_name: string;
+    score_rate: number;
 }
 
 export type RootStackParamList = {
@@ -34,10 +39,10 @@ export type RootStackParamList = {
 }
 
 export type TabParamList = {
-    Home: undefined
-    Score: undefined
-    Settings: undefined,
-    Lessons: undefined,
+    Home: undefined;
+    Score: undefined;
+    Settings: undefined;
+    Lessons: undefined;
 }
 
 export type Children = {
@@ -72,7 +77,7 @@ export type ContextType = {
     setProfilePhoto: (value: string | null ) => void;
 }
 
-export type ErrorType = string | null
+export type ErrorType = string | null;
 
 export type RootStackNavigationProp = NativeStackNavigationProp<RootStackParamList>
 

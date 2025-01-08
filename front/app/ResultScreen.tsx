@@ -24,9 +24,9 @@ export default function ResultScreen ({route}: Props) {
     const context = useContext(Context);
 
     const fruitImages = {
-        strawberry : require('../assets/images/strawberry.png'),
-        thumb: require('../assets/images/thumb.png'),
-        medal: require('../assets/images/medal.png')
+        strawberry : require('@/assets/images/strawberry.png'),
+        thumb: require('@/assets/images/thumb.png'),
+        medal: require('@/assets/images/medal.png')
     }
 
     const startAnimation: any = () => {
@@ -92,13 +92,12 @@ export default function ResultScreen ({route}: Props) {
     const handleShare = async () => {
         try {
             if(viewRef.current) {
-                
                 const uri = await captureRef(viewRef, {
                     format: 'png',
                     quality: 1,
                 });
 
-                console.log(uri)
+                console.log('Image capturée : ', uri)
 
                 await Share.share({
                     url: uri,
@@ -113,7 +112,7 @@ export default function ResultScreen ({route}: Props) {
     }
 
     return (
-        <View style={styles.container} ref={viewRef}>
+        <View style={styles.container} ref={viewRef} collapsable={false}>
             <StatusBar
                 backgroundColor="#1E3C58"
                 barStyle="light-content"   
@@ -128,7 +127,7 @@ export default function ResultScreen ({route}: Props) {
             {/* <Text style={styles.comment}>conseil</Text>  */}
             <View style={styles.details}>
                 <Image
-                    source={require('../assets/images/myAvatar.png')}
+                    source={require('@/assets/images/myAvatar.png')}
                     style={styles.circularImgView}
                 />
                 <Text style={styles.username}> Christian CDR </Text>

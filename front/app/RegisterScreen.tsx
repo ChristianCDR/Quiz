@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, StatusBar, Image, ActivityIndicator } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import customAxiosInstance from '@/api/Interceptors';
+import * as SecureStore from 'expo-secure-store';
 
 export default function RegisterScreen () {
 
@@ -22,6 +23,9 @@ export default function RegisterScreen () {
     const navigation = useNavigation<RootStackNavigationProp>();
   
     const handleRegister = async () => {
+      // await SecureStore.deleteItemAsync ('accessToken');
+      // await SecureStore.deleteItemAsync ('refreshToken');
+
       setError('');
 
       switch ('') {
@@ -81,11 +85,12 @@ export default function RegisterScreen () {
             // console.log(error.response)
             setError(error.response.data.error);
           } else {
-            setError('Une erreur est survenue. Veuillez réessayer.');
+            // console.log(error)
+            setError('Une erreur est survenue. Veuillez réessayer..');
           }
         }  
         finally {
-        setLoading(false);
+          setLoading(false);
         }
       }   
     }
@@ -101,7 +106,7 @@ export default function RegisterScreen () {
                 barStyle="light-content"   
             />
             <View style={styles.logoView}>
-              <Image style={styles.logo} source={require('../assets/images/resq18.png')}/>
+              <Image style={styles.logo} source={require('@/assets/images/resq18.png')}/>
             </View>
             {error &&
               <View>

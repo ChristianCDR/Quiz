@@ -25,8 +25,7 @@ export default function Informations () {
     const { username, setUsername, email, setEmail, profilePhoto }  = context;
 
     const navigation = useNavigation<RootStackNavigationProp>();
-
-    const baseUrl = 'http://192.168.1.161:8000/uploads/images/';
+    const baseUrl = 'http://resq18.fr/uploads/images/';
 
     const [imageUri, setImageUri] = useState<string>(baseUrl + 'default.png');
 
