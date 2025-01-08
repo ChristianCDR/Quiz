@@ -77,7 +77,7 @@ export default function ForgotPassword () {
             />
             <TouchableOpacity style={styles.button} onPress={handleForgotPassword}>
               <Text style={styles.buttonText}>Réinitialiser mon mot de passe</Text>
-          </TouchableOpacity>
+            </TouchableOpacity>
           <View>
             <Text>{info}</Text>
           </View>

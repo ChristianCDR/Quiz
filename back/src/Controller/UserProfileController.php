@@ -230,7 +230,7 @@ class UserProfileController extends AbstractController
                 'app_confirm_email_reset', 
                 $user,
                 (new TemplatedEmail())
-                    ->from(new Address('no-reply@resq18.com', 'RESQ18'))
+                    ->from(new Address('contact@resq18.fr', 'RESQ18'))
                     ->to($user->getOldEmail())
                     ->subject('Modification de votre adresse email')
                     ->htmlTemplate('/emails/reset_credentials.html.twig')
@@ -310,7 +310,7 @@ class UserProfileController extends AbstractController
             'app_reset_forgot_password', 
             $user, 
             (new TemplatedEmail())
-                ->from(new Address('no-reply@resq18.com', 'RESQ18'))
+                ->from(new Address('contact@resq18.fr', 'RESQ18'))
                 ->to($user->getEmail())
                 ->subject('Réinitialiser votre mot de passe')
                 ->htmlTemplate('/emails/forgot_password.html.twig')
@@ -342,7 +342,7 @@ class UserProfileController extends AbstractController
             $this->passwordResetService->resetPassword($new_password, $user);
 
             $email = (new TemplatedEmail())
-                ->from(new Address('no-reply@resq18.com', 'RESQ18'))
+                ->from(new Address('contact@resq18.fr', 'RESQ18'))
                 ->to($user->getEmail())
                 ->subject('Mot de passe modifié')
                 ->htmlTemplate('/emails/changed_password.html.twig')
@@ -522,7 +522,7 @@ class UserProfileController extends AbstractController
             'app_verify_email', 
             $user, 
             (new TemplatedEmail())
-                ->from(new Address('no-reply@resq18.com', 'RESQ18'))
+                ->from(new Address('contact@resq18.fr', 'RESQ18'))
                 ->to($user->getEmail())
                 ->subject('Confirmation de votre inscription')
                 ->htmlTemplate('/emails/confirmation_inscription.html.twig')
@@ -539,7 +539,7 @@ class UserProfileController extends AbstractController
     {
 
         // $email = (new TemplatedEmail())
-            //     ->from(new Address('no-reply@resq18.com', 'RESQ18'))
+            //     ->from(new Address('contact@resq18.fr', 'RESQ18'))
             //     ->to($user->getOldEmail())
             //     ->subject('Modification de votre adresse email')
             //     ->htmlTemplate('/emails/reset_credentials.html.twig')

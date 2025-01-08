@@ -112,7 +112,7 @@ class RegistrationController extends AbstractController
                 'app_verify_email', 
                 $user, 
                 (new TemplatedEmail())
-                    ->from(new Address('no-reply@resq18.com', 'RESQ18'))
+                    ->from(new Address('contact@resq18.fr', 'RESQ18'))
                     ->to($user->getEmail())
                     ->subject('Confirmation de votre inscription')
                     ->htmlTemplate('/emails/confirmation_inscription.html.twig')
@@ -170,7 +170,7 @@ class RegistrationController extends AbstractController
             'app_verify_email', 
             $user, 
             (new TemplatedEmail())
-                ->from(new Address('no-reply@resq18.com', 'RESQ18'))
+                ->from(new Address('contact@resq18.fr', 'RESQ18'))
                 ->to($user->getEmail())
                 ->subject('Nouveau lien de confirmation')
                 ->htmlTemplate('/emails/invalid_link.html.twig')
