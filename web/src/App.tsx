@@ -1,26 +1,22 @@
-import LegalPage from './pages/LegalPage'
-import { Route, Routes, Link } from 'react-router-dom';
+import LegalPage from './pages/LegalPage';
+import NotFound from './pages/NotFound';
+import HomePage from './pages/HomePage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import { Route, Routes } from 'react-router-dom';
+
 
 function App() {
 
   return (
-    <>
-      <nav className="p-4 bg-gray-800 text-white">
-        <ul className="flex space-x-4">
-          <li>
-            <Link to="/" className="hover:text-blue-400">Accueil</Link>
-          </li>
-          <li>
-            <Link to="/legal" className="hover:text-red-500">Mentions Légales</Link>
-          </li>
-        </ul>
-      </nav>
-      
+    <>  
       <Routes>
-        <Route path="/legal" element={<LegalPage />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/mentions-legales" element={<LegalPage />} />
+        <Route path="/politique-de-confidentialite" element={<PrivacyPolicyPage />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   )
 }
 
-export default App
+export default App;

@@ -7,16 +7,14 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 
+// icone de l'appli
+
 // Notifications push
 
 // Publicités
 
 // Captureref
 
-// mentionner  l'origine des pics de l'appli
-// info legales
-// icone de l'appli
-// Aide  & contact => creer un mail gmail pour l'instant
 
 // Bruteforce
 // Oauth2

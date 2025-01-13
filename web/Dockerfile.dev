@@ -1,0 +1,15 @@
+FROM node:23-alpine
+
+WORKDIR /app
+
+RUN npm install typescript -g
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 5173
+
+CMD [ "npm", "run", "dev"]
