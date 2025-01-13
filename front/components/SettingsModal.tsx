@@ -41,7 +41,7 @@ export default function SettingsModal () {
     }
 
     const openEmailApps = () => {
-        const email = 'resq18@gmail.com';
+        const email = 'contact@resq18.fr';
         const subject = 'Sujet du message';
         const mailToUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
 
@@ -64,8 +64,9 @@ export default function SettingsModal () {
     }
 
     const goToLegal = () => {
-        setScreenToReach('Legal');
-        hideModal();
+        const url = "https://resq18.fr/legal";
+        Linking.openURL(url)
+        .catch((err) => console.error('An error occurred', err));
     }
 
     const goToLogin = () => {
