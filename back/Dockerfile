@@ -9,6 +9,10 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
+RUN pecl install redis
+
+RUN echo "extension=redis.so" > /usr/local/etc/php/conf.d/redis.ini
+
 # Extensions de PHP
 RUN docker-php-ext-install pdo pdo_pgsql
 
