@@ -1,9 +1,11 @@
+import { useEffect } from 'react';
+
 const HomePage = () => {
-    return (
-        <div>
-            <p> Welcome on RESQ18 !</p>
-        </div>
-    );
+    useEffect(() => {
+        window.location.href = '/mentions-legales';
+    }, []);
+    
+    return null;
 }
 
 export default HomePage;

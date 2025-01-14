@@ -1,0 +1,15 @@
+myhostname = mail.resq18.fr
+mydomain = resq18.fr
+myorigin = $mydomain
+inet_interfaces = all
+inet_protocols = ipv4
+mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain
+smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
+biff = no
+append_dot_mydomain = no
+readme_directory = no
+smtp_tls_security_level = may
+smtp_tls_loglevel = 1
+smtpd_use_tls = yes
+smtpd_tls_cert_file = /etc/ssl/fullchain.pem
+smtpd_tls_key_file = /etc/ssl/_.resq18.fr_private_key.key

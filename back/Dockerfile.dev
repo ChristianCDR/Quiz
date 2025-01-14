@@ -29,7 +29,8 @@ COPY . /var/www/html
 RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
 
 #Installer toutes les dépendances du projet
-RUN composer install --optimize-autoloader --no-dev
+RUN composer install --optimize-autoloader
+# --no-dev
 
 # Expose le port 9000 (pour PHP-FPM)
 EXPOSE 9000

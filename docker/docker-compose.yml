@@ -69,6 +69,7 @@ services:
     networks:
       - app-network
     restart: always
+    
   ###> Web ###
   web: 
     build: 
