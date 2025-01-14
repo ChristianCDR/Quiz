@@ -20,18 +20,15 @@ services:
 
   ###> symfony/mailer ###
   mailer:
-    image: axllent/mailpit
+    build: 
+      context: ./postfix
+      dockerfile: Dockerfile
     container_name: mailer
     ports:
-      - "1025:1025"
-      - "8025:8025"  
+      - "25:25"
+      - "587:587"  
     networks:
       - app-network
-    env_file:
-      - .env
-    environment:
-      MP_SMTP_AUTH_ACCEPT_ANY: 1 
-      MP_SMTP_AUTH_ALLOW_INSECURE: 1
     restart: always
 
   ###> PHP ###
@@ -60,10 +57,11 @@ services:
     image: nginx:latest
     container_name: nginx
     ports:
-      - "8000:80"
+      - "8000:443"
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/back/nginx.conf:/etc/nginx/conf.d/nginx.conf
       - ../back:/var/www/html
+      - ../ssl:/etc/nginx/ssl
     depends_on:
       - php
     networks:
@@ -78,6 +76,9 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    volumes:
+      - ./nginx/web/nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - ../ssl:/etc/nginx/ssl
     networks:
       - app-network
     restart: always
