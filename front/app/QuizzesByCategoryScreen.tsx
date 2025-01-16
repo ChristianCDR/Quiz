@@ -54,7 +54,7 @@ export default function QuizzesByCategoryScreen ({route} : Props) {
                         </View>
                     ))
                 ) : (
-                <Text style = {{textAlign: 'center'}} >Pas de quiz disponible pour l'instant.</Text>
+                <Text style = {styles.noQuizText} >Pas de quiz disponible pour l'instant.</Text>
                 )}
 
             { loading && <ActivityIndicator size="large" color="white" /> }
@@ -92,5 +92,10 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 18,
         fontWeight: 'bold'
+    },
+    noQuizText: {
+        color: 'black',
+        fontSize: 18,
+        textAlign: 'center'
     }
 })

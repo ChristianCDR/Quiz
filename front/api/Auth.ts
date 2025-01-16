@@ -21,3 +21,13 @@ export const getTokens = async () => {
     console.log(error);
   }
 }
+
+export const removeTokens = async () => {
+  try {
+    await SecureStore.deleteItemAsync ('accessToken');
+    await SecureStore.deleteItemAsync ('refreshToken');
+  }
+  catch (error) {
+    console.log(error);
+  }
+}

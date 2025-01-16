@@ -21,11 +21,11 @@ export default function SettingsModal () {
             'Souhaitez-vous vraiment vous déconnecter ?',
             [
                 {
-                    text: "Annuler",
+                    text: "Non",
                     style: "cancel", // Style du bouton "Annuler"
                 },
                 {
-                    text: "Déconnexion",
+                    text: "Oui",
                     onPress: () => { 
                         handleLogout()
                         .then(() => {
@@ -64,7 +64,7 @@ export default function SettingsModal () {
     }
 
     const goToLegal = () => {
-        const url = "https://resq18.fr/legal";
+        const url = "https://resq18.fr/mentions-legales";
         Linking.openURL(url)
         .catch((err) => console.error('An error occurred', err));
     }
