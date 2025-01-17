@@ -47,7 +47,7 @@ export default function HomeScreen({route}: Props) {
 
     const jsonAxiosInstance = customAxiosInstance('application/json');
 
-    const baseUrl = 'http://resq18.fr/uploads/images/';
+    const baseUrl = 'https://resq18.fr:8000/uploads/images/';
 
     const [imageUri, setImageUri] = useState<string>(baseUrl + 'default.png');
 
@@ -177,6 +177,7 @@ const styles = StyleSheet.create({
     errorText: {
         fontSize: 18,
         color: 'red',
+        paddingLeft: 10
     },
     user: {
         flexDirection: 'row',

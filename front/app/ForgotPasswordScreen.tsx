@@ -5,6 +5,7 @@ import BackButton from '@/components/BackButton';
 import { Context } from '@/utils/Context';
 import { RootStackNavigationProp } from '@/utils/Types';
 import customAxiosInstance from '@/api/Interceptors';
+import { removeTokens } from '@/api/Auth';
 
 export default function ForgotPassword () {
     const [emptyEmail, setEmptyEmail] = useState<boolean>(false);
@@ -23,6 +24,9 @@ export default function ForgotPassword () {
     const jsonAxiosInstance = customAxiosInstance('application/json');
 
     const handleForgotPassword = async () => {
+
+        removeTokens();
+
         setError('');
 
         setLoading(true);

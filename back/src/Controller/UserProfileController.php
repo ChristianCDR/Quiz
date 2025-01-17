@@ -132,6 +132,18 @@ class UserProfileController extends AbstractController
 
         try {
             $this->passwordResetService->resetPassword($new_password, $user);
+
+            $email = (new TemplatedEmail())
+                ->from(new Address('contact@resq18.fr', 'RESQ18'))
+                ->to($user->getEmail())
+                ->subject('Mot de passe modifié')
+                ->htmlTemplate('/emails/changed_password.html.twig')
+                ->context([
+                    'username' => $user->getUsername()
+                ]);
+
+            $this->mailer->send($email);
+
             return new JsonResponse(['message' => 'Mot de passe modifié avec succès!'], JsonResponse::HTTP_OK);
         }
         catch (\Exception $e) {
@@ -181,6 +193,7 @@ class UserProfileController extends AbstractController
     public function reset_user_infos (Request $request): JsonResponse 
     {
         $data = json_decode($request->getContent(), true);
+        $isVerified = false;
 
         $newEmail = $data['email']?? '';
         $newUsername = $data['username']?? '';
@@ -216,12 +229,18 @@ class UserProfileController extends AbstractController
 
         $userExists = $this->userRepository->findOneBy(['email' => $newEmail]);
 
-        if ($newEmail !== $oldEmail && $userExists) return new JsonResponse(['error' => 'Cette adresse e-mail est déjà utilisée.'], JsonResponse::HTTP_BAD_REQUEST);
+        if ($newEmail !== $oldEmail && $userExists) {
+            return new JsonResponse(['error' => 'Cette adresse e-mail est déjà utilisée.'], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        if ($newEmail === $oldEmail && $newUsername !== $oldUsername) {
+            $isVerified = true;
+        }
 
         $user
             ->setEmail($newEmail)
             ->setUsername($newUsername)
-            ->setIsVerified(false)
+            ->setIsVerified($isVerified)
             ->setOldEmail($oldEmail)
         ;
 
@@ -358,7 +377,7 @@ class UserProfileController extends AbstractController
         //     foreach ($form->getErrors(true) as $error) {
         //         echo $error->getMessage() . '<br>';
         //     }
-        // }new OA\RequestBody
+        // }
 
         return $this->render('/pages/reset_password.html.twig', [
             'form' => $form,
@@ -504,7 +523,8 @@ class UserProfileController extends AbstractController
     {
         $id = $request->query->get('id'); 
 
-        if (null === $id) {
+        //if (!$id)
+        if ($id === null) {
             return $this->render('/pages/email_confirmation.html.twig', ['message' => 'Le lien ne contient pas votre identifiant.']);
         }
     

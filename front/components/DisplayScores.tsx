@@ -34,7 +34,9 @@ export default function DisplayScores ({scores}: Props) {
 
     return (
         <View style={styles.scoresContainer}>
-            {scores.map(score => (
+            { scores.length > 0 ?
+
+            scores.map(score => (
                 <TouchableOpacity key={score.id} style={styles.scores} onPress={() => handlePress(score.quiz_id, score.category_name, score.category_id)}>
                     <Text style={styles.scoresText}>Quiz {score.quiz_id}</Text>
                     <Text style={{color: '#fff'}}>Taux de réussite: {score.score_rate}%</Text>
@@ -43,7 +45,10 @@ export default function DisplayScores ({scores}: Props) {
                         color="#fff" 
                     />
                 </TouchableOpacity>
-            ))}
+            ))
+            :
+            <Text style={styles.noScoreText}>Vos scores récents s'afficheront ici !</Text>
+        }
         </View>
     );
 }
@@ -67,5 +72,10 @@ const styles = StyleSheet.create({
         height: 80,
         marginBottom: 10,
         justifyContent: 'space-between'
+    },
+    noScoreText: {
+        color: 'black',
+        fontSize: 18,
+        paddingLeft: 10
     }
 });

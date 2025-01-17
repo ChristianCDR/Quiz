@@ -9,7 +9,6 @@ import QuizzesByCategoryScreen from '@/app/QuizzesByCategoryScreen';
 import TabNavigator from '@/navigation/Tabs';
 import AccountScreen from '@/app/AccountScreen';
 import ForgotPasswordScreen from '@/app/ForgotPasswordScreen';
-import LegalScreen from '@/app/LegalScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -41,10 +40,6 @@ const AppNavigator = () => {
             <Stack.Screen 
                 name="Account"
                 component={AccountScreen}
-            />
-            <Stack.Screen 
-                name="Legal"
-                component={LegalScreen}
             />
             <Stack.Screen 
                 name="ForgotPassword"
