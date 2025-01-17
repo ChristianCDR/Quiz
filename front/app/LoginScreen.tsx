@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { removeTokens, storeTokens } from '@/api/Auth';
+import { storeTokens } from '@/api/Auth';
 import customAxiosInstance from '@/api/Interceptors';
 import { Context } from '@/utils/Context';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -89,10 +89,6 @@ export default function LoginScreen ({route}: Props) {
     const handleForgotPassword = () => {
       navigation.navigate('ForgotPassword');
     }
-
-    useEffect(() => {
-      removeTokens();
-    })
 
     return (
       <View style={styles.container}>

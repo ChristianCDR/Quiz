@@ -25,7 +25,7 @@ services:
       dockerfile: Dockerfile
     container_name: php
     volumes:
-      - ../back:/var/www/html
+      - ../back/public:/var/www/html/public
       - ./docker-fpm.ini:/usr/local/etc/php/conf.d/docker-fpm.ini
     depends_on:
       - database

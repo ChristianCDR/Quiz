@@ -2,12 +2,10 @@ services:
 
   ###> doctrine/doctrine-bundle ###
   database:
-    image: postgres:15-bookworm
+    image: postgres:17-bookworm
     container_name: database
     ports:
       - "5432:5432"
-    env_file:
-      - .env.local
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -15,7 +13,7 @@ services:
     networks:
       - app-network
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql@17/data
     restart: always
 
   ###> symfony/mailer ###
@@ -27,8 +25,6 @@ services:
       - "8025:8025"  
     networks:
       - app-network
-    env_file:
-      - .env
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: 1 
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
@@ -41,15 +37,13 @@ services:
       dockerfile: Dockerfile.dev
     container_name: php
     volumes:
-      - ../back:/var/www/html
+      - ../back/public:/var/www/html/public
       - ./docker-fpm.ini:/usr/local/etc/php/conf.d/docker-fpm.ini
     depends_on:
       - database
       - mailer
     networks:
       - app-network
-    env_file:
-      - .env.local
     environment:
       - DATABASE_URL=pgsql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
       - MAILER_DSN=smtp://mailer:1025

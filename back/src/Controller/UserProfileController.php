@@ -132,6 +132,18 @@ class UserProfileController extends AbstractController
 
         try {
             $this->passwordResetService->resetPassword($new_password, $user);
+
+            $email = (new TemplatedEmail())
+                ->from(new Address('contact@resq18.fr', 'RESQ18'))
+                ->to($user->getEmail())
+                ->subject('Mot de passe modifié')
+                ->htmlTemplate('/emails/changed_password.html.twig')
+                ->context([
+                    'username' => $user->getUsername()
+                ]);
+
+            $this->mailer->send($email);
+
             return new JsonResponse(['message' => 'Mot de passe modifié avec succès!'], JsonResponse::HTTP_OK);
         }
         catch (\Exception $e) {
