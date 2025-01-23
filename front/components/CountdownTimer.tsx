@@ -13,13 +13,13 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({initialSeconds, reset, o
 
   useEffect(()=>{
     if(reset) {
-      setSecondsRemaining(30);
+      setSecondsRemaining(20);
     }
   },[reset]);
 
   useEffect(()=>{
     if(isLastQuestion) {
-      setSecondsRemaining(30);
+      setSecondsRemaining(20);
     }
   },[isLastQuestion]);
 
