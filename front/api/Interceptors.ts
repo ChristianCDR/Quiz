@@ -1,10 +1,12 @@
 import axios from 'axios';
 import { storeTokens, getTokens } from './Auth';
 
+// http://192.168.1.161:8000 //https://resq18.fr:8000
+const baseURL = 'http://192.168.1.161:8000'
+
 const customAxiosInstance = (value: string) => {
     const instance = axios.create({
-        // http://192.168.1.161:8000
-        baseURL: 'https://resq18.fr:8000',
+        baseURL: baseURL,
         headers: { 'Content-Type': value, Accept: value }
     });
 
@@ -55,15 +57,17 @@ const customAxiosInstance = (value: string) => {
 
 export const refreshAccessToken = async () => {
     const { refreshToken }  = await getTokens () || { refreshToken: null };
-    const jsonAxiosInstance = customAxiosInstance('application/json');
 
     try {
-        const response = await jsonAxiosInstance.post('/api/v1/refreshToken', { token: refreshToken });
+        const response = await axios.post(baseURL + '/api/v1/refreshToken', { 'refreshToken': refreshToken });
 
-        if (response.data.token) {
+        if (response.data.accessToken) {
             const { accessToken, refreshToken } = response.data;
             await storeTokens(accessToken, refreshToken);
             return accessToken;
+        }
+        else {
+            console.log(response.data)
         }
     }
     catch (error) {

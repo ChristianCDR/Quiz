@@ -37,7 +37,14 @@
           "resizeMode": "contain",
           "backgroundColor": "#fff"
         }
-      ]
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Autoriser RESQ18 à accéder à votre galerie photo."
+        }
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true

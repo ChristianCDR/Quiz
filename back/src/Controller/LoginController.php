@@ -113,9 +113,9 @@ class LoginController extends AbstractController
             required: true,
             content: new OA\JsonContent(
                 type: 'object',
-                required: ['token'],
+                required: ['refreshToken'],
                 properties: [
-                    new OA\Property(property: 'token', type: 'string', example: 'b3a79766cb948ccdfbc9e23fda70461dff08db79da831a1ac5e31ecffe84608b'),
+                    new OA\Property(property: 'refreshToken', type: 'string', example: 'b3a79766cb948ccdfbc9e23fda70461dff08db79da831a1ac5e31ecffe84608b'),
                 ]
             )
         ),
@@ -126,7 +126,7 @@ class LoginController extends AbstractController
                 content: new OA\JsonContent(
                     type: 'object',
                     properties: [
-                        new OA\Property(property: 'token', type: 'string', example: 'jwt token'),
+                        new OA\Property(property: 'accessToken', type: 'string', example: 'jwt token'),
                         new OA\Property(property: 'refreshToken', type: 'string', example: 'refresh token')
                     ]
                 )
@@ -143,6 +143,7 @@ class LoginController extends AbstractController
             )
         ]
     )]
+    #[Security(name: null)]
     public function refreshToken(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -156,7 +157,7 @@ class LoginController extends AbstractController
 
         $userIdentifier = $this->refreshTokenManager->getUserIdentifierFromRefreshToken($refreshToken);
         
-        $user = $this->userRepository->findOneBy(['email'=>$userIdentifier->getEmail()]);
+        $user = $this->userRepository->findOneBy(['email' => $userIdentifier->getEmail()]);
 
         $newJWTToken = $this->JWTManager->create($user);
         
