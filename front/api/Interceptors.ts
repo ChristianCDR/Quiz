@@ -2,7 +2,7 @@ import axios from 'axios';
 import { storeTokens, getTokens } from './Auth';
 
 // http://192.168.1.161:8000 //https://resq18.fr:8000
-const baseURL = 'http://192.168.1.161:8000'
+const baseURL = 'https://resq18.fr:8000'
 
 const customAxiosInstance = (value: string) => {
     const instance = axios.create({
@@ -38,8 +38,8 @@ const customAxiosInstance = (value: string) => {
             originalRequest._retry = true;
 
             try {
-                const newAccessToken = await refreshAccessToken ();
-                originalRequest.headers.Authorization = 'Bearer ' + newAccessToken;
+                const response = await refreshAccessToken ();
+                originalRequest.headers.Authorization = 'Bearer ' + response.accessToken;
                 return instance(originalRequest);  // Relance la requête avec le nouveau token
             }
             catch (error) {
@@ -64,7 +64,7 @@ export const refreshAccessToken = async () => {
         if (response.data.accessToken) {
             const { accessToken, refreshToken } = response.data;
             await storeTokens(accessToken, refreshToken);
-            return accessToken;
+            return response.data;
         }
         else {
             console.log(response.data)

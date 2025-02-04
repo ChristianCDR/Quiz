@@ -164,6 +164,10 @@ class LoginController extends AbstractController
         $newRefreshToken = $this->refreshTokenManager->updateRefreshToken($refreshToken, $userIdentifier);
             
         return new JsonResponse([
+            'email' => $user->getEmail(),
+            'username' => $user->getUsername(),
+            'userId' => $user->getId(),
+            'profilePhoto' => $user->getProfilePhoto(),
             'accessToken' => $newJWTToken,
             'refreshToken' => $newRefreshToken->getToken()
         ]);    

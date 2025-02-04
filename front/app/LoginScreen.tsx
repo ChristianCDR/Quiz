@@ -104,22 +104,26 @@ export default function LoginScreen ({route}: Props) {
           if (timestampInSeconds > payload.exp ) {
 
             try {
-              const newAccessToken = await refreshAccessToken();
-              // console.log(newAccessToken);
+              const response = await refreshAccessToken();
+              navigation.navigate('Tabs', { screen: 'Home'});
+              setUserId(response.userId);
+              setUsername(response.username);
+              setEmail(response.email);
+              setProfilePhoto(response.profilePhoto);
             }
             catch (error) {
               console.log(error);
             }
           }
           else {
-            console.log('Token still valid.');
+            console.log('Token is still valid.');
             navigation.navigate('Tabs', { screen: 'Home'});
           }
         }
       }
 
       onAppLaunch();
-    })
+    }, [])
 
     return (
       <View style={styles.container}>
