@@ -350,14 +350,19 @@ class UserProfileController extends AbstractController
         if (!$user) {
             return $this->render('/pages/email_confirmation.html.twig', ['message' => 'Utilisateur non trouvé. Veuillez réessayer.']);
         }
-        else $user->setPassword('');
 
         $form = $this->createForm(ResetPasswordType::class, $user);
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
+            $user_email = $form->get('email')->getData();
             $new_password = $form->get('password')->getData();
             
+            if ($user->getEmail() !== $user_email) {
+                return $this->render('/pages/email_confirmation.html.twig', ['message' => 'Veuillez fournir un utilisateur valide.']);
+            }
+            else $user->setPassword('');
+
             $this->passwordResetService->resetPassword($new_password, $user);
 
             $email = (new TemplatedEmail())
@@ -545,7 +550,7 @@ class UserProfileController extends AbstractController
                 ->from(new Address('contact@resq18.fr', 'RESQ18'))
                 ->to($user->getEmail())
                 ->subject('Confirmation de votre inscription')
-                ->htmlTemplate('/emails/confirmation_inscription.html.twig')
+                ->htmlTemplate('/emails/changed_email.html.twig')
                 ->context([
                     'username' => $user->getUsername()
                 ])

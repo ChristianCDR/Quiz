@@ -38,6 +38,7 @@ security:
         - { path: ^/api/v1/register, roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/invalid_link, roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1/refreshToken, roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/logout, roles: PUBLIC_ACCESS }
         - { path: ^/api/v1, roles: ROLE_USER }
         

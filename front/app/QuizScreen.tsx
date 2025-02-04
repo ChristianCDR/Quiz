@@ -147,7 +147,7 @@ export default function QuizScreen({route} : Props) {
           <Svg width="24" height="24" viewBox="0 0 24 24">
             <Path fill="#1E3C58" d="M9 3V1h6v2zm2 11h2V8h-2zm1 8q-1.85 0-3.488-.712T5.65 19.35t-1.937-2.863T3 13t.713-3.488T5.65 6.65t2.863-1.937T12 4q1.55 0 2.975.5t2.675 1.45l1.4-1.4l1.4 1.4l-1.4 1.4Q20 8.6 20.5 10.025T21 13q0 1.85-.713 3.488T18.35 19.35t-2.863 1.938T12 22m0-2q2.9 0 4.95-2.05T19 13t-2.05-4.95T12 6T7.05 8.05T5 13t2.05 4.95T12 20m0-7"/>
           </Svg>
-          <CountdownTimer initialSeconds={30} reset={reset} onTimerEnd={handleTimerEnd} isLastQuestion={isLastQuestion} />
+          <CountdownTimer initialSeconds={20} reset={reset} onTimerEnd={handleTimerEnd} isLastQuestion={isLastQuestion} />
         </View>
 
         <Text style= {styles.progressText}>Question <Text style={styles.formattedNumber}>{formattedNumber}</Text> / {quizData.length}</Text>
@@ -240,22 +240,24 @@ const styles = StyleSheet.create({
     borderColor: "#1E3C58",
     borderRadius: 30,
     height: 150,
+    paddingHorizontal: 10,
     margin: 'auto'
   },
   questionText: {
-    fontSize: 28,
+    fontSize: 20,
     textAlign: "center"
   },
   optionContainer: {
     width: '90%',
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     height: 300,
     margin: 'auto',
     marginTop: 50
   },
   optionText: {
-    fontSize: 22,
+    fontSize: 18,
     textAlign: 'center',
+    width: '90%'
   },
   itemButton: {
     borderWidth: 1,

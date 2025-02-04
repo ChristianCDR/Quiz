@@ -86,25 +86,22 @@ class RefreshTokenManager
             return null; 
         }
 
-        $this->revokeRefreshToken($token);
-
         $newToken = bin2hex(random_bytes(32));
 
-        $newRefreshToken = new RefreshToken ();
-        $newRefreshToken
+        $refreshToken
             ->setToken($newToken)
             ->setExpiresAt((new \DateTime())->modify('+30 days'))
             ->setUserIdentifier($userIdentifier)
         ;
 
         try {
-            $this->entityManager->persist($newRefreshToken);
+            $this->entityManager->persist($refreshToken);
             $this->entityManager->flush();
         }
         catch (Exception $exception) {
             throw new Exception ($exception);
         }
 
-        return $newRefreshToken;
+        return $refreshToken;
     }
 }

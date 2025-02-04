@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { storeTokens } from '@/api/Auth';
 import customAxiosInstance from '@/api/Interceptors';
 import { Context } from '@/utils/Context';
@@ -6,21 +6,16 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
-
-// icone de l'appli
-
-// Notifications push
-
-// Publicités
-
-// Captureref
-
-
-// Bruteforce
-// Oauth2
+import { getTokens } from '@/api/Auth';
+import { Buffer } from 'buffer';
+import { refreshAccessToken } from '@/api/Interceptors';
 
 type Props = {
   route: LoginScreenRouteProp
+}
+
+type Token = {
+  accessToken: string | null
 }
 
 export default function LoginScreen ({route}: Props) {
@@ -89,6 +84,42 @@ export default function LoginScreen ({route}: Props) {
     const handleForgotPassword = () => {
       navigation.navigate('ForgotPassword');
     }
+
+    useEffect(() => {
+      const onAppLaunch = async () => {
+        const tokens = await getTokens();
+
+        if (!tokens) {
+          throw new Error("Impossible de récupérer les tokens");
+        }
+
+        const { accessToken }: Token =  tokens;
+
+        const parts = accessToken?.split('.').map((part) => Buffer.from(part.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString());
+
+        if (parts) {
+          const payload = JSON.parse(parts[1]);
+          const timestampInSeconds = Math.floor(Date.now() / 1000);
+
+          if (timestampInSeconds > payload.exp ) {
+
+            try {
+              const newAccessToken = await refreshAccessToken();
+              // console.log(newAccessToken);
+            }
+            catch (error) {
+              console.log(error);
+            }
+          }
+          else {
+            console.log('Token still valid.');
+            navigation.navigate('Tabs', { screen: 'Home'});
+          }
+        }
+      }
+
+      onAppLaunch();
+    })
 
     return (
       <View style={styles.container}>

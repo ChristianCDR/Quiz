@@ -4,6 +4,12 @@ import { Alert } from 'react-native';
 import { ContextType } from '@/utils/Types';
 
 export const pickImageFromGallery = async (context: ContextType) => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== 'granted') {
+        alert('Désolé, nous avons besoin d\'accéder à vos photos pour mettre à jour votre profil.');
+    }
+
     let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images'],
         allowsEditing: true,

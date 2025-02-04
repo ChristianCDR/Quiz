@@ -4,7 +4,7 @@
     "slug": "front",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/app_icon_without_bg.png",
+    "icon": "./assets/images/app_icon_mini.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -14,7 +14,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/app_icon_without_bg.png",
+        "foregroundImage": "./assets/images/app_icon_mini.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": [
@@ -25,19 +25,26 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/app_icon_without_bg.png"
+      "favicon": "./assets/images/app_icon_mini.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/app_icon_without_bg.png",
+          "image": "./assets/images/app_icon_mini.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#fff"
         }
-      ]
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Autoriser RESQ18 à accéder à votre galerie photo."
+        }
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
