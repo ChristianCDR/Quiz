@@ -1,7 +1,7 @@
 const LegalPage = () => {
 
     return (
-        <div className="flex flex-col items-center justify-center p-8 bg-white text-black">
+        <div className="flex flex-col items-center justify-center p-2 bg-white text-black">
             <h1 className="text-xl sm:text-3xl font-bold text-primary mb-4">Mentions légales</h1>
             <div className="w-full bg-white lg:w-3/5 sm:text-xl text-base"> 
                 <div className="mb-5 py-5 px-5">

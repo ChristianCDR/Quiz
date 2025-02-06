@@ -1,7 +1,7 @@
 const PrivacyPolicyPage = () => {
 
     return (
-        <div className="flex flex-col items-center p-8 bg-white text-black">
+        <div className="flex flex-col items-center p-2 bg-white text-black">
             <h1 className="text-xl sm:text-3xl font-bold text-primary mb-4">Politique de confidentialité</h1>
             <div className="w-full bg-white lg:w-3/5 sm:text-xl text-base"> 
                 <div className="py-5 px-5">
@@ -41,11 +41,11 @@ const PrivacyPolicyPage = () => {
                     <h2 className="sm:text-2xl text-lg mb-3 font-bold">9. Vos droits</h2>
                     <p>En vertu des lois applicables, vous avez certains droits concernant vos données personnelles, notamment :</p>
                     <ul className="my-3">
-                        <li> <strong className="text-lg">Droit d'accès</strong> : Vous avez le droit de demander une copie des informations personnelles que nous détenons à votre sujet.</li>
-                        <li> <strong className="text-lg">Droit de rectification</strong>  : Vous pouvez corriger ou mettre à jour vos informations personnelles si elles sont incorrectes ou incomplètes.
+                        <li className="mb-2"> <strong className="text-lg">Droit d'accès</strong> : Vous avez le droit de demander une copie des informations personnelles que nous détenons à votre sujet.</li>
+                        <li className="mb-2"> <strong className="text-lg">Droit de rectification</strong>  : Vous pouvez corriger ou mettre à jour vos informations personnelles si elles sont incorrectes ou incomplètes.
                         </li>
-                        <li><strong className="text-lg">Droit de suppression</strong> : Vous pouvez demander la suppression de vos informations personnelles dans certaines circonstances.</li>
-                        <li><strong className="text-lg">Droit d’opposition</strong> : Vous pouvez vous opposer à l'utilisation de vos données personnelles à des fins de marketing direct.</li>
+                        <li className="mb-2"><strong className="text-lg">Droit de suppression</strong> : Vous pouvez demander la suppression de vos informations personnelles dans certaines circonstances. <br /> Plus d'informations <a href="https://resq18.fr/supprimer-mon-compte">[ici]</a>.</li>
+                        <li className="mb-2"><strong className="text-lg">Droit d’opposition</strong> : Vous pouvez vous opposer à l'utilisation de vos données personnelles à des fins de marketing direct.</li>
                     </ul>
                     <p>Pour exercer ces droits, veuillez nous contacter à l'adresse suivante : <a href="mailto:contact@resq18.fr">contact@resq18.fr.</a></p>
                 </div>

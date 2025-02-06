@@ -22,6 +22,7 @@ export default function ResultScreen ({route}: Props) {
     const viewRef = useRef(null)
     const scaleValue = useRef(new Animated.Value(0.1)).current 
     const context = useContext(Context);
+    const [imageUri, setImageUri] = useState<string>();
 
     const fruitImages = {
         strawberry : require('@/assets/images/strawberry.png'),
@@ -42,7 +43,7 @@ export default function ResultScreen ({route}: Props) {
 
         if (!context) throw new Error ('Context returned null')
 
-        const { quizNumber, categoryId, setUpdateScores }  = context;
+        const { quizNumber, categoryId, setUpdateScores, profilePhoto }  = context;
 
         const scoreRate = (score*100) / quizLength;   
         
@@ -67,6 +68,7 @@ export default function ResultScreen ({route}: Props) {
            }
         }
 
+        setImageUri('https://resq18.fr:8000/uploads/images/' + profilePhoto);
         storeScore();
     }, [])
 
@@ -127,7 +129,7 @@ export default function ResultScreen ({route}: Props) {
             {/* <Text style={styles.comment}>conseil</Text>  */}
             <View style={styles.details}>
                 <Image
-                    source={require('@/assets/images/myAvatar.png')}
+                    source={{uri: imageUri}}
                     style={styles.circularImgView}
                 />
                 <Text style={styles.username}> Christian CDR </Text>

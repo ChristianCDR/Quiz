@@ -22,7 +22,8 @@ const TabNavigator = () => {
   const { showModal } = context;
 
   return (
-    <Tab.Navigator 
+    <Tab.Navigator
+      initialRouteName='Home'
       screenOptions = {({route}) => ({ 
         headerShown: false,
         tabBarActiveTintColor: 'tomato',

@@ -1,21 +1,14 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { storeTokens } from '@/api/Auth';
+import React, { useState, useContext } from 'react';
+import { storeTokens, storeUserInfos } from '@/api/Auth';
 import customAxiosInstance from '@/api/Interceptors';
 import { Context } from '@/utils/Context';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackNavigationProp, LoginScreenRouteProp } from '@/utils/Types';
 import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
-import { getTokens } from '@/api/Auth';
-import { Buffer } from 'buffer';
-import { refreshAccessToken } from '@/api/Interceptors';
 
 type Props = {
   route: LoginScreenRouteProp
-}
-
-type Token = {
-  accessToken: string | null
 }
 
 export default function LoginScreen ({route}: Props) {
@@ -33,7 +26,7 @@ export default function LoginScreen ({route}: Props) {
 
     if (!context) throw new Error ('Context returned null');
       
-    const { setUserId, setUsername, email, setEmail, setProfilePhoto }  = context;
+    const { email, setEmail }  = context;
 
     const jsonAxiosInstance = customAxiosInstance('application/json');
 
@@ -54,12 +47,9 @@ export default function LoginScreen ({route}: Props) {
           if (response.status === 200) {
             const accessToken = response.data.accessToken;
             const refreshToken = response.data.refreshToken;
-
+            const res = response.data
             await storeTokens(accessToken, refreshToken);
-            setUserId(response.data.userId);
-            setUsername(response.data.username);
-            setEmail(response.data.email);
-            setProfilePhoto(response.data.profilePhoto);
+            await storeUserInfos(res.userId, res.username, res.email, res.profilePhoto);
 
             navigation.replace('Tabs', { screen: 'Home'});
           }
@@ -84,46 +74,6 @@ export default function LoginScreen ({route}: Props) {
     const handleForgotPassword = () => {
       navigation.navigate('ForgotPassword');
     }
-
-    useEffect(() => {
-      const onAppLaunch = async () => {
-        const tokens = await getTokens();
-
-        if (!tokens) {
-          throw new Error("Impossible de récupérer les tokens");
-        }
-
-        const { accessToken }: Token =  tokens;
-
-        const parts = accessToken?.split('.').map((part) => Buffer.from(part.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString());
-
-        if (parts) {
-          const payload = JSON.parse(parts[1]);
-          const timestampInSeconds = Math.floor(Date.now() / 1000);
-
-          if (timestampInSeconds > payload.exp ) {
-
-            try {
-              const response = await refreshAccessToken();
-              navigation.navigate('Tabs', { screen: 'Home'});
-              setUserId(response.userId);
-              setUsername(response.username);
-              setEmail(response.email);
-              setProfilePhoto(response.profilePhoto);
-            }
-            catch (error) {
-              console.log(error);
-            }
-          }
-          else {
-            console.log('Token is still valid.');
-            navigation.navigate('Tabs', { screen: 'Home'});
-          }
-        }
-      }
-
-      onAppLaunch();
-    }, [])
 
     return (
       <View style={styles.container}>

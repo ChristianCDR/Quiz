@@ -4,7 +4,7 @@
     "slug": "front",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/app_icon_mini.png",
+    "icon": "./assets/images/app_icon_main.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -14,8 +14,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/app_icon_mini.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/app_icon_foreground.png",
+        "backgroundColor": "#E2E2E1"
       },
       "permissions": [
         "NOTIFICATIONS"
@@ -25,17 +25,16 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/app_icon_mini.png"
+      "favicon": "./assets/images/app_favicon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/app_icon_mini.png",
-          "imageWidth": 200,
+          "image": "./assets/images/app_icon_foreground.png",
           "resizeMode": "contain",
-          "backgroundColor": "#fff"
+          "backgroundColor": "#E2E2E1"
         }
       ],
       [

@@ -6,15 +6,23 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "@/utils/Types";
 import { StyleSheet, View, SafeAreaView, Text, StatusBar, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import settingsNavigation from '@/utils/HandleSettingsNavigation';
+import { getTokens, getUserInfos } from '@/api/Auth';
+import { Buffer } from 'buffer';
+import { refreshAccessToken } from '@/api/Interceptors';
 
 type Props = {
     route: HomeScreenRouteProp
+}
+
+type Token = {
+    accessToken: string | null
 }
 
 export default function HomeScreen({route}: Props) {
     const [data, setCategory] = useState<Category[]>([]);
     const [error, setError] = useState<ErrorType>();
     const [loading, setLoading] = useState<boolean>(true);
+    const [jwt, setJwt] = useState<string>('');
 
     let images: { [key: string]: any } = {
         'Incendie': require('@/assets/images/fire_v2.png'),
@@ -30,8 +38,10 @@ export default function HomeScreen({route}: Props) {
     if(!context) throw new Error ('Context returned null');
 
     const { 
-        username, 
-        userId, 
+        username,
+        setUsername,
+        userId,
+        setUserId,
         setCategoryName, 
         setCategoryId,  
         scores, 
@@ -40,7 +50,9 @@ export default function HomeScreen({route}: Props) {
         setUpdateScores,
         screenToReach,
         setScreenToReach,
-        profilePhoto 
+        setEmail,
+        profilePhoto,
+        setProfilePhoto
     } = context;
 
     const scoresChunckedArray = scores.slice(0,3);
@@ -50,6 +62,60 @@ export default function HomeScreen({route}: Props) {
     const baseUrl = 'https://resq18.fr:8000/uploads/images/';
 
     const [imageUri, setImageUri] = useState<string>(baseUrl + 'default.png');
+
+    useEffect(() => {
+        const onAppLaunch = async () => {
+            const tokens = await getTokens();
+
+            if (!tokens) {
+                throw new Error("Impossible de récupérer les tokens");
+            }
+
+            const { accessToken }: Token =  tokens;
+
+            const {userId, username, email, profilePhoto } = await getUserInfos() || {userId: null , username: null, email: null, profilePhoto: null };
+
+            const parts = accessToken?.split('.').map((part) => Buffer.from(part.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString());
+
+            if (parts) {
+                const payload = JSON.parse(parts[1]);
+                const timestampInSeconds = Math.floor(Date.now() / 1000);
+
+                if (timestampInSeconds > payload.exp ) {
+
+                    try {
+                        const response = await refreshAccessToken();
+
+                        setJwt(response.accessToken);
+                        setUserId(response.userId);
+                        setUsername(response.username);
+                        setEmail(response.email);
+                        setProfilePhoto(response.profilePhoto);
+
+                        if (!response.accessToken) {
+                            navigation.navigate('Login', { message: null});
+                            navigation.reset({
+                                index: 0,
+                                routes: [{name: 'Login'}]
+                            })
+                        }
+                    }
+                    catch (error) {
+                        console.log(error);
+                    }
+                }
+                else {
+                    setProfilePhoto(profilePhoto);
+                    if (userId) setUserId(Number(userId));
+                    if (username) setUsername(username);
+                    if (email) setEmail(email);
+                    console.log('Token is still valid.');
+                }
+            }
+        }
+
+        onAppLaunch();
+    }, [jwt]);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -67,7 +133,7 @@ export default function HomeScreen({route}: Props) {
         }
 
         fetchCategories();     
-    },[]);
+    },[jwt]);
 
     useEffect(() => {
         const fetchScores = async () => {
