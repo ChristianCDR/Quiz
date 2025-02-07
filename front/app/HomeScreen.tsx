@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackNavigationProp, HomeScreenRouteProp, ErrorType, Category } from "@/utils/Types";
 import { StyleSheet, View, SafeAreaView, Text, StatusBar, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import settingsNavigation from '@/utils/HandleSettingsNavigation';
-import { getTokens, getUserInfos } from '@/api/Auth';
+import { getTokens } from '@/api/Auth';
 import { Buffer } from 'buffer';
 import { refreshAccessToken } from '@/api/Interceptors';
 
@@ -67,13 +67,16 @@ export default function HomeScreen({route}: Props) {
         const onAppLaunch = async () => {
             const tokens = await getTokens();
 
-            if (!tokens) {
+            if (!tokens || !tokens.accessToken) {
+                navigation.navigate('Login', { message: null });
+                navigation.reset({
+                    index: 0,
+                    routes: [{name: 'Login'}]
+                })
                 throw new Error("Impossible de récupérer les tokens");
             }
 
             const { accessToken }: Token =  tokens;
-
-            const {userId, username, email, profilePhoto } = await getUserInfos() || {userId: null , username: null, email: null, profilePhoto: null };
 
             const parts = accessToken?.split('.').map((part) => Buffer.from(part.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString());
 
@@ -86,12 +89,6 @@ export default function HomeScreen({route}: Props) {
                     try {
                         const response = await refreshAccessToken();
 
-                        setJwt(response.accessToken);
-                        setUserId(response.userId);
-                        setUsername(response.username);
-                        setEmail(response.email);
-                        setProfilePhoto(response.profilePhoto);
-
                         if (!response.accessToken) {
                             navigation.navigate('Login', { message: null});
                             navigation.reset({
@@ -99,16 +96,22 @@ export default function HomeScreen({route}: Props) {
                                 routes: [{name: 'Login'}]
                             })
                         }
+                        setJwt(response.accessToken);
                     }
                     catch (error) {
                         console.log(error);
                     }
                 }
                 else {
-                    setProfilePhoto(profilePhoto);
-                    if (userId) setUserId(Number(userId));
-                    if (username) setUsername(username);
-                    if (email) setEmail(email);
+                    const response = await jsonAxiosInstance.get('/api/v1/user/infos');
+                    if (response.data[0]) {
+                        const res = response.data[0];
+                        setProfilePhoto(res.profilePhoto);
+                        setUserId(Number(res.userId));
+                        setUsername(res.username);
+                        setEmail(res.email);
+                    }
+
                     console.log('Token is still valid.');
                 }
             }
@@ -152,7 +155,7 @@ export default function HomeScreen({route}: Props) {
 
         fetchScores();
         setUpdateScores(false);
-    },[updateScores]);
+    },[updateScores, jwt]);
 
     useEffect(() => {
         if (screenToReach) {

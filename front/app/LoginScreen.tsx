@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { storeTokens, storeUserInfos } from '@/api/Auth';
+import { storeTokens } from '@/api/Auth';
 import customAxiosInstance from '@/api/Interceptors';
 import { Context } from '@/utils/Context';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -45,12 +45,10 @@ export default function LoginScreen ({route}: Props) {
       try {
           const response = await jsonAxiosInstance.post('/api/v1/login', body);
           if (response.status === 200) {
-            const accessToken = response.data.accessToken;
-            const refreshToken = response.data.refreshToken;
-            const res = response.data
-            await storeTokens(accessToken, refreshToken);
-            await storeUserInfos(res.userId, res.username, res.email, res.profilePhoto);
+            const accessToken: string = response.data.accessToken;
+            const refreshToken: string = response.data.refreshToken;
 
+            await storeTokens(accessToken, refreshToken);
             navigation.replace('Tabs', { screen: 'Home'});
           }
       }

@@ -105,20 +105,10 @@ class UserController extends AbstractController
         return new JsonResponse ($data, JsonResponse::HTTP_OK);
     }
 
-    #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
+    #[Route('/infos', name: 'app_user_infos', methods: ['GET'])]
     #[OA\Get(
-        summary: 'Get user by ID',
+        summary: 'Get user infos',
         tags: ['User'],
-        parameters: [
-            new OA\Parameter(
-                name: 'id',
-                in: 'path',
-                required: true,
-                schema: new OA\Schema(type: 'integer'),
-                description: 'The ID of the user to retrieve',
-                example: 3
-            )
-        ],
         responses: [
             new OA\Response(
                 response: 200,
@@ -129,7 +119,7 @@ class UserController extends AbstractController
                         new OA\Property(property: 'id', type: 'integer', example: 1),
                         new OA\Property(property: 'email', type: 'string', example: 'mail@mail.com'),
                         new OA\Property(property: 'username', type: 'string', example: 'christian CDR'),
-                        new OA\Property(property: 'password', type: 'string', example: 'hashedPassword')
+                        new OA\Property(property: 'profilePhoto', type: 'string', example: 'profilePhoto.jpg')
                     ]
                 )
             ),
@@ -145,12 +135,14 @@ class UserController extends AbstractController
             )
         ]
     )]
-    public function show(User $user): JsonResponse
+    public function show(): JsonResponse
     {
+        $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
+
+        $user = $this->userRepository->findOneBy(['email' => $decodedJwtToken['email']]) ;
+
         if(!$user) {
-            return new JsonResponse([
-                'error' => 'User not found'
-            ], JsonResponse::HTTP_NOT_FOUND);
+            throw $this->createNotFoundException('Utilisateur non trouvé');
         }
 
         $data = [];
@@ -158,8 +150,8 @@ class UserController extends AbstractController
         $data[] = [
             'userId' => $user->getId(),
             'email' => $user->getEmail(), 
-            'username' => $user->getUsername(), 
-            'password' => $user->getPassword()
+            'username' => $user->getUsername(),
+            'profilePhoto' => $user->getProfilePhoto()
         ];
 
         return new JsonResponse ($data, JsonResponse::HTTP_OK);

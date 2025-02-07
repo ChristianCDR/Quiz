@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { storeTokens, getTokens } from './Auth';
 
-// http://192.168.1.161:8000 //https://resq18.fr:8000
+// http://192.168.1.161:8000 // https://resq18.fr:8000
 const baseURL = 'https://resq18.fr:8000'
 
 const customAxiosInstance = (value: string) => {
