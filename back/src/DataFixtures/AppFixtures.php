@@ -34,6 +34,7 @@ class AppFixtures extends Fixture
             $password = $this->hasher->hashPassword($user, 'Azerty1@');
             $user->setPassword($password);
             $user->setIsVerified(true);
+            $user->setProfilePhoto('default.png');
 
             $manager->persist($user);
         }

@@ -155,7 +155,7 @@ export default function HomeScreen({route}: Props) {
 
         fetchScores();
         setUpdateScores(false);
-    },[updateScores, jwt]);
+    },[updateScores, userId]);
 
     useEffect(() => {
         if (screenToReach) {
