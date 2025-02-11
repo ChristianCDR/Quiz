@@ -20,9 +20,13 @@ export default function ResultScreen ({route}: Props) {
     const { score, quizLength } = route.params
     const formattedScore = (score) < 10 ? `0${score}` : score.toString()
     const viewRef = useRef(null)
-    const scaleValue = useRef(new Animated.Value(0.1)).current 
+    const scaleValue = useRef(new Animated.Value(0.1)).current
+    const [imageUri, setImageUri] = useState<string>()
     const context = useContext(Context);
-    const [imageUri, setImageUri] = useState<string>();
+
+    if (!context) throw new Error ('Context returned null');
+
+    const { quizNumber, categoryId, setUpdateScores, profilePhoto, username } = context;
 
     const fruitImages = {
         strawberry : require('@/assets/images/strawberry.png'),
@@ -40,10 +44,6 @@ export default function ResultScreen ({route}: Props) {
     }
 
     useEffect(() => {
-
-        if (!context) throw new Error ('Context returned null')
-
-        const { quizNumber, categoryId, setUpdateScores, profilePhoto }  = context;
 
         const scoreRate = (score*100) / quizLength;   
         
@@ -132,7 +132,7 @@ export default function ResultScreen ({route}: Props) {
                     source={{uri: imageUri}}
                     style={styles.circularImgView}
                 />
-                <Text style={styles.username}> Christian CDR </Text>
+                <Text style={styles.username}> {username} </Text>
                 <Text style={styles.yourScore}>Votre score</Text>
                 <Text style={styles.score}> <Text style={{color: scoreColor}}>{formattedScore}</Text> / {quizLength}</Text> 
                 <View style={styles.detailsButtons}>

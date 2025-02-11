@@ -76,6 +76,8 @@ const styles = StyleSheet.create({
     noScoreText: {
         color: 'black',
         fontSize: 18,
-        paddingLeft: 10
+        width: '90%',
+        marginHorizontal: 'auto',
+        textAlign: 'left'
     }
 });

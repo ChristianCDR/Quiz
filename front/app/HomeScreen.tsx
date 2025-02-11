@@ -192,14 +192,11 @@ export default function HomeScreen({route}: Props) {
                 </View>
 
                 <View style={styles.card}>
-                    <View style={styles.cardImageView}>
-                        <Image  style={styles.cardImage} source ={require('@/assets/images/brain_v3.png')}/>
-                    </View>
-                    
+                    <Image  style={styles.cardImage} source ={require('@/assets/images/brain_v3.png')}/>
                     <View style={styles.cardText}>
                         <Text style={styles.cardText1}> Joue & {"\n"} Révise !</Text>
                         <Text style={styles.cardText2}>
-                        Chaque question est une nouvelle occasion de briller. N'attends plus, challenge-toi et montre tes compétences !
+                            Chaque question est une nouvelle occasion de briller. N'attends plus, challenge-toi et montre tes compétences !
                         </Text>
                     </View>
                 </View>
@@ -246,7 +243,8 @@ const styles = StyleSheet.create({
     errorText: {
         fontSize: 18,
         color: 'red',
-        paddingLeft: 10
+        width: '90%',
+        marginHorizontal: 'auto'
     },
     user: {
         flexDirection: 'row',
@@ -282,13 +280,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         alignItems: 'center'
     },
-    cardImageView: {
-        width: '40%',
-        aspectRatio: 1, // Maintient le ratio pour garder la View carrée
-        overflow: 'hidden',   
-    },
     cardImage: {
-        width: '100%',
+        width: '40%',
         height: '100%',
         resizeMode: 'contain'
     },
@@ -315,6 +308,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         height: 120,
         marginTop: 10,
+        minWidth: '100%'
     },
     category: {
         backgroundColor: '#1E3C58',
